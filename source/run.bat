@@ -1,0 +1,1 @@
+START "" pythonw c:/Users/P/source/repos/pct-scalewiz/source/main.py
