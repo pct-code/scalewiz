@@ -1,0 +1,27 @@
+### installing python / the venv
+-------------------------------------------------------------------------------
+> choco install python
+
+find a folder somewhere to store venvs
+# this can be in the repo, just be sure to add the folder name to .gitignore
+run from in the desired parent dir
+
+# puts a new venv in a dir called 'scaledev' or anything else 
+> python -m venv scaledev
+
+in the vscode command palette find 'select python interpreter'
+select the python.exe in scaledev/scripts
+open a new vscode terminal in the /pct-scalewiz dir
+if the venv is getting activated like it should the terminal line should begin with (scaledev)
+nowinstall python module dependencies to the venv that we just created (and activated)
+
+> python -m pip install -r requirements.txt
+
+now one should be able to run the program from main.py
+
+
+### configuring git
+-------------------------------------------------------------------------------
+> choco install git
+> git config --global user.name "John Doe"
+> git config --global user.email johndoe@example.com
