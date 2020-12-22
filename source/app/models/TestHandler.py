@@ -143,7 +143,9 @@ class TestHandler():
 
             psi1 = self.pump1.pressure()
             psi2 = self.pump2.pressure()
+            print(f"Collected both PSIs in {time.time() - readingStart} s")
             average = round(((psi1 + psi2)/2))
+
             # todo
             # if psi1 > limitPSI: psi1 = limitPSI
             # if psi2 > limitPSI: psi2 = limitPSI
@@ -167,6 +169,7 @@ class TestHandler():
 
             if psi1 > self.maxPSI1: self.maxPSI1 = psi1
             if psi2 > self.maxPSI2: self.maxPSI2 = psi2
+            print(f"Finished doing everything else in {time.time() - readingStart} s")
             time.sleep(interval - (time.time() - readingStart))
         # end of readings loop ------------------------------------------------
         
