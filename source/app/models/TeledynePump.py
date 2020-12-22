@@ -14,9 +14,9 @@ class TeledynePump:
         try:
             self.port.write("pr".encode())
             response = self.port.readline().decode()
-            print(response)
+            # print(response)
             psi = response.split(',')[1][:-1]
-            print(psi)
+            # print(psi)
             return int(psi)
         except Exception:
             print("Reading failed")
