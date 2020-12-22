@@ -40,8 +40,8 @@ class TestHandler():
         return (
             # we can reasonably expect this to not happen, and if it does we have bigger issues anyway
             # (self.pump1.port.isOpen() and self.pump2.port.isOpen())
-            (self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get())
-            and (len(self.queue) < self.maxReadings())
+            self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get()
+            and len(self.queue) < self.maxReadings()
             and not self.stopRequested
         )
 
@@ -169,13 +169,14 @@ class TestHandler():
             if psi2 > self.maxPSI2: self.maxPSI2 = psi2
             time.sleep(interval - (time.time() - readingStart))
         # end of readings loop ------------------------------------------------
+        
         # find the actual elapsed time
         trueElapsed = round((time.time() - startTime) / 60, 2)
         # compare to the most recent elapsedMin value
         if trueElapsed != elapsedMin:
             # maybe make a dialog pop up instead?
-            self.toLog(f"The test says like it took {elapsedMin} min.")
-            self.toLog(f"but really it took {trueElapsed} min (I counted)")
+            self.toLog(f"The test says it took {elapsedMin} min.")
+            self.toLog(f"but really it took {trueElapsed} min. (I counted)")
 
         self.stopTest()
         self.saveTestToProject()
