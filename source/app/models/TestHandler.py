@@ -162,7 +162,7 @@ class TestHandler():
             # why do this vs adding to test directly?
             self.queue.append(reading)
 
-            self.elapsed.set(f"{elapsedMin} min.")
+            self.elapsed.set(f"{elapsedMin:.2f} min.")
             self.progress.set(round(len(self.queue) / self.maxReadings() * 100))
 
             if psi1 > self.maxPSI1: self.maxPSI1 = psi1

@@ -20,7 +20,7 @@ class TestResultRow(ttk.Frame):
         # col 1 - report as
         cols.append(ttk.Entry(self.parent, textvariable=self.test.reportAs, width=25))
         # col 2 - duration
-        duration = len(self.test.readings) * self.project.interval.get() / 60
+        duration = round(len(self.test.readings) * self.project.interval.get() / 60, 2)
         cols.append(ttk.Label(self.parent, text=f"{duration:.2f}", anchor='center'))
         # col 3 - to consider
         cols.append(ttk.Combobox(self.parent, textvariable=self.test.toConsider, values=["pump 1", "pump 2", "average"], state='readonly', width=7))
