@@ -40,8 +40,8 @@ class TestHandler():
         return (
             # we can reasonably expect this to not happen, and if it does we have bigger issues anyway
             # (self.pump1.port.isOpen() and self.pump2.port.isOpen())
-            (self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get())
-            and (len(self.queue) < self.maxReadings())
+            self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get()
+            and len(self.queue) < self.maxReadings()
             and not self.stopRequested
         )
 
@@ -143,7 +143,9 @@ class TestHandler():
 
             psi1 = self.pump1.pressure()
             psi2 = self.pump2.pressure()
+            print(f"Collected both PSIs in {time.time() - readingStart} s")
             average = round(((psi1 + psi2)/2))
+
             # todo
             # if psi1 > limitPSI: psi1 = limitPSI
             # if psi2 > limitPSI: psi2 = limitPSI
@@ -167,15 +169,17 @@ class TestHandler():
 
             if psi1 > self.maxPSI1: self.maxPSI1 = psi1
             if psi2 > self.maxPSI2: self.maxPSI2 = psi2
+            print(f"Finished doing everything else in {time.time() - readingStart} s")
             time.sleep(interval - (time.time() - readingStart))
         # end of readings loop ------------------------------------------------
+        
         # find the actual elapsed time
         trueElapsed = round((time.time() - startTime) / 60, 2)
         # compare to the most recent elapsedMin value
         if trueElapsed != elapsedMin:
             # maybe make a dialog pop up instead?
-            self.toLog(f"The test says like it took {elapsedMin} min.")
-            self.toLog(f"but really it took {trueElapsed} min (I counted)")
+            self.toLog(f"The test says it took {elapsedMin} min.")
+            self.toLog(f"but really it took {trueElapsed} min. (I counted)")
 
         self.stopTest()
         self.saveTestToProject()
