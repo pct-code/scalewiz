@@ -235,9 +235,10 @@ class TestHandler():
         self.isRunning.set(False)
         self.isDone.set(False)
         self.elapsed.set("")
-        self.parent.pltFrm.destroy()
-        self.parent.logFrm.destroy()
-        self.parent.build()
+        # todo why is this here?
+        # self.parent.pltFrm.destroy()
+        # self.parent.logFrm.destroy()
+        # self.parent.build()
   
     def modProj(self):
         if len(self.editors) > 0: 

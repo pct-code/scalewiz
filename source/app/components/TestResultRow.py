@@ -31,7 +31,6 @@ class TestResultRow(ttk.Frame):
         # col 6 - clarity
         cols.append(ttk.Label(self.parent, textvariable=self.test.clarity, anchor='center'))
         # col 7 - notes
-        self.grid_columnconfigure(6, weight=1)
         cols.append(ttk.Entry(self.parent, textvariable=self.test.notes))
         # col 8 - result
         cols.append(ttk.Label(self.parent, textvariable=self.test.result, anchor='center'))
@@ -40,9 +39,12 @@ class TestResultRow(ttk.Frame):
         # col 10 - delete
         cols.append(ttk.Button(self.parent, command=lambda: self.removeFromProject(), text="Delete", width=7))
 
+        self.parent.grid_columnconfigure(7, weight=1)
         for i in range(len(cols)):
             if i == 0:
                 cols[i].grid(row=self.row, column=i, padx=1, pady=1, sticky='w')
+            if i == 7:
+                cols[i].grid(row=self.row, column=i, padx=1, pady=1, sticky='ew')
             else:
                 cols[i].grid(row=self.row, column=i, padx=1, pady=1, )
     
