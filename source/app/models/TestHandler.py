@@ -37,13 +37,15 @@ class TestHandler():
         self.update_BtnText()
 
     def canRun(self) -> bool:
-        return (
+        value = (
             # we can reasonably expect this to not happen, and if it does we have bigger issues anyway
             # (self.pump1.port.isOpen() and self.pump2.port.isOpen())
-            self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get()
-            and len(self.queue) < self.maxReadings()
-            and not self.stopRequested
+            (self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get())
+            and (len(self.queue) < self.maxReadings())
+            and (not self.stopRequested)
         )
+        print(value)
+        return value
 
     def maxReadings(self) -> int:
         return round(self.project.limitMin.get() * 60 / self.project.interval.get())
