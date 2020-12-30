@@ -44,7 +44,6 @@ class TestHandler():
             and (len(self.queue) < self.maxReadings())
             and (not self.stopRequested)
         )
-        print(value)
         return value
 
     def maxReadings(self) -> int:
