@@ -127,9 +127,10 @@ class TestHandler():
         self.pump1.run()
         self.pump2.run()
         uptake = self.project.uptake.get()
-        self.toLog(f"Awaiting uptake time {uptake} s ...")
+        for i in range(uptake):
+            self.toLog(f"Awaiting uptake time {uptake - i} s ...")
+            time.sleep(1)
         self.toLog("")
-        time.sleep(uptake)
         limitPSI = self.project.limitPSI.get()
         interval = self.project.interval.get()
         # assigning these vars isnt just to make them shorter
