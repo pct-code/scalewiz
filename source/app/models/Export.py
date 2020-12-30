@@ -79,16 +79,24 @@ def export_report(self, project):
         ws['C5'] = project.submittedBy.get()
         ws['C6'] = project.productionCo.get()
         ws['C7'] = project.sample.get()
-        if not '-' in project.numbers.get():
+        if not '-' in project.numbers.get() and project.numbers.get != '':
             # if the analysis no is just one #, excel will show an error
             # for having a number formatted as text
-            ws['I4'] = int(project.numbers.get())
+            try:
+                ws['I4'] = int(project.numbers.get())
+            except Exception:
+                pass
         else:
             # otherwise "# - #" is a fine text value for the cell
             ws['I4'] = project.numbers.get()
-        ws['I5'] = datetime.strptime(project.sampleDate.get(), '%m/%d/%Y')
-        ws['I6'] = datetime.strptime(project.recDate.get(), '%m/%d/%Y')
-        ws['I7'] = datetime.strptime(project.compDate.get(), '%m/%d/%Y')
+
+        try:
+            ws['I5'] = datetime.strptime(project.sampleDate.get(), '%m/%d/%Y')
+            ws['I6'] = datetime.strptime(project.recDate.get(), '%m/%d/%Y')
+            ws['I7'] = datetime.strptime(project.compDate.get(), '%m/%d/%Y')
+        except Exception:
+            pass
+        
         ws['D11'] = project.baseline.get()
         ws['G16'] = project.limitPSI.get()
         ws['A29'] = project.analyst.get()
