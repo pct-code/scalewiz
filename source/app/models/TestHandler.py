@@ -164,6 +164,7 @@ class TestHandler():
             self.toLog(msg)
 
             # why do this vs adding to test directly?
+            # -> trying to not access same obj across threads
             self.queue.append(reading)
 
             self.elapsed.set(f"{elapsedMin:.2f} min.")
@@ -210,7 +211,9 @@ class TestHandler():
         self.elapsed.set("")
 
     def saveTestToProject(self):
-        self.test.readings = self.queue
+        for reading in self.queue:
+            self.test.readings.append(reading)
+        self.queue.clear()
         self.project.tests.append(self.test)
         Project.dumpJson(self.project, self.project.path.get())
         self.loadProj(path=self.project.path)
