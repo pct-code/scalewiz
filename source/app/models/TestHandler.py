@@ -133,48 +133,52 @@ class TestHandler():
         self.toLog("")
         limitPSI = self.project.limitPSI.get()
         interval = self.project.interval.get()
+        snooze = round(interval * 0.9, 2)
         # assigning these vars isnt just to make them shorter
         # since we don't expect the values to change referencing them this way
         # is slightly less expensive than requesting the value from its tkVar on each iteration
         startTime = time.time()
+        # set this here so we can take a reading on the firt iteration
+        readingStart = startTime - interval
         # readings loop -------------------------------------------------------
         while(self.canRun()):
-            readingStart = time.time()
-            # elapsedMin = round((time.time() - startTime)/60, 2)
-            # changed elapsed min to 
-            elapsedMin = round(len(self.queue) * interval / 60, 2)
+            if time.time() - readingStart >= interval:
+                readingStart = time.time()
+                # elapsedMin = round((time.time() - startTime)/60w, 2)
+                # changed elapsed min to 
+                elapsedMin = round(len(self.queue) * interval / 60, 2)
 
-            psi1 = self.pump1.pressure()
-            psi2 = self.pump2.pressure()
-            print(f"Collected both PSIs in {time.time() - readingStart} s")
-            average = round(((psi1 + psi2)/2))
+                psi1 = self.pump1.pressure()
+                psi2 = self.pump2.pressure()
+                print(f"Collected both PSIs in {time.time() - readingStart} s")
+                average = round(((psi1 + psi2)/2))
 
-            # todo
-            # if psi1 > limitPSI: psi1 = limitPSI
-            # if psi2 > limitPSI: psi2 = limitPSI
-            reading = {
-                "elapsedMin": elapsedMin,
-                "pump 1": psi1,
-                "pump 2": psi2,
-                "average": average
-            }
+                # todo
+                # if psi1 > limitPSI: psi1 = limitPSI
+                # if psi2 > limitPSI: psi2 = limitPSI
+                reading = {
+                    "elapsedMin": elapsedMin,
+                    "pump 1": psi1,
+                    "pump 2": psi2,
+                    "average": average
+                }
 
-            # make a message for the log in the test handler view
-            msg = f"@ {elapsedMin:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
-            print(msg)
-            self.toLog(msg)
+                # make a message for the log in the test handler view
+                msg = f"@ {elapsedMin:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
+                print(msg)
+                self.toLog(msg)
 
-            # why do this vs adding to test directly?
-            # -> trying to not access same obj across threads
-            self.queue.append(reading)
+                # why do this vs adding to test directly?
+                # -> trying to not access same obj across threads
+                self.queue.append(reading)
 
-            self.elapsed.set(f"{elapsedMin:.2f} min.")
-            self.progress.set(round(len(self.queue) / self.maxReadings() * 100))
+                self.elapsed.set(f"{elapsedMin:.2f} min.")
+                self.progress.set(round(len(self.queue) / self.maxReadings() * 100))
 
-            if psi1 > self.maxPSI1: self.maxPSI1 = psi1
-            if psi2 > self.maxPSI2: self.maxPSI2 = psi2
-            print(f"Finished doing everything else in {time.time() - readingStart} s")
-            time.sleep(interval - (time.time() - readingStart))
+                if psi1 > self.maxPSI1: self.maxPSI1 = psi1
+                if psi2 > self.maxPSI2: self.maxPSI2 = psi2
+                print(f"Finished doing everything else in {time.time() - readingStart} s")
+                time.sleep(snooze)
         # end of readings loop ------------------------------------------------
         
         # find the actual elapsed time
