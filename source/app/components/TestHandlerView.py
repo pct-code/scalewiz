@@ -12,6 +12,7 @@ class TestHandlerView(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
         self.handler = handler
+        self.handler.parent = self
         self.devList = []
         self.build()
     
