@@ -17,12 +17,16 @@ class App(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+        self.root = parent
 
         # set UI
+        # font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Arial")
         parent.option_add("*Font", "TkDefaultFont")
         bold_font = font.Font(family="Helvetica", weight='bold')
+        
+        # widget backgrounds / themes
         parent.tk_setPalette(background='#FAFAFA')
         ttk.Style().configure('TLabel', background='#FAFAFA')
         ttk.Style().configure('TFrame', background='#FAFAFA')
@@ -33,13 +37,14 @@ class App(tk.Frame):
         ttk.Style().configure('TNotebook', background='#FAFAFA')
         ttk.Style().configure('TNotebook.Tab', font=bold_font)
 
+        # apparently this is a bad practice...
         parent.resizable(0, 0)
+
+        # icon / version
         parent.title(f"ScaleWiz {App.VERSION}")
-        icon_path = os.path.abspath(r"C:\Users\P\source\repos\scalewiz\assets\chem.ico")
+        icon_path = os.path.abspath(r"assets/chem.ico")
         parent.wm_iconbitmap(icon_path)
 
-        self.root = parent
-        
         MainWindow(self).grid()
         # other logic here
 
