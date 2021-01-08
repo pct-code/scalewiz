@@ -58,13 +58,23 @@ class Project:
         self.template.set(t)
 
     def makeName(self, *args):
+
+        # if self.productionCo.get() != "":
+        #     initial = f"{self.editorProject.productionCo.get()} - {self.editorProject.field.get()} ({self.editorProject.sample.get()})"
+        # else:
+        #     initial = f"{self.editorProject.customer.get()} - {self.editorProject.field.get()} ({self.editorProject.sample.get()})"
+        
         s = ""
-        if (self.customer.get() != ""):
-            s = self.customer.get()
-        if (self.field.get() != ""):
-            s = f"{s} - {self.field.get()}"
-        if (self.sample.get() != ""):
-            s = f"{s} ({self.sample.get()})"
+        if self.productionCo.get() != "":
+            s = self.productionCo.get().strip()
+        else:
+            s = self.customer.get().strip()
+        if self.field.get() != "":
+            s = f"{s} - {self.field.get()}".strip()
+        if self.sample.get() != "":
+            s = f"{s} ({self.sample.get()})".strip()
+        # todo
+        # we hold on to this -- no use for it yet !
         self.defaultName.set(s)
         self.name.set(self.defaultName.get())
 
@@ -171,57 +181,7 @@ class Project:
         for i in range(len(obj.get('tests'))):
             test = Test()
             test.loadJson(obj.get('tests')[i])
-            # remove me later -- ------------------------------------
-            # if test.name.get() == "Blank 2":
-            #     print(f"blank 2 has {len(test.readings)} readings")
-            #     actual = test.readings[-1]["elapsedMin"]
-            #     print(f"it lasted {actual} min.")
-            #     just change one thing at a 
-            #     time shift
-            #     for i in test.readings:
-            #         i["elapsedMin"] = i["elapsedMin"] - 3.5 
-
-            #     baseline correction
-            #     for i in test.readings:
-            #         if i["pump 1"] < 95:
-            #             i["pump 1"] = 95
-            #         if i["pump 2"] < 95:
-            #             i["pump 2"] = 95
-
-            #     get rid of readings shifted < 0
-            #     x = []
-            #     for i in test.readings:
-            #         if i["elapsedMin"] >= 0:
-            #             x.append(i)
-            #     test.readings = x
-
-            # if test.name.get() == "S-218 50 ppm":
-            #     print(f"thingy has {len(test.readings)} readings")
-            #     actual = test.readings[-1]["elapsedMin"]
-            #     print(f"it lasted {actual} min.")
-            #     for i in test.readings:
-            #         i["elapsedMin"] = i["elapsedMin"] - 1.8
-            #     times = []
-            #     snip = []
-            #     for i in test.readings:
-            #         if i["elapsedMin"] >= 80 and i["elapsedMin"] <= 90:
-            #             times.append(i["elapsedMin"])
-            #         if i["elapsedMin"] >= 60 and i["elapsedMin"] <= 70:
-            #             psis = (i["pump 1"], i["pump 2"])
-            #             snip.append(psis)
-            #     i = 0
-            #     there's a better way to do this, idx is unused 
-            #     just do for in
-            #     for idx, val in enumerate(test.readings):
-            #         if val["elapsedMin"] >= 80 and val["elapsedMin"] <= 90:
-            #             psis = snip[i]
-            #             val["pump 1"], val["pump 2"] = psis[0], psis[1]
-            #             val["average"] = round(psis[0] + psis[1] / 2)
-            #             i = i + 1
-            #     for i in range(21):
-            #         test.readings.append(test.readings[-1])
-
-            # --------------------------------------------------------
+         
             this.tests.append(test)
         return this
 

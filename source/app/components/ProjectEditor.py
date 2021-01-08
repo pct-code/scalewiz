@@ -59,12 +59,13 @@ class ProjectEditor(ttk.Frame):
 
     def saveAs(self):
         file = filedialog.asksaveasfilename(
-            initialdir="hey",
             title="Save Project As:",
-            filetypes=[("JSON files", "*.json")]
+            filetypes=[("JSON files", "*.json")],
+            initialfile=f"{self.editorProject.name.get()}.json"
         )
 
         if not (file == ""):
+            # make sure it is JSON extension
             ext = file[-5:]
             if not (ext == ".json" or ext == ".JSON"):
                 file = f"{file}.json"
