@@ -1,6 +1,7 @@
 """Main Window Tkinter widget for the application"""
 
 # util
+import logging
 import tkinter as tk
 from tkinter import ttk
 
@@ -27,17 +28,27 @@ class MainWindow(tk.Frame):
         self.addTestHandler()
     
     def addTestHandler(self):
-        handler = TestHandler() # make a new handler
-        foo = TestHandlerView(self.tabControl, handler) # plug it in
+        # make a new handler
+        handler = TestHandler() 
+        # plug it in
+        foo = TestHandlerView(self.tabControl, handler) 
+        # todo why this assignment?
         handler.parent = foo
-        self.tabControl.add(foo, sticky=tk.N+tk.W+tk.E+tk.S) # add it to the tab control then rename
-        self.tabControl.tab(foo, text=f"  System {self.tabControl.index(foo) + 1}  ") 
+        # add it to the tab control then rename
+        self.tabControl.add(foo, sticky='nsew') 
+        system_name = f"  System {self.tabControl.index(foo) + 1}  "
+        handler.name = system_name.strip()
+        self.tabControl.tab(foo, text=system_name)
+        # logger = logging.getLogger('base')
+        logging.info(f"Added {handler.name} to main window")
+
 
     def close(self):
         for tab in self.tabControl.tabs():
             widget = self.nametowidget(tab)
             if widget.handler.isRunning.get():
                 if not widget.handler.isDone.get():
+                    logging.warning(f"Attempted to close {widget.text} while a test was running")
                     return
         # todo messagebox saying cant close while running
         self.parent.root.destroy()

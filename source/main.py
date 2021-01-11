@@ -10,6 +10,7 @@ from tkinter import ttk
 
 # internal
 from app.components.MainWindow import MainWindow
+from app.components.LogWindow import LogWindow
 
 class App(tk.Frame):
     """Core object for the application."""
@@ -21,6 +22,7 @@ class App(tk.Frame):
         self.root = parent
 
         # set UI
+
         # font
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Arial")
@@ -47,8 +49,19 @@ class App(tk.Frame):
         if os.path.isfile(icon_path):
             parent.wm_iconbitmap(icon_path)
         
+        # make log window
+        self.logWindow = tk.Toplevel(self)
+        # replace the window closing behavior with withdrawing instead
+        self.logWindow.protocol("WM_DELETE_WINDOW", lambda: self.logWindow.withdraw())
+        LogWindow(self.logWindow).grid()
+        self.logWindow.withdraw()
+
+        # main window
         MainWindow(self).grid()
         # other logic here
+
+        logging.debug("root app init complete")
+        
 
 if __name__ == "__main__":
     root = tk.Tk()

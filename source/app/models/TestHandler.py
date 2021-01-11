@@ -1,6 +1,7 @@
 """Handles a test."""
 
 # util
+import logging
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import time
@@ -35,6 +36,8 @@ class TestHandler():
         self.isDone = tk.BooleanVar()
         self.projBtnText = tk.StringVar()
         self.update_BtnText()
+        # logging
+        # todo add another logging handler here and set it to a file next to the project.json 
 
     def canRun(self) -> bool:
         value = (
@@ -63,6 +66,7 @@ class TestHandler():
             self.project = Project.loadJson(path)
             self.project.path.set(path)
             self.update_BtnText()
+            logging.info(f"Loaded {self.project.name.get()} to {self.name}")
 
     def startTest(self):
         if self.isRunning.get(): return
@@ -117,6 +121,7 @@ class TestHandler():
         self.isDone.set(False)
         self.isRunning.set(True)
         self.progress.set(0)
+        logging.info(f"{self.name} is starting a test for {self.project.name.get()}")
         self.pool.submit(self.takeReadings)
     
     def takeReadings(self):
@@ -150,7 +155,8 @@ class TestHandler():
 
                 psi1 = self.pump1.pressure()
                 psi2 = self.pump2.pressure()
-                print(f"Collected both PSIs in {time.time() - readingStart} s")
+                collected = time.time() - readingStart
+                logging.debug(f"{self.name} collected both PSIs in {collected} s")
                 average = round(((psi1 + psi2)/2))
 
                 # todo
@@ -167,6 +173,7 @@ class TestHandler():
                 msg = f"@ {elapsedMin:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
                 print(msg)
                 self.toLog(msg)
+                logging.info(f"{self.name} - {msg}")
 
                 # why do this vs adding to test directly?
                 # -> trying to not access same obj across threads
@@ -177,7 +184,8 @@ class TestHandler():
 
                 if psi1 > self.maxPSI1: self.maxPSI1 = psi1
                 if psi2 > self.maxPSI2: self.maxPSI2 = psi2
-                print(f"Finished doing everything else in {time.time() - readingStart} s")
+                logging.debug(f"Finished doing everything else in {time.time() - readingStart - collected} s")
+                logging.info(f"{self.name} collected data in {time.time() - readingStart}")
                 time.sleep(snooze)
         # end of readings loop ------------------------------------------------
         
@@ -188,6 +196,7 @@ class TestHandler():
             # maybe make a dialog pop up instead?
             self.toLog(f"The test says it took {elapsedMin} min.")
             self.toLog(f"but really it took {trueElapsed} min. (I counted)")
+            logging.warning(f"{self.name} - {elapsedMin} was really {trueElapsed}")
 
         self.stopTest()
         self.saveTestToProject()
@@ -199,8 +208,9 @@ class TestHandler():
         if not self.isRunning.get(): return 
 
         if self.isRunning.get():
-            self.stopRequested = True
             # the readings loop thread checks this flag on each iteration
+            self.stopRequested = True
+            logging.info(f"{self.name} received a stop request")
 
     def stopTest(self):
         if self.pump1.port.isOpen():
@@ -214,6 +224,7 @@ class TestHandler():
         self.isDone.set(True)
         self.progress.set(0)
         self.elapsed.set("")
+        logging.info(f"{self.name}'s test has been stopped")
 
     def saveTestToProject(self):
         for reading in self.queue:
@@ -221,6 +232,7 @@ class TestHandler():
         self.queue.clear()
         self.project.tests.append(self.test)
         Project.dumpJson(self.project, self.project.path.get())
+        logging.info(f"{self.name} saved {self.project.name.get()} to {self.project.path.get()}")
         self.loadProj(path=self.project.path)
 
     def setupPumps(self):
@@ -229,16 +241,18 @@ class TestHandler():
         try:
             port1 = Serial(self.dev1.get(), timeout=0.05)
             self.pump1 = TeledynePump(port1)
+            logging.info(f"{self.name} established a connection to {port1.port}")
+            
             port2 = Serial(self.dev2.get(), timeout=0.05)
             self.pump2 = TeledynePump(port2)
-            # self.pump1.open()
-            # self.pump2.open()
+            logging.info(f"{self.name} established a connection to {port2.port}")
         except SerialException as e:
             messagebox.showwarning("Serial Exception", e)
 
     # methods that affect UI
 
     def newTest(self):
+        logging.info(f"{self.name} initialized a new test")
         self.test = Test()
         self.isRunning.set(False)
         self.isDone.set(False)
@@ -269,7 +283,9 @@ class TestHandler():
         self.editors.append(window)
         editor = EvaluationWindow(window, self)
         editor.grid()
+        logging.info(f"{self.name} opened an evaluation window for {self.project.name.get()}")
 
+    # todo is this necessary??
     def update_BtnText(self):
             if(self.project.name.get() == ""):
                 self.projBtnText.set("Select a project")

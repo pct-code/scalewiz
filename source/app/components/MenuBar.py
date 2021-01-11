@@ -15,8 +15,9 @@ class MenuBar(tk.Frame):
 
         menubar = tk.Menu()
         menubar.add_command(label="Add System", command=lambda: parent.addTestHandler())
-        menubar.add_command(label="Project Editor", command=lambda: self.requestProjectEdit())
-        menubar.add_command(label="Evaluation Window", command=lambda: self.requestEvalutaionWindow())
+        menubar.add_command(label="Project", command=lambda: self.requestProjectEdit())
+        menubar.add_command(label="Evaluation", command=lambda: self.requestEvalutaionWindow())
+        menubar.add_command(label="Log", command=lambda: self.showLogWindow())
         
         parent.winfo_toplevel().config(menu=menubar)
 
@@ -37,3 +38,6 @@ class MenuBar(tk.Frame):
             messagebox.showwarning("No Project File", "The requested Project file has not yet been saved, or is missing")
         else:
             widget.handler.evalProj()
+
+    def showLogWindow(self):
+        self.parent.parent.logWindow.deiconify()
