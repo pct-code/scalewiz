@@ -43,6 +43,7 @@ class LogWindow(ttk.Frame):
         
         # Create a logging handler using a queue
         logging.basicConfig(level=logging.DEBUG)
+        # todo need to make custom logger to stay rid of all those matplotlib debug logs
         logger = logging.getLogger()
         self.log_queue = queue.Queue()
         self.queue_handler = QueueHandler(self.log_queue)
