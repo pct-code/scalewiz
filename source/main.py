@@ -2,6 +2,7 @@
 
 """
 # utils
+import logging
 import os
 import tkinter as tk
 from tkinter import font
@@ -36,15 +37,16 @@ class App(tk.Frame):
         ttk.Style().configure('TCheckbutton', background='#FAFAFA')
         ttk.Style().configure('TNotebook', background='#FAFAFA')
         ttk.Style().configure('TNotebook.Tab', font=bold_font)
-
+       
         # apparently this is a bad practice...
         parent.resizable(0, 0)
 
         # icon / version
         parent.title(f"ScaleWiz {App.VERSION}")
         icon_path = os.path.abspath(r"assets/chem.ico")
-        parent.wm_iconbitmap(icon_path)
-
+        if os.path.isfile(icon_path):
+            parent.wm_iconbitmap(icon_path)
+        
         MainWindow(self).grid()
         # other logic here
 
