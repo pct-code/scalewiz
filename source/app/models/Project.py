@@ -1,10 +1,12 @@
 """Model object for a project. Provides a JSON/Tk mapping."""
-
+import logging
 import os.path
 import tkinter as tk
 import json as json
 
 from .Test import Test
+
+logger = logging.getLogger('scalewiz')
 
 class Project:
     def __init__(self):
@@ -54,7 +56,7 @@ class Project:
         self.limitMin.set(90)
         self.interval.set(3)
         self.uptake.set(60)
-        t = os.path.abspath(r"C:\Users\P\Documents\GitHub\pct-scalewiz\assets\template.xlsx")
+        t = os.path.abspath(r"assets/template.xlsx")
         self.template.set(t)
 
     def makeName(self, *args):
@@ -141,9 +143,12 @@ class Project:
         
         with open(project.path.get(), "w") as file:
             json.dump(this, file, indent=4)
+        
+        logger.info(f"Saved {project.name.get()} to {project.path.get()}")
 
     @staticmethod
     def loadJson(path) -> 'Project':
+        logger.info(f"Loading from {path}")
         with open(path, "r") as file:
             obj = json.load(file)
 

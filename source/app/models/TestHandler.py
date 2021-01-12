@@ -68,7 +68,10 @@ class TestHandler():
         if not (path == ""):
             self.closeEditors()
             self.project = Project.loadJson(path)
-            self.project.path.set(path)
+            if path != self.project.path.get():
+                logger.warning(f"{self.name} opened a Project whose actual path didn't match its path property")
+                self.project.path.set(path)
+                Project.dumpJson(self.project, path)
             self.update_BtnText()
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
