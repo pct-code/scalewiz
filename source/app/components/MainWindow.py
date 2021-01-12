@@ -10,6 +10,8 @@ from .MenuBar import MenuBar
 from .TestHandlerView import TestHandlerView
 from ..models.TestHandler import TestHandler
 
+logger = logging.getLogger('scalewiz')
+
 class MainWindow(tk.Frame):
     """Main Window for the application."""
 
@@ -30,17 +32,16 @@ class MainWindow(tk.Frame):
     def addTestHandler(self):
         # make a new handler
         handler = TestHandler() 
+        system_name = f"  System {len(self.tabControl.tabs()) + 1}  "
+        handler.name = system_name.strip()
         # plug it in
         foo = TestHandlerView(self.tabControl, handler) 
         # todo why this assignment?
         handler.parent = foo
         # add it to the tab control then rename
         self.tabControl.add(foo, sticky='nsew') 
-        system_name = f"  System {self.tabControl.index(foo) + 1}  "
-        handler.name = system_name.strip()
         self.tabControl.tab(foo, text=system_name)
-        # logger = logging.getLogger('base')
-        logging.info(f"Added {handler.name} to main window")
+        logger.info(f"Added {handler.name} to main window")
 
 
     def close(self):

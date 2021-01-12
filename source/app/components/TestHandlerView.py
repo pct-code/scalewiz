@@ -1,11 +1,14 @@
 """A Tkinter widget for handling tests."""
 
+import logging
 import tkinter as tk
 import tkinter.scrolledtext
 from tkinter import ttk
 import serial.tools.list_ports as list_ports
 
 from .LivePlot import LivePlot
+
+logger = logging.getLogger('scalewiz')
 
 class TestHandlerView(ttk.Frame):
     def __init__(self, parent, handler):
@@ -140,12 +143,14 @@ class TestHandlerView(ttk.Frame):
         label.grid(row=row, column=0, sticky=tk.N + tk.E)
         entry.grid(row=row, column=1, sticky=tk.N + tk.E + tk.W, pady=1, padx=1)
 
+    # todo shouldn't this be held by the test handler?
     def update_DevList(self, *args):
         self.devList = sorted([i.device for i in list_ports.comports()])
         if(len(self.devList) < 1):
             self.devList.append("None found")
         self.dev1Ent.configure(values=self.devList)
         self.dev2Ent.configure(values=self.devList)
+        logger.debug(f"{self.handler.name} found devices: {self.devList}")
 
     def update_InputFrame(self, *args):
         for child in self.inputs:
@@ -167,13 +172,17 @@ class TestHandlerView(ttk.Frame):
             self.trialLblFrm.grid_remove()
             self.trialEntFrm.grid_remove()
             self.render(self.blankLbl, self.blankEnt, 3)
+            logger.info(f"{self.handler.name} changed to Blank mode")
         else:
             self.blankLbl.grid_remove()
             self.blankEnt.grid_remove()
             self.render(self.trialLblFrm, self.trialEntFrm, 3)
+            logger.info(f"{self.handler.name} changed to Trial mode")
+
 
     def update_PlotVisible(self):
         isVisible = bool()
+        # check if the plot is gridded
         if not self.pltFrm.grid_info() == {}:
             isVisible = True
 
