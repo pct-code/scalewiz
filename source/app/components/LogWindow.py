@@ -27,10 +27,10 @@ class LogWindow(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
-        parent.winfo_toplevel().title('Log Window')
         self.build()
 
     def build(self):
+        self.parent.winfo_toplevel().title('Log Window')
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.scrolled_text = ScrolledText(self, state='disabled')
@@ -44,11 +44,13 @@ class LogWindow(ttk.Frame):
         # Create a logging handler using a queue
         logging.basicConfig(level=logging.DEBUG)
         # todo need to make custom logger to stay rid of all those matplotlib debug logs
-        logger = logging.getLogger()
+        logger = logging.getLogger('scalewiz')
+
         self.log_queue = queue.Queue()
         self.queue_handler = QueueHandler(self.log_queue)
         formatter = logging.Formatter('%(asctime)s - %(thread)d - %(levelname)s - %(message)s')
         self.queue_handler.setFormatter(formatter)
+        self.queue_handler.setLevel(logging.DEBUG)
         logger.addHandler(self.queue_handler)
         # Start polling messages from the queue
         self.after(100, self.poll_log_queue)
