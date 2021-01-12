@@ -59,8 +59,6 @@ class App(tk.Frame):
         # main window
         MainWindow(self).grid()
         # other logic here
-
-        logging.debug("root app init complete")
         
 
 if __name__ == "__main__":
