@@ -169,6 +169,7 @@ class TestHandler():
                 readingStart = time.time()
                 # elapsedMin = round((time.time() - startTime)/60w, 2)
                 # changed elapsed min to 
+                # todo add ++ here???
                 elapsedMin = round(len(self.queue) * interval / 60, 2)
 
                 psi1 = self.pump1.pressure()
@@ -233,12 +234,12 @@ class TestHandler():
         if self.pump1.port.isOpen():
             self.pump1.stop()
             self.pump1.close()
-            logger.info(f"{self.name} has stopped and closed the device @ {self.pump1.port}")
+            logger.info(f"{self.name} has stopped and closed the device @ {self.pump1.port.port}")
         
         if self.pump2.port.isOpen():
             self.pump2.stop()
             self.pump2.close()
-            logger.info(f"{self.name} has stopped and closed the device @ {self.pump1.port}")
+            logger.info(f"{self.name} has stopped and closed the device @ {self.pump1.port.port}")
 
         self.isDone.set(True)
         self.progress.set(0)
