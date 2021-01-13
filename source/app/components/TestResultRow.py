@@ -21,7 +21,7 @@ class TestResultRow(ttk.Frame):
         cols.append(ttk.Entry(self.parent, textvariable=self.test.reportAs, width=25))
         # col 2 - duration
         duration = round(len(self.test.readings) * self.project.interval.get() / 60, 2)
-        cols.append(ttk.Label(self.parent, text=f"{duration:.2f}", anchor='center'))
+        cols.append(ttk.Label(self.parent, text=f"{duration:.2f}, ({len(self.test.readings)})", anchor='center'))
         # col 3 - to consider
         cols.append(ttk.Combobox(self.parent, textvariable=self.test.toConsider, values=["pump 1", "pump 2", "average"], state='readonly', width=7))
         # col 4 - obs baseline
