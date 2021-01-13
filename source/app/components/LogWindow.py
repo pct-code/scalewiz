@@ -16,7 +16,7 @@ class LogWindow(ttk.Frame):
         self.parent.winfo_toplevel().title('Log Window')
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        self.scrolled_text = ScrolledText(self, state='disabled', width=70)
+        self.scrolled_text = ScrolledText(self, state='disabled', width=80)
         self.scrolled_text.grid(row=0, column=0, sticky='nsew')
         self.scrolled_text.tag_config('INFO', foreground='black')
         self.scrolled_text.tag_config('DEBUG', foreground='gray')
