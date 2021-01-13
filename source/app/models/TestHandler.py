@@ -207,13 +207,13 @@ class TestHandler():
         # end of readings loop ------------------------------------------------
         
         # find the actual elapsed time
-        trueElapsed = round((time.time() - startTime) / 60, 2)
+        trueElapsed = round((time.time() - startTime) / 60, 3)
         # compare to the most recent elapsedMin value
         if trueElapsed != elapsedMin:
             # maybe make a dialog pop up instead?
             self.toLog(f"The test says it took {elapsedMin} min.")
             self.toLog(f"but really it took {trueElapsed} min. (I counted)")
-            logger.warning(f"{self.name} - {elapsedMin} was really {trueElapsed}")
+            logger.warning(f"{self.name} - {elapsedMin} was really {trueElapsed} ({len(self.queue)}/{self.maxReadings()})")
 
         self.stopTest()
         self.saveTestToProject()
