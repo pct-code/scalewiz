@@ -252,7 +252,7 @@ class TestHandler():
         self.project.tests.append(self.test)
         Project.dumpJson(self.project, self.project.path.get())
         logger.info(f"{self.name} saved {self.project.name.get()} to {self.project.path.get()}")
-        self.loadProj(path=self.project.path)
+        self.loadProj(path=self.project.path.get())
 
     def setupPumps(self):
         # the timeout values are an alternative to using TextIOWrapper
