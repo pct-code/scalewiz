@@ -153,7 +153,7 @@ class TestHandlerView(ttk.Frame):
         self.dev2Ent.configure(values=self.devList)
         for i in self.devList:
             if not i in old and not i == "None found":
-                logger.debug(f"{self.handler.name} found device: {self.devList}")
+                logger.debug(f"{self.handler.name} found device: {i}")
 
     def update_InputFrame(self, *args):
         for child in self.inputs:
