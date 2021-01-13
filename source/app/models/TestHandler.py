@@ -136,6 +136,9 @@ class TestHandler():
         if hasattr(self, 'logFileHandler'):
             logger.removeHandler(self.logFileHandler)
         self.logFileHandler = logging.FileHandler(logFile)
+        formatter = logging.Formatter('%(asctime)s - %(thread)d - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+        self.logFileHandler.setFormatter(formatter)
+        self.logFileHandler.setLevel(logging.DEBUG)
         logger.addHandler(self.logFileHandler)
         logger.info(f"{self.name} set up a log file at {logFile}")
         logger.info(f"{self.name} is starting a test for {self.project.name.get()}")
@@ -265,6 +268,7 @@ class TestHandler():
             self.pump2 = TeledynePump(port2)
             logger.info(f"{self.name} established a connection to {port2.port}")
         except SerialException as e:
+            logger.exception(e)
             messagebox.showwarning("Serial Exception", e)
 
     # methods that affect UI
