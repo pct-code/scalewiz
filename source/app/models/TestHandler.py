@@ -323,4 +323,3 @@ class TestHandler():
         self.logText.insert('end', msg + "\n")
         self.logText.configure(state='disabled')
         self.logText.see('end')
-        logger.debug(f"{self.name} placed a message in its readings log")
