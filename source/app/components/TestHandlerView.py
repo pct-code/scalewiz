@@ -145,12 +145,15 @@ class TestHandlerView(ttk.Frame):
 
     # todo shouldn't this be held by the test handler?
     def update_DevList(self, *args):
+        old = [i for i in self.devList]
         self.devList = sorted([i.device for i in list_ports.comports()])
         if(len(self.devList) < 1):
             self.devList.append("None found")
         self.dev1Ent.configure(values=self.devList)
         self.dev2Ent.configure(values=self.devList)
-        logger.debug(f"{self.handler.name} found devices: {self.devList}")
+        for i in self.devList:
+            if not i in old and not i == "None found":
+                logger.debug(f"{self.handler.name} found device: {self.devList}")
 
     def update_InputFrame(self, *args):
         for child in self.inputs:
