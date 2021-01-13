@@ -52,8 +52,9 @@ class TestHandler():
         )
         return value
 
+    # todo should be using a tkVar+trace instead ... 
     def maxReadings(self) -> int:
-        return round(self.project.limitMin.get() * 60 / self.project.interval.get())
+        return round(self.project.limitMin.get() * 60 / self.project.interval.get()) + 1
 
     def loadProj(self, path = None):
         if path is None:
@@ -154,23 +155,26 @@ class TestHandler():
             self.toLog(f"Awaiting uptake time {uptake - i} s ...")
             time.sleep(1)
         self.toLog("")
-        limitPSI = self.project.limitPSI.get()
         interval = self.project.interval.get()
         snooze = round(interval * 0.9, 2)
         # assigning these vars isnt just to make them shorter
         # since we don't expect the values to change referencing them this way
         # is slightly less expensive than requesting the value from its tkVar on each iteration
-        startTime = time.time()
+        # startTime = time.time()
         # set this here so we can take a reading on the firt iteration
+        # not anymore ? emulating do while
+        # see indent on snooze call at end of while loop
+        startTime = time.time()
         readingStart = startTime - interval
+
         # readings loop -------------------------------------------------------
         while(self.canRun()):
             if time.time() - readingStart >= interval:
                 readingStart = time.time()
-                # elapsedMin = round((time.time() - startTime)/60w, 2)
+                elapsedMin = round((time.time() - startTime)/60, 2)
                 # changed elapsed min to 
                 # todo add ++ here???
-                elapsedMin = round(len(self.queue) * interval / 60, 2)
+                # elapsedMin = round(len(self.queue) * interval / 60, 2)
 
                 psi1 = self.pump1.pressure()
                 psi2 = self.pump2.pressure()
@@ -208,7 +212,7 @@ class TestHandler():
         # end of readings loop ------------------------------------------------
         
         # find the actual elapsed time
-        trueElapsed = round((time.time() - startTime) / 60, 3)
+        trueElapsed = round((time.time() - startTime) / 60, 2)
         # compare to the most recent elapsedMin value
         if trueElapsed != elapsedMin:
             # maybe make a dialog pop up instead?
