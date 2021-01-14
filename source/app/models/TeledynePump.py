@@ -1,8 +1,9 @@
 """Serial port wrapper for MX-class Teledyne pumps."""
 
 class TeledynePump:
-    def __init__(self, serialport):
+    def __init__(self, serialport, logger=None):
         self.port = serialport
+        self.logger = logger
 
     def run(self):
         self.port.write("ru".encode())
@@ -19,7 +20,7 @@ class TeledynePump:
             # print(psi)
             return int(psi)
         except Exception:
-            print("Reading failed")
+            self.logger.critical(f"Reading failed on {self.port.port}")
             return -1
     
     def close(self):

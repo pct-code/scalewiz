@@ -238,17 +238,17 @@ class TestHandler():
         if self.pump1.port.isOpen():
             self.pump1.stop()
             self.pump1.close()
-            logger.info(f"{self.name} has stopped and closed the device @ {self.pump1.port.port}")
+            logger.info(f"{self.name}: Stopped and closed the device @ {self.pump1.port.port}")
         
         if self.pump2.port.isOpen():
             self.pump2.stop()
             self.pump2.close()
-            logger.info(f"{self.name} has stopped and closed the device @ {self.pump1.port.port}")
+            logger.info(f"{self.name}: Stopped and closed the device @ {self.pump1.port.port}")
 
         self.isDone.set(True)
         self.progress.set(0)
         self.elapsed.set("")
-        logger.info(f"{self.name}'s test has been stopped")
+        logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
 
     def saveTestToProject(self):
         for reading in self.queue:
@@ -264,12 +264,12 @@ class TestHandler():
         # the values chosen were suggested by the pump's documentation
         try:
             port1 = Serial(self.dev1.get(), timeout=0.05)
-            self.pump1 = TeledynePump(port1)
-            logger.info(f"{self.name} established a connection to {port1.port}")
+            self.pump1 = TeledynePump(port1, logger=logger)
+            logger.info(f"{self.name}: established a connection to {port1.port}")
             
             port2 = Serial(self.dev2.get(), timeout=0.05)
-            self.pump2 = TeledynePump(port2)
-            logger.info(f"{self.name} established a connection to {port2.port}")
+            self.pump2 = TeledynePump(port2, logger=logger)
+            logger.info(f"{self.name}: established a connection to {port2.port}")
         except SerialException as e:
             logger.exception(e)
             messagebox.showwarning("Serial Exception", e)
