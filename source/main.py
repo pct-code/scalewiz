@@ -11,7 +11,7 @@ from tkinter import ttk
 # internal
 from app.components.BaseFrame import BaseFrame
 from app.components.MainFrame import MainFrame
-from app.components.LogWindow import LogFrame
+from app.components.LogFrame import LogFrame
 from app.models.Logger import Logger
 
 class App(BaseFrame):
