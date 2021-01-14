@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 # internal
 from ..components.ProjectEditor import ProjectEditor
-from ..components.EvaluationWindow import EvaluationWindow
+from ..components.EvaluationFrame import EvaluationFrame
 from ..models.Project import Project
 from ..models.Test import Test
 from ..models.TeledynePump import TeledynePump
