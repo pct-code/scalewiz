@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 import logging
-from logging.handlers import QueueHandler, QueueListener
+from logging.handlers import QueueHandler
 import queue
 
 
@@ -32,26 +32,20 @@ class LogWindow(ttk.Frame):
         formatter = logging.Formatter('%(asctime)s - %(thread)d - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
         self.queue_handler.setFormatter(formatter)
         self.queue_handler.setLevel(logging.DEBUG)
-        # listener = QueueListener(self.log_queue, self.queue_handler, respect_handler_level=True)
-        # listener.start()
         logger = logging.getLogger('scalewiz')
-        # logger.propagate = False
         logger.addHandler(self.queue_handler)
-
-        # Start polling messages from the queue
+        # start polling messages from the queue
         self.after(100, self.poll_log_queue)
 
     def display(self, record):
         msg = record.getMessage()
         self.scrolled_text.configure(state='normal')
-        # last arg is for the tag
-        self.scrolled_text.insert(tk.END, msg + '\n', record.levelname)
+        self.scrolled_text.insert(tk.END, msg + '\n', record.levelname) # last arg is for the tag
         self.scrolled_text.configure(state='disabled')
-        # scroll to bottom
-        self.scrolled_text.yview(tk.END)
+        self.scrolled_text.yview(tk.END) # scroll to bottom
 
     def poll_log_queue(self):
-        # Check every 100ms if there is a new message in the queue to display
+        # check every 100ms if there is a new message in the queue to display
         while True:
             try:
                 record = self.log_queue.get(block=False)
