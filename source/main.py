@@ -9,17 +9,17 @@ from tkinter import font
 from tkinter import ttk
 
 # internal
-from app.components.MainWindow import MainWindow
-from app.components.LogWindow import LogWindow
+from app.components.BaseFrame import BaseFrame
+from app.components.MainFrame import MainFrame
 
-class App(tk.Frame):
+class App(BaseFrame):
     """Core object for the application."""
     
     VERSION = '[1.0.0]'
 
     def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.root = parent
+        # expects the parent to be the root Tk object (and/or it's assoc. toplevel...?)
+        BaseFrame.__init__(self, parent)
 
         # set UI
 
@@ -56,9 +56,7 @@ class App(tk.Frame):
         LogWindow(self.logWindow).grid()
         self.logWindow.withdraw()
 
-        # main window
-        MainWindow(self).grid()
-        # other logic here
+        MainFrame(self).grid() # this will hijack the window closing protocol
         
 
 if __name__ == "__main__":

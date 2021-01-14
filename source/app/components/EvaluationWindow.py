@@ -13,6 +13,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
+from .BaseFrame import BaseFrame
 from .TestResultRow import TestResultRow
 from .ProjectInfo import ProjectInfo
 from .ProjectParams import ProjectParams
@@ -20,10 +21,9 @@ from .ProjectReport import ProjectReport
 from ..models.Project import Project
 from ..models.Export import export_report
 
-class EvaluationWindow(ttk.Frame):
+class EvaluationWindow(BaseFrame):
     def __init__(self, parent, handler):
-        ttk.Frame.__init__(self, parent)
-        self.parent = parent
+        BaseFrame.__init__(self, parent)
         self.handler = handler 
         self.project = Project.loadJson(handler.project.path.get())
         self.editorProject = self.project

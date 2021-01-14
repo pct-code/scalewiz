@@ -7,14 +7,14 @@ from tkinter import ttk, filedialog
 
 # internal
 from ..models.Project import Project
+from .BaseFrame import BaseFrame
 from .ProjectInfo import ProjectInfo
 from .ProjectParams import ProjectParams
 from .ProjectReport import ProjectReport
 
-class ProjectEditor(ttk.Frame):
+class ProjectEditor(BaseFrame):
     def __init__(self, parent, handler):
-        ttk.Frame.__init__(self, parent)
-        self.parent = parent
+        BaseFrame.__init__(self, parent)
         self.handler = handler
         self.grid_columnconfigure(0, weight=1)
         if(os.path.isfile(handler.project.path.get())):
