@@ -21,7 +21,7 @@ from .ProjectReport import ProjectReport
 from ..models.Project import Project
 from ..models.Export import export_report
 
-class EvaluationWindow(BaseFrame):
+class EvaluationFrame(BaseFrame):
     def __init__(self, parent, handler):
         BaseFrame.__init__(self, parent)
         self.handler = handler 
