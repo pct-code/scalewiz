@@ -14,9 +14,9 @@ class Logger:
         """The LogWindow depends on access to the .loq_queue attribute."""
         self.log_queue = queue.Queue()
         # set default logging behavior. could be moved to json. see dictConfig ?
-        # logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG)
         queue_handler = QueueHandler(self.log_queue)
         formatter = logging.Formatter('%(asctime)s - %(thread)d - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
         queue_handler.setFormatter(formatter)
-        queue_handler.setLevel(logging.DEBUG)
+        queue_handler.setLevel(logging.INFO)
         logging.getLogger('scalewiz').addHandler(queue_handler)

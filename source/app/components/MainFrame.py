@@ -48,7 +48,7 @@ class MainFrame(BaseFrame):
             widget = self.nametowidget(tab)
             if widget.handler.isRunning.get():
                 if not widget.handler.isDone.get():
-                    logging.warning(f"Attempted to close while a test was running on {widget.handler.name}")
+                    logger.warning(f"Attempted to close while a test was running on {widget.handler.name}")
                     return
         self.winfo_toplevel().destroy()
         exit()
