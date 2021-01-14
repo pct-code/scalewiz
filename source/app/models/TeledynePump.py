@@ -20,7 +20,7 @@ class TeledynePump:
             return int(psi)
         except Exception:
             print("Reading failed")
-            return 0
+            return -1
     
     def close(self):
         self.port.close()
