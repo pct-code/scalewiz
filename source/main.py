@@ -11,6 +11,8 @@ from tkinter import ttk
 # internal
 from app.components.BaseFrame import BaseFrame
 from app.components.MainFrame import MainFrame
+from app.components.LogWindow import LogFrame
+from app.models.Logger import Logger
 
 class App(BaseFrame):
     """Core object for the application."""
@@ -20,8 +22,11 @@ class App(BaseFrame):
     def __init__(self, parent):
         # expects the parent to be the root Tk object (and/or it's assoc. toplevel...?)
         BaseFrame.__init__(self, parent)
-
+        
         # set UI
+        # icon / version
+        parent.title(f"ScaleWiz {App.VERSION}")
+        parent.resizable(0, 0) # apparently this is a bad practice...
 
         # font
         default_font = font.nametofont("TkDefaultFont")
@@ -39,22 +44,14 @@ class App(BaseFrame):
         ttk.Style().configure('TCheckbutton', background='#FAFAFA')
         ttk.Style().configure('TNotebook', background='#FAFAFA')
         ttk.Style().configure('TNotebook.Tab', font=bold_font)
-       
-        # apparently this is a bad practice...
-        parent.resizable(0, 0)
-
-        # icon / version
-        parent.title(f"ScaleWiz {App.VERSION}")
-        icon_path = os.path.abspath(r"assets/chem.ico")
-        if os.path.isfile(icon_path):
-            parent.wm_iconbitmap(icon_path)
         
-        # make log window
-        self.logWindow = tk.Toplevel(self)
-        # replace the window closing behavior with withdrawing instead
-        self.logWindow.protocol("WM_DELETE_WINDOW", lambda: self.logWindow.withdraw())
-        LogWindow(self.logWindow).grid()
-        self.logWindow.withdraw()
+        
+        # make log window, immediately hide it
+        # holding a ref for the menubar to find...
+        self.log_window = tk.Toplevel(self)
+        self.log_window.parent = self
+        LogFrame(self.log_window, Logger()).grid()
+        self.log_window.withdraw()
 
         MainFrame(self).grid() # this will hijack the window closing protocol
         

@@ -11,6 +11,7 @@ from .ProjectEditor import ProjectEditor
 class MenuBar(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+        # expecting parent to be the toplevel parent of the main frame
         self.parent = parent
 
         menubar = tk.Menu()
@@ -40,4 +41,4 @@ class MenuBar(tk.Frame):
             widget.handler.evalProj()
 
     def showLogWindow(self):
-        self.parent.parent.logWindow.deiconify()
+        self.parent.parent.log_window.deiconify() # woof
