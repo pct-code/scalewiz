@@ -232,7 +232,7 @@ class TestHandler():
         if self.isRunning.get():
             # the readings loop thread checks this flag on each iteration
             self.stopRequested = True
-            logger.info(f"{self.name} received a stop request")
+            logger.info(f"{self.name}: Received a stop request")
 
     def stopTest(self):
         if self.pump1.port.isOpen():
@@ -256,7 +256,7 @@ class TestHandler():
         self.queue.clear()
         self.project.tests.append(self.test)
         Project.dumpJson(self.project, self.project.path.get())
-        logger.info(f"{self.name} saved {self.project.name.get()} to {self.project.path.get()}")
+        logger.info(f"{self.name}: Saved {self.project.name.get()} to {self.project.path.get()}")
         self.loadProj(path=self.project.path.get())
 
     def setupPumps(self):
@@ -271,13 +271,12 @@ class TestHandler():
             self.pump2 = TeledynePump(port2, logger=logger)
             logger.info(f"{self.name}: established a connection to {port2.port}")
         except SerialException as e:
-            logger.exception(e)
+            logger.exception(e) # todo add more args ?
             messagebox.showwarning("Serial Exception", e)
 
     # methods that affect UI
-
     def newTest(self):
-        logger.info(f"{self.name} initialized a new test")
+        logger.info(f"{self.name}: Initialized a new test")
         self.test = Test()
         self.isRunning.set(False)
         self.isDone.set(False)
@@ -297,7 +296,7 @@ class TestHandler():
         self.editors.append(window)
         editor = ProjectEditor(window, self)
         editor.grid()
-        logger.info(f"{self.name} opened an editor window for {self.project.name.get()}")
+        logger.info(f"{self.name}: Opened an editor window for {self.project.name.get()}")
 
     def evalProj(self):
         if len(self.editors) > 0: 
@@ -309,7 +308,7 @@ class TestHandler():
         self.editors.append(window)
         editor = EvaluationWindow(window, self)
         editor.grid()
-        logger.info(f"{self.name} opened an evaluation window for {self.project.name.get()}")
+        logger.info(f"{self.name}: Opened an evaluation window for {self.project.name.get()}")
 
     # todo is this necessary??
     def update_BtnText(self):
