@@ -5,6 +5,8 @@ import queue
 class Logger:
     """Sets default logging behavior for the program.
 
+    Holds a ref to a queue. The LogFrame depends on access to this.
+
     Use from anywhere by calling logging.getLogger('scalewiz')
     """ 
 
