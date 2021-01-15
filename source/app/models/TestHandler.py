@@ -286,30 +286,6 @@ class TestHandler():
         self.parent.logFrm.destroy()
         self.parent.build()
   
-    def modProj(self):
-        if len(self.editors) > 0: 
-            messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
-            return
-        window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", self.closeEditors)
-        window.resizable(0, 0)
-        self.editors.append(window)
-        editor = ProjectEditor(window, self)
-        editor.grid()
-        logger.info(f"{self.name}: Opened an editor window for {self.project.name.get()}")
-
-    def evalProj(self):
-        if len(self.editors) > 0: 
-            messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
-            return
-        window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", self.closeEditors)
-        window.resizable(0, 0)
-        self.editors.append(window)
-        editor = EvaluationWindow(window, self)
-        editor.grid()
-        logger.info(f"{self.name}: Opened an evaluation window for {self.project.name.get()}")
-
     # todo is this necessary??
     def update_BtnText(self):
             if(self.project.name.get() == ""):

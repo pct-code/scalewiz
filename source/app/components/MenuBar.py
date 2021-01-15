@@ -28,7 +28,7 @@ class MenuBar(tk.Frame):
         if (widget.handler.isRunning.get()):
             messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
         else:
-            widget.handler.modProj()
+            self.modProj(widget.handler)
 
     def requestEvalutaionWindow(self):
         currentTab = self.parent.tabControl.select()
@@ -38,7 +38,32 @@ class MenuBar(tk.Frame):
         elif not os.path.isfile(widget.handler.project.path.get()):
             messagebox.showwarning("No Project File", "The requested Project file has not yet been saved, or is missing")
         else:
-            widget.handler.evalProj()
+            self.evalProj(widget.handler)
 
     def showLogWindow(self):
+        # todo this is not elegant
         self.parent.parent.log_window.deiconify() # woof
+
+    def modProj(self, handler):
+        if len(handler.editors) > 0: 
+            messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
+            return
+        window = tk.Toplevel()
+        window.protocol("WM_DELETE_WINDOW", self.closeEditors)
+        window.resizable(0, 0)
+        handler.editors.append(window)
+        editor = ProjectEditor(window, self)
+        editor.grid()
+        logger.info(f"{self.name}: Opened an editor window for {self.project.name.get()}")
+
+    def evalProj(self, handler):
+        if len(handler.editors) > 0: 
+            messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
+            return
+        window = tk.Toplevel()
+        window.protocol("WM_DELETE_WINDOW", self.closeEditors)
+        window.resizable(0, 0)
+        handler.editors.append(window)
+        editor = EvaluationWindow(window, self)
+        editor.grid()
+        logger.info(f"{self.name}: Opened an evaluation window for {self.project.name.get()}")
