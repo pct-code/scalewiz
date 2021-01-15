@@ -15,12 +15,11 @@ class TeledynePump:
         try:
             self.port.write("pr".encode())
             response = self.port.readline().decode()
-            # print(response)
             psi = response.split(',')[1][:-1]
-            # print(psi)
             return int(psi)
         except Exception:
-            self.logger.critical(f"Reading failed on {self.port.port}")
+            if self.logger != None:
+                self.logger.critical(f"Reading failed on {self.port.port}")
             return -1
     
     def close(self):
