@@ -1,12 +1,16 @@
 """MenuBar for the MainWindow."""
 
 # util
+import logging
 import os
 import tkinter as tk
 from tkinter import messagebox
 
+from .EvaluationFrame import EvaluationFrame
 # internal
 from .ProjectEditor import ProjectEditor
+
+logger = logging.getLogger('scalewiz')
 
 class MenuBar(tk.Frame):
     def __init__(self, parent):
@@ -44,26 +48,28 @@ class MenuBar(tk.Frame):
         # todo this is not elegant
         self.parent.parent.log_window.deiconify() # woof
 
+# todo move close editors method off of testhandler
+
     def modProj(self, handler):
         if len(handler.editors) > 0: 
             messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
             return
         window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", self.closeEditors)
+        window.protocol("WM_DELETE_WINDOW", lambda: handler.closeEditors())
         window.resizable(0, 0)
         handler.editors.append(window)
-        editor = ProjectEditor(window, self)
+        editor = ProjectEditor(window, handler)
         editor.grid()
-        logger.info(f"{self.name}: Opened an editor window for {self.project.name.get()}")
+        logger.info(f"{handler.name}: Opened an editor window for {handler.project.name.get()}")
 
     def evalProj(self, handler):
         if len(handler.editors) > 0: 
             messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
             return
         window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", self.closeEditors)
+        window.protocol("WM_DELETE_WINDOW", lambda: handler.closeEditors())
         window.resizable(0, 0)
         handler.editors.append(window)
-        editor = EvaluationWindow(window, self)
+        editor = EvaluationFrame(window, handler)
         editor.grid()
-        logger.info(f"{self.name}: Opened an evaluation window for {self.project.name.get()}")
+        logger.info(f"{handler.name}: Opened an evaluation window for {handler.project.name.get()}")
