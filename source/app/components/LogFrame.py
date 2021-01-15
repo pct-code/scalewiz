@@ -18,7 +18,7 @@ class LogFrame(BaseFrame):
         BaseFrame.__init__(self, parent)
         self.winfo_toplevel().title('Log Window')
         # replace the window closing behavior with withdrawing instead
-        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", lambda: parent.withdraw())
+        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", lambda: self.winfo_toplevel().withdraw())
         self.log_queue = logger.log_queue
         self.build()
 
