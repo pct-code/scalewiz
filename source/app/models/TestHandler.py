@@ -208,6 +208,8 @@ class TestHandler():
                 if psi2 > self.maxPSI2: self.maxPSI2 = psi2
                 logger.debug(f"Finished doing everything else in {time.time() - readingStart - collected} s")
                 logger.debug(f"{self.name} collected data in {time.time() - readingStart}")
+                # todo try asyncio - called defer or await or s/t
+                # should let CPU be busy in meantime ... ?
                 time.sleep(snooze)
         # end of readings loop ------------------------------------------------
         

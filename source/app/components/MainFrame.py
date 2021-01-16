@@ -30,17 +30,17 @@ class MainFrame(BaseFrame):
         self.addTestHandler()
     
     def addTestHandler(self):
-        # make a new handler
+        # make a new handler 🤠
         handler = TestHandler() 
         system_name = f"  System {len(self.tabControl.tabs()) + 1}  "
-        handler.name = system_name.strip()
-        # plug it in
-        foo = TestHandlerView(self.tabControl, handler) 
+        handler.name = system_name.strip() # todo perhaps we could pass this as arg to TestHandler init
+        # plug it in 🔌
+        view = TestHandlerView(self.tabControl, handler) 
         # todo why this assignment?
-        handler.parent = foo
+        handler.parent = view # 😬
         # add it to the tab control then rename
-        self.tabControl.add(foo, sticky='nsew') 
-        self.tabControl.tab(foo, text=system_name)
+        self.tabControl.add(view, sticky='nsew') 
+        self.tabControl.tab(view, text=system_name)
         logger.info(f"Added {handler.name} to main window")
 
     def close(self):

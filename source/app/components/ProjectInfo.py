@@ -78,6 +78,6 @@ class ProjectInfo(ttk.Frame):
         
         # not implemented
         # row 12 ---------------------------------------------------------------
-        pathLbl = ttk.Label(self, text="File path:")
-        pathEnt = ttk.Entry(self, textvariable=parent.editorProject.path)
+        # pathLbl = ttk.Label(self, text="File path:")
+        # pathEnt = ttk.Entry(self, textvariable=parent.editorProject.path)
         # parent.render(pathLbl, pathEnt, 12)

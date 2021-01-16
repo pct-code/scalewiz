@@ -1,9 +1,12 @@
+import logging
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
+
+logger = logging.getLogger('scalewiz')
 
 class LivePlot(ttk.Frame):
     def __init__(self, parent, handler):
@@ -20,7 +23,8 @@ class LivePlot(ttk.Frame):
         self.ani = FuncAnimation(fig, self.animate, interval=interval)
 
     def animate(self, interval):
-        # data access here
+        # data access here 😳
+        logger.debug(f"{self.handler.name}: Drawing a new plot")
         with plt.style.context('bmh'):
             self.axis.grid(color='darkgrey', alpha=0.65, linestyle='-')
             self.axis.set_facecolor('w')
@@ -34,7 +38,8 @@ class LivePlot(ttk.Frame):
             pump1 = []
             pump2 = []
             elapsed = []
-            for i in range(len(self.handler.queue)):
+            points = len(self.handler.queue)
+            for i in range(points):
                 pump1.append(self.handler.queue[i]["pump 1"])
                 pump2.append(self.handler.queue[i]["pump 2"])
                 elapsed.append(self.handler.queue[i]["elapsedMin"])
@@ -42,6 +47,4 @@ class LivePlot(ttk.Frame):
             self.axis.plot(elapsed, pump2, label="Pump 2")
             self.axis.legend(loc=0)
             plt.tight_layout()
-
-         
-
+            logger.debug(f"{self.handler.name}: Drawing a new plot for {points} data points")

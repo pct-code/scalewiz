@@ -10,6 +10,8 @@ from .LivePlot import LivePlot
 
 logger = logging.getLogger('scalewiz')
 
+# todo these frames should probably be separated into separate classes 
+
 class TestHandlerView(ttk.Frame):
     def __init__(self, parent, handler):
         ttk.Frame.__init__(self, parent)
@@ -130,10 +132,11 @@ class TestHandlerView(ttk.Frame):
         # row 2 ---------------------------------------------------------------
         self.logFrm = ttk.Frame(self)
         self.logText = tk.scrolledtext.ScrolledText(self.logFrm, background='white', height=5, width=44, state='disabled')
-        self.handler.logText = self.logText
+        # todo alert alert this is not elegant
+        self.handler.logText = self.logText # this is bad
         self.logText.grid(sticky='ew')
 
-        self.update_TestType()
+        self.update_TestType() 
         self.update_InitBtn()
         self.update_DevList()
 
@@ -175,12 +178,12 @@ class TestHandlerView(ttk.Frame):
             self.trialLblFrm.grid_remove()
             self.trialEntFrm.grid_remove()
             self.render(self.blankLbl, self.blankEnt, 3)
-            logger.info(f"{self.handler.name} changed to Blank mode")
+            logger.info(f"{self.handler.name}: changed to Blank mode")
         else:
             self.blankLbl.grid_remove()
             self.blankEnt.grid_remove()
             self.render(self.trialLblFrm, self.trialEntFrm, 3)
-            logger.info(f"{self.handler.name} changed to Trial mode")
+            logger.info(f"{self.handler.name}: changed to Trial mode")
 
 
     def update_PlotVisible(self):
@@ -192,9 +195,11 @@ class TestHandlerView(ttk.Frame):
         for tab in self.parent.tabs():
             this = self.parent.nametowidget(tab)
             if not isVisible:
+                logger.info(f"{this.handler.name}: Showing details view")
                 this.pltFrm.grid(row=0, column=1, rowspan=3)
                 this.logFrm.grid(row=2, column=0, sticky='ew')
             else:
+                logger.info(f"{this.handler.name}: Hiding details view")
                 this.pltFrm.grid_remove()
                 this.logFrm.grid_remove()
 

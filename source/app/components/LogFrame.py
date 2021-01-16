@@ -17,7 +17,7 @@ class LogFrame(BaseFrame):
     def __init__(self, parent, logger):
         BaseFrame.__init__(self, parent)
         self.winfo_toplevel().title('Log Window')
-        # replace the window closing behavior with withdrawing instead
+        # replace the window closing behavior with withdrawing instead 🐱‍👤
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", lambda: self.winfo_toplevel().withdraw())
         self.log_queue = logger.log_queue
         self.build()
@@ -33,7 +33,7 @@ class LogFrame(BaseFrame):
         self.scrolled_text.tag_config('ERROR', foreground='red')
         self.scrolled_text.tag_config('CRITICAL', foreground='red', underline=1)
 
-        # start polling messages from the queue
+        # start polling messages from the queue 📩
         self.after(100, self.poll_log_queue)
         
     def display(self, record):
@@ -41,7 +41,7 @@ class LogFrame(BaseFrame):
         self.scrolled_text.configure(state='normal')
         self.scrolled_text.insert(tk.END, msg + '\n', record.levelname) # last arg is for the tag
         self.scrolled_text.configure(state='disabled')
-        self.scrolled_text.yview(tk.END) # scroll to bottom
+        self.scrolled_text.yview(tk.END) # scroll to bottom 
 
     def poll_log_queue(self):
         # check every 100ms if there is a new message in the queue to display

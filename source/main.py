@@ -28,13 +28,13 @@ class App(BaseFrame):
         parent.title(f"ScaleWiz {App.VERSION}")
         parent.resizable(0, 0) # apparently this is a bad practice...
 
-        # font
+        # font 🔠 
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Arial")
         parent.option_add("*Font", "TkDefaultFont")
         bold_font = font.Font(family="Helvetica", weight='bold')
         
-        # widget backgrounds / themes
+        # widget backgrounds / themes 🎨
         parent.tk_setPalette(background='#FAFAFA')
         ttk.Style().configure('TLabel', background='#FAFAFA')
         ttk.Style().configure('TFrame', background='#FAFAFA')
@@ -45,13 +45,13 @@ class App(BaseFrame):
         ttk.Style().configure('TNotebook', background='#FAFAFA')
         ttk.Style().configure('TNotebook.Tab', font=bold_font)
         
-        
         # make log window, immediately hide it
+        # todo this seems inelegant
         # holding a ref for the menubar to find...
         self.log_window = tk.Toplevel(self)
-        self.log_window.parent = self
+        self.log_window.parent = self # tacky ? 
         LogFrame(self.log_window, Logger()).grid()
-        self.log_window.withdraw()
+        self.log_window.withdraw() #🏌️‍♀️👋
 
         MainFrame(self).grid() # this will hijack the window closing protocol
         
