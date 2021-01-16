@@ -16,7 +16,7 @@ class LivePlot(ttk.Frame):
         plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
         self.canvas = FigureCanvasTkAgg(fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
-        interval = handler.project.interval.get() * 1000
+        interval = handler.project.interval.get() * 1000 # ms 
         self.ani = FuncAnimation(fig, self.animate, interval=interval)
 
     def animate(self, interval):
