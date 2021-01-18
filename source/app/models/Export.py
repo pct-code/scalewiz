@@ -1,3 +1,4 @@
+import logging
 import tkinter 
 from tkinter import messagebox
 import shutil
@@ -7,13 +8,21 @@ from openpyxl.styles import NamedStyle
 from datetime import datetime
 import PIL
 
+logger = logging.getLogger('scalewiz')
+
+
 def export_report(self, project):
+        logger.info(f"Beginning export of {project.name.get()}")
         # save the report
         self.save()
+        logger.debug(f"{project.name.get()} was saved to its json file")
+
 
         template = project.template.get()
         if not os.path.isfile(template):
-            messagebox.showinfo(self, message="No valid template file found")
+            msg = f"No valid template file found at {template}"
+            messagebox.showinfo(self, message=msg)
+            logger.error(msg)
             return
 
         out = f"{project.numbers.get().replace(' ', '')} {project.name.get()} - CaCO3 Scale Block Analysis.xlsx"
