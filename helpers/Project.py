@@ -54,7 +54,7 @@ class Project:
         self.limitMin.set(90)
         self.interval.set(3)
         self.uptake.set(60)
-        t = os.path.abspath(r"C:\Users\P\Documents\GitHub\pct-scalewiz\assets\template.xlsx")
+        t = os.path.abspath(r"assets\template.xlsx")
         self.template.set(t)
 
     def makeName(self, *args):
