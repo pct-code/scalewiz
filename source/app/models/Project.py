@@ -123,7 +123,8 @@ class Project:
                 "name": project.name.get(),
                 "analyst": project.analyst.get(),
                 "numbers": project.numbers.get(),
-                "path": project.path.get()
+                "path": project.path.get(),
+                "notes": project.notes.get()
             },
             "params": {
                 "bicarbonates": project.bicarbs.get(),
@@ -166,6 +167,7 @@ class Project:
         this.numbers.set(info.get('numbers'))
         this.analyst.set(info.get('analyst'))
         this.path.set(info.get('path'))
+        this.notes.set(info.get('notes'))
        
         params = obj.get('params')
         this.bicarbs.set(params.get('bicarbonates'))
