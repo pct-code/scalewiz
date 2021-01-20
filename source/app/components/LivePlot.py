@@ -1,4 +1,5 @@
 import logging
+import time
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -24,7 +25,8 @@ class LivePlot(ttk.Frame):
 
     def animate(self, interval):
         # data access here 😳
-        logger.debug(f"{self.handler.name}: Drawing a new plot")
+        start = time.time()
+        logger.debug(f"{self.handler.name}: Drawing a new plot ...")
         with plt.style.context('bmh'):
             self.axis.grid(color='darkgrey', alpha=0.65, linestyle='-')
             self.axis.set_facecolor('w')
@@ -47,4 +49,4 @@ class LivePlot(ttk.Frame):
             self.axis.plot(elapsed, pump2, label="Pump 2")
             self.axis.legend(loc=0)
             plt.tight_layout()
-            logger.debug(f"{self.handler.name}: Drawing a new plot for {points} data points")
+            logger.debug(f"{self.handler.name}: Drew a new plot for {points} data points in {round(time.time() - start) s}")
