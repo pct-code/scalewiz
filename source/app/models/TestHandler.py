@@ -128,9 +128,9 @@ class TestHandler():
         self.isRunning.set(True)
         self.progress.set(0)
         # make a new log file
-        fileName = f"{self.test.name.get()} {date.today()}.txt"
+        fileName = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
         dirName = os.path.dirname(self.project.path.get())
-        logFile = os.path.join(dirName, fileName)
+        logFile = os.path.join(dirName,'logs', fileName)
         # update the file handler 
         if hasattr(self, 'logFileHandler'):
             logger.removeHandler(self.logFileHandler)
