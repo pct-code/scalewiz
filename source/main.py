@@ -51,6 +51,7 @@ class App(BaseFrame):
         self.log_window = tk.Toplevel(self)
         self.log_window.parent = self # tacky ? 
         LogFrame(self.log_window, Logger()).grid()
+        logging.getLogger('scalewiz').info(f"Starting in {os.getcwd()}")
         self.log_window.withdraw() #🏌️‍♀️👋
 
         MainFrame(self).grid() # this will hijack the window closing protocol
