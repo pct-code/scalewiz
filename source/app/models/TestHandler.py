@@ -20,8 +20,9 @@ from ..models.TeledynePump import TeledynePump
 logger = logging.getLogger('scalewiz')
 
 class TestHandler():
-    def __init__(self):
+    def __init__(self, name="Nemo"):
         # local state vars
+        self.name = name
         self.project = Project()
         self.test = Test()
         self.dev1 = tk.StringVar()
@@ -130,7 +131,11 @@ class TestHandler():
         # make a new log file
         fileName = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
         dirName = os.path.dirname(self.project.path.get())
-        logFile = os.path.join(dirName,'logs', fileName)
+        logsDir = os.path.join(dirName, 'logs')
+        if not os.path.isdir(logsDir):
+            os.mkdir(logsDir)
+        logFile = os.path.join(logsDir, fileName)
+
         # update the file handler 
         if hasattr(self, 'logFileHandler'):
             logger.removeHandler(self.logFileHandler)

@@ -31,9 +31,9 @@ class MainFrame(BaseFrame):
     
     def addTestHandler(self):
         # make a new handler 🤠
-        handler = TestHandler() 
         system_name = f"  System {len(self.tabControl.tabs()) + 1}  "
-        handler.name = system_name.strip() # todo perhaps we could pass this as arg to TestHandler init
+        name = system_name.strip() # todo perhaps we could pass this as arg to TestHandler init
+        handler = TestHandler(name) 
         # plug it in 🔌
         view = TestHandlerView(self.tabControl, handler) 
         # todo why this assignment?
