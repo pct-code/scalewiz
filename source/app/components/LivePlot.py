@@ -49,4 +49,4 @@ class LivePlot(ttk.Frame):
             self.axis.plot(elapsed, pump2, label="Pump 2")
             self.axis.legend(loc=0)
             plt.tight_layout()
-            logger.debug(f"{self.handler.name}: Drew a new plot for {points} data points in {round(time.time() - start) s}")
+            logger.debug(f"{self.handler.name}: Drew a new plot for {points} data points in {round(time.time() - start)} s")
