@@ -83,12 +83,13 @@ class Project:
     @staticmethod
     def dumpJson(project, path) -> None:
 
-        # filter the data
+        # filter the data alphanumerically
         _blanks = {}
         _trials = {}
         keys = []
         for test in project.tests:
-            test.reportAs.set(test.reportAs.get().strip())
+            if not test.reportAs.get().strip() == test.reportAs.get():
+                test.reportAs.set(test.reportAs.get().strip())
             key = test.reportAs.get().lower()
             while key in keys:
                 test.reportAs.set(test.reportAs.get() + " - copy")
