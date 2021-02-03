@@ -99,7 +99,9 @@ class Project:
                 _blanks[key] = test
             else:
                 _trials[key] = test
-            
+
+        # todo
+        # instead, sort by chem name then by conc magnitude     
         blankNames = sorted([blank.reportAs.get().lower() for blank in list(_blanks.values())])
         trialNames = sorted([test.reportAs.get().lower() for test in list(_trials.values())])
         blanks = []
