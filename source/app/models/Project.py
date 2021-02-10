@@ -5,6 +5,7 @@ import tkinter as tk
 import json as json
 
 from .Test import Test
+from .sort_nicely import sort_nicely
 
 logger = logging.getLogger('scalewiz')
 
@@ -80,37 +81,44 @@ class Project:
         self.defaultName.set(s)
         self.name.set(self.defaultName.get())
 
+    def trimNames(self):
+        for test in self.tests:
+            if test.chemical.get().strip() != test.chemical.get():
+                test.chemical.set(test.chemical.get().strip())
+
+            if test.reportAs.get().strip() != test.reportAs.get():
+                test.reportAs.set(test.reportAs.get().strip())
+            
+
     @staticmethod
     def dumpJson(project, path) -> None:
+        project.trimNames()
 
         # filter the data alphanumerically
-        _blanks = {}
+        _blanks = {} # put in dicts to allow for popping later
         _trials = {}
         keys = []
         for test in project.tests:
-            if not test.reportAs.get().strip() == test.reportAs.get():
-                test.reportAs.set(test.reportAs.get().strip())
-            key = test.reportAs.get().lower()
-            while key in keys:
+            key = test.reportAs.get().lower() # eliminate capitalization discrepancies
+            while key in keys: # checking for duplicate values
                 test.reportAs.set(test.reportAs.get() + " - copy")
                 key = test.reportAs.get().lower()
+            
             keys.append(key)
+
             if test.isBlank.get():
                 _blanks[key] = test
             else:
                 _trials[key] = test
 
-        # todo
+        blankNames = sort_nicely([blank.reportAs.get().lower() for blank in list(_blanks.values())])
+        blanks = [_blanks.pop(name) for name in blankNames]
+                
         # instead, sort by chem name then by conc magnitude     
-        blankNames = sorted([blank.reportAs.get().lower() for blank in list(_blanks.values())])
-        trialNames = sorted([test.reportAs.get().lower() for test in list(_trials.values())])
-        blanks = []
-        trials = []
-        for name in blankNames:
-            blanks.append(_blanks.pop(name))
-        for name in trialNames:
-            trials.append(_trials.pop(name))
-        
+        trialNames = sort_nicely([trial.reportAs.get().lower() for trial in list(_trials.values())])
+        trials = [_trials.pop(name) for name in trialNames]
+
+        # would prefer to keep all the tests together
         project.tests = [*blanks, *trials]
 
         this = {
