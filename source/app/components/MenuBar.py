@@ -4,9 +4,10 @@
 import logging
 import os
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 from .EvaluationFrame import EvaluationFrame
+from .RinseModal import RinseModal
 # internal
 from .ProjectEditor import ProjectEditor
 
@@ -23,6 +24,7 @@ class MenuBar(tk.Frame):
         menubar.add_command(label="Project", command=lambda: self.requestProjectEdit())
         menubar.add_command(label="Evaluation", command=lambda: self.requestEvalutaionWindow())
         menubar.add_command(label="Log", command=lambda: self.showLogWindow())
+        menubar.add_command(label="Rinse", command=lambda: self.showRinse())
         
         parent.winfo_toplevel().config(menu=menubar)
 
@@ -47,6 +49,18 @@ class MenuBar(tk.Frame):
     def showLogWindow(self):
         # todo this is not elegant
         self.parent.parent.log_window.deiconify() # woof
+
+    def showRinse(self):
+        currentTab = self.parent.tabControl.select()
+        widget = self.parent.nametowidget(currentTab)
+
+        window = tk.Toplevel()
+        rinse = RinseModal(widget.handler, window)
+        rinse.grid()
+        window.resizable(0, 0)
+
+       
+
 
 # todo move close editors method off of testhandler
 
