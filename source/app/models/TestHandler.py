@@ -158,6 +158,8 @@ class TestHandler():
         uptake = self.project.uptake.get()
         for i in range(uptake):
             self.toLog(f"Awaiting uptake time {uptake - i} s ...")
+            self.elapsed.set({uptake - i} s)
+            self.progress.set(round(i/uptake))
             time.sleep(1)
         self.toLog("")
         interval = self.project.interval.get()
@@ -289,8 +291,8 @@ class TestHandler():
         self.isDone.set(False)
         self.elapsed.set("")
         # todo why is this here?
-        self.parent.pltFrm.destroy()
-        self.parent.logFrm.destroy()
+        # self.parent.pltFrm.destroy()
+        # self.parent.logFrm.destroy()
         self.parent.build()
   
     # todo is this necessary??
