@@ -158,6 +158,8 @@ class TestHandler():
         uptake = self.project.uptake.get()
         for i in range(uptake):
             self.toLog(f"Awaiting uptake time {uptake - i} s ...")
+            self.elapsed.set({uptake - i} s)
+            self.progress.set(round(i/uptake))
             time.sleep(1)
         self.toLog("")
         interval = self.project.interval.get()
