@@ -157,10 +157,14 @@ class TestHandler():
         self.pump2.run()
         uptake = self.project.uptake.get()
         for i in range(uptake):
-            self.toLog(f"Awaiting uptake time {uptake - i} s ...")
-            self.elapsed.set(f"{uptake - i} s")
-            self.progress.set(round(i/uptake))
-            time.sleep(1)
+            if self.canRun():
+                self.elapsed.set(f"{uptake - i} s")
+                self.progress.set(round(i/uptake*100))
+                time.sleep(1)
+            else:
+                self.stopTest()
+                break
+
         self.toLog("")
         interval = self.project.interval.get()
         snooze = round(interval * 0.9, 2)
