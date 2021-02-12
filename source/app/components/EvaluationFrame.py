@@ -41,6 +41,9 @@ class EvaluationFrame(BaseFrame):
         entry.grid(row=row, column=1, sticky='new', padx=(5, 550), pady=2)
 
     def build(self):
+        for child in self.winfo_children():
+            child.destroy()
+
         self.tabControl = ttk.Notebook(self)
         self.tabControl.grid(row=0, column=0)
         # col config this too?
