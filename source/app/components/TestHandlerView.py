@@ -22,7 +22,7 @@ class TestHandlerView(ttk.Frame):
         self.build()
     
     def setBindings(self):
-        self.handler.test.isBlank.trace('w', self.build) # might have to retrace on new test
+        self.handler.test.isBlank.trace('w', self.update_TestType) # might have to retrace on new test
         self.handler.isRunning.trace('w', self.update_InputFrame)
         self.handler.isDone.trace('w', self.update_InitBtn)
         self.handler.dev1.trace('w', self.update_DevList)
