@@ -5,6 +5,7 @@ import tkinter as tk
 import tkinter.scrolledtext
 from tkinter import ttk
 import serial.tools.list_ports as list_ports
+import matplotlib.pyplot as plt
 
 from .LivePlot import LivePlot
 
@@ -128,6 +129,8 @@ class TestHandlerView(ttk.Frame):
         self.initBtn = ttk.Button(frame, text="New", command=lambda: self.handler.newTest())
 
         # rows 0-1 -------------------------------------------------------------
+        # close all pyplots to prevent memory leak
+        plt.close('all')
         self.pltFrm = LivePlot(self, self.handler)
         self.grid_columnconfigure(1, weight=1) # let it grow
         self.grid_rowconfigure(1, weight=1)
