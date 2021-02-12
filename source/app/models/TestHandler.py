@@ -291,8 +291,8 @@ class TestHandler():
         self.isDone.set(False)
         self.elapsed.set("")
         # todo why is this here?
-        self.parent.pltFrm.destroy()
-        self.parent.logFrm.destroy()
+        # self.parent.pltFrm.destroy()
+        # self.parent.logFrm.destroy()
         self.parent.build()
   
     # todo is this necessary??
