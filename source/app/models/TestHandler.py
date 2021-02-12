@@ -271,6 +271,8 @@ class TestHandler():
         Project.dumpJson(self.project, self.project.path.get())
         logger.info(f"{self.name}: Saved {self.project.name.get()} to {self.project.path.get()}")
         self.loadProj(path=self.project.path.get())
+        # todo ask them to rebuild instead
+        self.closeEditors()
 
     def setupPumps(self):
         # the timeout values are an alternative to using TextIOWrapper

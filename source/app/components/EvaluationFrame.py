@@ -25,13 +25,15 @@ class EvaluationFrame(BaseFrame):
     def __init__(self, parent, handler):
         BaseFrame.__init__(self, parent)
         self.handler = handler 
-        self.project = Project.loadJson(handler.project.path.get())
+        # self.project = Project.loadJson(handler.project.path.get())
+        # self.editorProject = self.project
+        self.project = handler.project
         self.editorProject = self.project
         parent.winfo_toplevel().title(self.project.name.get())
         self.build()
 
     def trace(self):
-        for test in self.project.tests:
+        for test in self.editorProject.tests:
             test.reportAs.trace('w', self.score)
             test.toConsider.trace('w', self.score)
             test.includeOnRep.trace('w', self.score)

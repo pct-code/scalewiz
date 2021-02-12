@@ -29,17 +29,17 @@ class MenuBar(tk.Frame):
     def requestProjectEdit(self):
         currentTab = self.parent.tabControl.select()
         widget = self.parent.nametowidget(currentTab)
-        if (widget.handler.isRunning.get()):
-            messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
-        else:
-            self.modProj(widget.handler)
+        # if (widget.handler.isRunning.get()):
+        #     messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
+        # else:
+        self.modProj(widget.handler)
 
     def requestEvalutaionWindow(self):
         currentTab = self.parent.tabControl.select()
         widget = self.parent.nametowidget(currentTab)
-        if widget.handler.isRunning.get():
-            messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
-        elif not os.path.isfile(widget.handler.project.path.get()):
+        # if widget.handler.isRunning.get():
+        #     messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
+        if not os.path.isfile(widget.handler.project.path.get()):
             messagebox.showwarning("No Project File", "The requested Project file has not yet been saved, or is missing")
         else:
             self.evalProj(widget.handler)
