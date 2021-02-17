@@ -3,10 +3,11 @@ from tkinter import ttk
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+from app.components.BaseFrame import BaseFrame
 
-class RinseModal(ttk.Frame):
+class RinseFrame(BaseFrame):
     def __init__(self, handler, window):
-        ttk.Frame.__init__(self)
+        BaseFrame.__init__(self, window)
         window.protocol("WM_DELETE_WINDOW", self.close)
         self.window = window
         self.handler = handler

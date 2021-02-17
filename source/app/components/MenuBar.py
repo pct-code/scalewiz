@@ -7,7 +7,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from .EvaluationFrame import EvaluationFrame
-from .RinseModal import RinseModal
+from .RinseFrame import RinseFrame
 # internal
 from .ProjectEditor import ProjectEditor
 
@@ -55,7 +55,7 @@ class MenuBar(tk.Frame):
         widget = self.parent.nametowidget(currentTab)
 
         window = tk.Toplevel()
-        rinse = RinseModal(widget.handler, window)
+        rinse = RinseFrame(widget.handler, window)
         rinse.grid()
         window.resizable(0, 0)
 
