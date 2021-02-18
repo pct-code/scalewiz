@@ -4,8 +4,9 @@ import os.path
 import tkinter as tk
 import json as json
 
-from .Test import Test
-from .sort_nicely import sort_nicely
+from models.Test import Test
+from models.sort_nicely import sort_nicely
+from models.get_resource import get_resource
 
 logger = logging.getLogger('scalewiz')
 
@@ -57,7 +58,7 @@ class Project:
         self.limitMin.set(90)
         self.interval.set(3)
         self.uptake.set(60)
-        t = os.path.abspath(r"assets/template.xlsx")
+        t = get_resource(r'../../assets/template.xlsx')
         self.template.set(t)
 
     def makeName(self, *args):
