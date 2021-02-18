@@ -11,7 +11,7 @@ from components.LivePlot import LivePlot
 
 logger = logging.getLogger('scalewiz')
 
-# todo these frames should probably be separated into separate classes 
+# todo #1 these frames should probably be separated into separate classes 
 
 class TestHandlerView(ttk.Frame):
     def __init__(self, parent, handler):
