@@ -46,7 +46,7 @@ If you don't already have a project loaded, click the 'Project' > 'Load existing
 
 Use the 'Devices' dropdown boxes to select the serial ports the pumps are connected to. Clicking the 'Devices' label will refresh the devices list.
 
-Use the 'Test Type' radio buttons to choose the appropriate test type. This property cannot be changed later.
+Use the 'Test Type' radio buttons to choose the appropriate test type. This property cannot be changed once the test begins.
 
 ### Blanks
 If you are running a blank, enter a name for it. This cannot be changed later. The 'Notes' property may be changed later.
