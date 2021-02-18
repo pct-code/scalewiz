@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "pct-scalewiz"
+version = "0.1.0"
+description = "A graphical user interface designed to work with Teledyne SSI MX-class HPLC pumps."
+authors = ["Alex Whittington <alex@southsun.tech>"]
+packages = [
+    {include = "pct_scalewiz/"},
+    {include = "pct_scalewiz/**/*.py"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+matplotlib = "^3.3.4"
+openpyxl = "^3.0.6"
+pyserial = "^3.5"
+tkcalendar = "^1.6.1"
+Markdown = "^3.3.3"
+
+
+[tool.poetry.scripts]
+scalewiz = "pct_scalewiz.main:main"
+
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
