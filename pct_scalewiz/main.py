@@ -23,7 +23,7 @@ class ScaleWiz(BaseFrame):
         
         # set UI
         # icon / version
-        parent.title("ScaleWiz")
+        parent.title("")
         parent.resizable(0, 0) # apparently this is a bad practice...
 
         # font 🔠 
