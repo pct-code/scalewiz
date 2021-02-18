@@ -159,7 +159,7 @@ babel = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6f7c426336d2e9c64db79aa071039899116b07d65f7ee79b1e30f894760dd887"
+content-hash = "eb5504f36179d2b1a22f1b1edfd6523058cc5f629c8b64abadaa5d632a1fe343"
 
 [metadata.files]
 babel = [
