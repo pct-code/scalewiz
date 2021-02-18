@@ -52,8 +52,7 @@ class ProjectEditor(BaseFrame):
         else:
             Project.dumpJson(self.editorProject, self.editorProject.path.get())
             self.handler.project = Project.loadJson(self.editorProject.path.get())
-            # todo
-            # how about a call to build instead?
+            # todo how about a call to build instead?
             self.handler.update_BtnText()
             self.handler.closeEditors()
 

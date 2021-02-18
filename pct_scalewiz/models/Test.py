@@ -25,8 +25,8 @@ class Test:
         self.name.trace('w', self.makeRepAs)
         self.toConsider.trace('w', self.getObsPSI)
 
-        # todo 
-        self.toConsider.set('pump 1') # move this to config later
+        # todo abstract this out to some TOML
+        self.toConsider.set('pump 1') 
         self.isBlank.set(True)
 
     def makeName(self, *args):

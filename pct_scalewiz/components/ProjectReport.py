@@ -15,11 +15,11 @@ class ProjectReport(ttk.Frame):
         templateEnt.bind("<Button-1>", self.loadTemplate)
         parent.render(templateLbl, templateEnt, 0)
 
-        # todo
+        # todo implement color selection
         # colorsLbl = ttk.Label(self, text="Plot color cycle:")
         # colorsEnt = ttk.Entry(self)
         # parent.render(colorsLbl, colorsEnt, 1)
-
+        # todo implement legend options
         # legendLbl = ttk.Label(self, text="Legend location:")
         # legendEnt = ttk.Combobox(self)
         # parent.render(legendLbl, legendEnt, 2)

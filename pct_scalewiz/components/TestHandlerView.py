@@ -125,7 +125,6 @@ class TestHandlerView(ttk.Frame):
         self.elapsed = ttk.Label(frame, textvariable=self.handler.elapsed)
         self.elapsed.grid(row=1, column=1)
         frame.grid(row=1, column=0, padx=1, pady=1, sticky='n')
-        # todo
         self.initBtn = ttk.Button(frame, text="New", command=lambda: self.handler.newTest())
 
         # rows 0-1 -------------------------------------------------------------

@@ -42,18 +42,18 @@ class TestHandler():
         self.update_BtnText()
 
         # logging
-        # todo add another logging handler here and set it to a file next to the project.json 
+        # todo add another logging handler here and set it to a file in logs/ next to the project.json 
 
+    # todo stop doing this method pls
     def canRun(self) -> bool:
         value = (
             (self.maxPSI1 <= self.project.limitPSI.get() or self.maxPSI2 <= self.project.limitPSI.get())
-            # todo stop doing this 
             and len(self.queue) < self.maxReadings()
             and not self.stopRequested
         )
         return value
 
-    # todo should be using a tkVar+trace instead ... 
+    # todo why is this a method ????
     def maxReadings(self) -> int:
         return round(self.project.limitMin.get() * 60 / self.project.interval.get()) + 1
 
@@ -183,8 +183,6 @@ class TestHandler():
             if time.time() - readingStart >= interval:
                 readingStart = time.time()
                 elapsedMin = round((time.time() - startTime)/60, 2)
-                # changed elapsed min to 
-                # todo add ++ here???
                 # elapsedMin = round(len(self.queue) * interval / 60, 2)
 
                 psi1 = self.pump1.pressure()
@@ -193,9 +191,6 @@ class TestHandler():
                 logger.debug(f"{self.name} collected both PSIs in {collected} s")
                 average = round(((psi1 + psi2)/2))
 
-                # todo
-                # if psi1 > limitPSI: psi1 = limitPSI
-                # if psi2 > limitPSI: psi2 = limitPSI
                 reading = {
                     "elapsedMin": elapsedMin,
                     "pump 1": psi1,
@@ -208,6 +203,7 @@ class TestHandler():
                 self.toLog(msg)
                 logger.info(f"{self.name} - {msg}")
 
+                # todo this is janky
                 # why do this vs adding to test directly?
                 # -> trying to not access same obj across threads
                 self.queue.append(reading)
@@ -220,7 +216,6 @@ class TestHandler():
                 logger.debug(f"Finished doing everything else in {time.time() - readingStart - collected} s")
                 logger.debug(f"{self.name} collected data in {time.time() - readingStart}")
                 # todo try asyncio - called defer or await or s/t
-                # should let CPU be busy in meantime ... ?
                 time.sleep(snooze)
         # end of readings loop ------------------------------------------------
         

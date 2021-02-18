@@ -51,7 +51,7 @@ class Project:
         self.sample.trace('w', self.makeName)
 
         # set defaults
-        # todo move this to a separate JSON/YAML later
+        # todo abstract these out into some TOML or something
         self.baseline.set(75)
         self.limitPSI.set(1500)
         self.limitMin.set(90)
@@ -76,8 +76,7 @@ class Project:
             s = f"{s} - {self.field.get()}".strip()
         if self.sample.get() != "":
             s = f"{s} ({self.sample.get()})".strip()
-        # todo
-        # we hold on to this -- no use for it yet !
+        # todo we hold on to this -- no use for it yet ! (should probably get rid of it)
         self.defaultName.set(s)
         self.name.set(self.defaultName.get())
 
@@ -194,8 +193,7 @@ class Project:
         this.template.set(obj.get('template'))
         this.plot.set(obj.get('plot'))
         
-        # todo
-        # probably a smarter way to enumerate over these
+        # todo probably a smarter way to enumerate over these
         for i in range(len(obj.get('tests'))):
             test = Test()
             test.loadJson(obj.get('tests')[i])
