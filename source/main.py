@@ -17,15 +17,13 @@ from app.models.Logger import Logger
 class App(BaseFrame):
     """Core object for the application."""
     
-    VERSION = '[1.0.0]'
-
     def __init__(self, parent):
         # expects the parent to be the root Tk object (and/or it's assoc. toplevel...?)
         BaseFrame.__init__(self, parent)
         
         # set UI
         # icon / version
-        parent.title(f"ScaleWiz {App.VERSION}")
+        parent.title(f"ScaleWiz")
         parent.resizable(0, 0) # apparently this is a bad practice...
 
         # font 🔠 
