@@ -2,14 +2,18 @@
 
 # util
 import logging
+import markdown
+from markdown.extensions.toc import TocExtension
 import os
+import tempfile
 import tkinter as tk
 from tkinter import messagebox, ttk
+import webbrowser
 
-from .EvaluationFrame import EvaluationFrame
-from .RinseFrame import RinseFrame
 # internal
-from .ProjectEditor import ProjectEditor
+from components.EvaluationFrame import EvaluationFrame
+from components.RinseFrame import RinseFrame
+from components.ProjectEditor import ProjectEditor
 
 logger = logging.getLogger('scalewiz')
 
@@ -25,7 +29,8 @@ class MenuBar(tk.Frame):
         menubar.add_command(label="Evaluation", command=lambda: self.requestEvalutaionWindow())
         menubar.add_command(label="Log", command=lambda: self.showLogWindow())
         menubar.add_command(label="Rinse", command=lambda: self.showRinse())
-        
+        menubar.add_command(label="Help", command=lambda: self.showHelp())
+
         parent.winfo_toplevel().config(menu=menubar)
 
     def requestProjectEdit(self):
@@ -59,7 +64,21 @@ class MenuBar(tk.Frame):
         rinse.grid()
         window.resizable(0, 0)
 
-       
+    def showHelp(self):
+        print(os.getcwd())
+        mdfile = os.path.abspath(r"../doc/index.md")
+        htmlfile = os.path.abspath(r"../doc/index.html")
+
+        markdown.markdownFromFile(
+        input=mdfile,
+        output=htmlfile,
+        extensions=[TocExtension(toc_depth="2-6")],
+        encoding="utf8"
+        )
+
+        webbrowser.open_new(os.path.abspath(htmlfile))
+
+
 
 
 # todo move close editors method off of testhandler

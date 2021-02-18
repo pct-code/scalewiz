@@ -3,7 +3,7 @@ from tkinter import ttk
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from app.components.BaseFrame import BaseFrame
+from components.BaseFrame import BaseFrame
 
 class RinseFrame(BaseFrame):
     def __init__(self, handler, window):

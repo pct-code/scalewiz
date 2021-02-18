@@ -7,7 +7,7 @@ from tkinter import ttk
 import serial.tools.list_ports as list_ports
 import matplotlib.pyplot as plt
 
-from .LivePlot import LivePlot
+from components.LivePlot import LivePlot
 
 logger = logging.getLogger('scalewiz')
 

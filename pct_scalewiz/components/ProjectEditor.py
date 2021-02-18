@@ -6,11 +6,11 @@ import tkinter as tk
 from tkinter import ttk, filedialog 
 
 # internal
-from ..models.Project import Project
-from .BaseFrame import BaseFrame
-from .ProjectInfo import ProjectInfo
-from .ProjectParams import ProjectParams
-from .ProjectReport import ProjectReport
+from models.Project import Project
+from components.BaseFrame import BaseFrame
+from components.ProjectInfo import ProjectInfo
+from components.ProjectParams import ProjectParams
+from components.ProjectReport import ProjectReport
 
 class ProjectEditor(BaseFrame):
     def __init__(self, parent, handler):

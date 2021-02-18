@@ -8,7 +8,7 @@ from logging.handlers import QueueHandler
 import queue
 
 # internal 
-from .BaseFrame import BaseFrame
+from components.BaseFrame import BaseFrame
 
 # thanks https://github.com/beenje/tkinter-logging-text-widget 
 

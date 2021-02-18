@@ -13,13 +13,13 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
-from .BaseFrame import BaseFrame
-from .TestResultRow import TestResultRow
-from .ProjectInfo import ProjectInfo
-from .ProjectParams import ProjectParams
-from .ProjectReport import ProjectReport
-from ..models.Project import Project
-from ..models.Export import export_report
+from components.BaseFrame import BaseFrame
+from components.TestResultRow import TestResultRow
+from components.ProjectInfo import ProjectInfo
+from components.ProjectParams import ProjectParams
+from components.ProjectReport import ProjectReport
+from models.Project import Project
+from models.Export import export_report
 
 class EvaluationFrame(BaseFrame):
     def __init__(self, parent, handler):

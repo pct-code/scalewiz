@@ -11,11 +11,11 @@ from serial import Serial, SerialException
 from concurrent.futures import ThreadPoolExecutor
 
 # internal
-from ..components.ProjectEditor import ProjectEditor
-from ..components.EvaluationFrame import EvaluationFrame
-from ..models.Project import Project
-from ..models.Test import Test
-from ..models.TeledynePump import TeledynePump
+from components.ProjectEditor import ProjectEditor
+from components.EvaluationFrame import EvaluationFrame
+from models.Project import Project
+from models.Test import Test
+from models.TeledynePump import TeledynePump
 
 logger = logging.getLogger('scalewiz')
 

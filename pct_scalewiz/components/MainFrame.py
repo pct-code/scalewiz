@@ -6,10 +6,10 @@ import tkinter as tk
 from tkinter import ttk
 
 # internal
-from .BaseFrame import BaseFrame
-from .MenuBar import MenuBar
-from .TestHandlerView import TestHandlerView
-from ..models.TestHandler import TestHandler
+from models.TestHandler import TestHandler
+from components.BaseFrame import BaseFrame
+from components.MenuBar import MenuBar
+from components.TestHandlerView import TestHandlerView
 
 logger = logging.getLogger('scalewiz')
 
@@ -50,5 +50,4 @@ class MainFrame(BaseFrame):
                 if not widget.handler.isDone.get():
                     logger.warning(f"Attempted to close while a test was running on {widget.handler.name}")
                     return
-        self.winfo_toplevel().destroy()
-        exit()
+        exit() 

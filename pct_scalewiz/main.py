@@ -9,12 +9,12 @@ from tkinter import font
 from tkinter import ttk
 
 # internal
-from app.components.BaseFrame import BaseFrame
-from app.components.MainFrame import MainFrame
-from app.components.LogFrame import LogFrame
-from app.models.Logger import Logger
+from components.BaseFrame import BaseFrame
+from components.MainFrame import MainFrame
+from components.LogFrame import LogFrame
+from models.Logger import Logger
 
-class App(BaseFrame):
+class ScaleWiz(BaseFrame):
     """Core object for the application."""
     
     def __init__(self, parent):
@@ -23,7 +23,7 @@ class App(BaseFrame):
         
         # set UI
         # icon / version
-        parent.title(f"ScaleWiz")
+        parent.title("ScaleWiz")
         parent.resizable(0, 0) # apparently this is a bad practice...
 
         # font 🔠 
@@ -54,8 +54,10 @@ class App(BaseFrame):
 
         MainFrame(self).grid() # this will hijack the window closing protocol
         
+def main():
+    root = tk.Tk()
+    ScaleWiz(root).grid()
+    root.mainloop()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    App(root).grid()
-    root.mainloop()
+    main()
