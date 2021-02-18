@@ -77,7 +77,7 @@ Between each test, it is necessary to rinse the system. Clicking 'Rinse' from th
 ![rinse dialog](../img/rinse_dialog.PNG)
 ![rinse dialog in progress](../img/rinse_dialog(rinsing).PNG)
 
-Closing the dialog will terminate the rinse cycle. 
+The button will temporarily disable while acting as a status label to show the progression of the rinse. Closing the dialog will terminate the rinse cycle. 
 
 ## Analyzing data 
 Click 'Evaluation' from the menu bar to open the Evalutaion Window. 
