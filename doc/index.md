@@ -4,9 +4,9 @@
 
 
 ## Starting a new project
-Launch ScaleWiz using your preferred method, and click 'Project' from the menu bar.
+Launch ScaleWiz using your preferred method, then click 'Project' > 'New/Edit' from the menu bar.
 
-![main menu](../img/main_menu.PNG)
+![main menu](../img/main_menu(project).PNG)
 
 This is the project editor screen. You'll mostly just use it for making new projects. The information is conveniently divided into three sections.
 
@@ -40,7 +40,7 @@ When you click 'Save' the project will be automatically loaded to the current Sy
 ## Collecting data
 Now that we've got our project file we are ready to collect some data. 
 
-If you don't already have a project loaded, click the button that says 'Select a project' to load one. If a project is currently loaded, it's name will be displayed on this button, like shown below.
+If you don't already have a project loaded, click the 'Project' > 'Load existing' from the menu bar. If a project is currently loaded, it's name will be displayed as shown below.
 
 ![main menu with loaded project](../img/main_menu(loaded).PNG)
 
@@ -50,6 +50,9 @@ Use the 'Test Type' radio buttons to choose the appropriate test type. This prop
 
 ### Blanks
 If you are running a blank, enter a name for it. This cannot be changed later. The 'Notes' property may be changed later.
+
+![trial entry](../img/main_menu(blank).PNG)
+
 
 ### Trials
 If you are running a chemical performance trial, some additional entries will appear. Enter the chemical name, and the treating rate to the nearest whole part per million. Use the 'Clarity' dropdown box to select the treated brine's water quality, or type in your own description. These properties cannot be changed later (except for 'Notes').
