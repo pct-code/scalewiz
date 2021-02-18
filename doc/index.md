@@ -62,11 +62,13 @@ If you are running a chemical performance trial, some additional entries will ap
 ### Running the test
 When you're ready to start the test, hit the 'Start' button. The uptake cycle will begin, and its status will be shown in the progress bar. 
 
+![uptake cycle](../img/main_menu(uptake).PNG)
+
 You can interrupt the uptake cycle (or the test itself) at any time by clicking the 'Stop' button. This will stop the pumps, then attempt to save the data to file.
 
 While a test is running, you may click 'Toggle Details' to show/hide a more detailed view of the experiment state, including a live plot of the data as it is collected.
 
-![live plot]()
+![live plot](../img/main_menu(details).PNG)
 
 
 A test will automatically stop itself and the pumps when either the time limit or pressure limit has been reached. The 'Start' button will become a 'New' button, which you can use to initialize a new test. 
@@ -82,12 +84,12 @@ The button will temporarily disable while acting as a status label to show the p
 ## Analyzing data 
 Click 'Evaluation' from the menu bar to open the Evalutaion Window. 
 
-![evalutaion frame with some data]()
+![evaluation frame with some data](../img/evaluation(data).PNG)
 
 The data for each test in the project will be displayed horizontally as a row.
 
 - Report As: what to call the test on the plot
-- Minutes: the duration of the test
+- Minutes: the duration of the test, (# of measurements)
 - Pump: which series of pressure measurements to use for scoring
 - Baseline: the observed baseline pressure for the selected Pump
 - Max: the highest pressure observed for the selected Pump
@@ -97,19 +99,22 @@ The data for each test in the project will be displayed horizontally as a row.
 - Report: a checkbox for indicating whether or not a test should be included on the report
 
 ### Plot
+The 'Plot' tab displays the most recent plot of all tests with a ticked 'Include on Report' box.
 
-![plot frame with some data]()
+![plot frame with some data](../img/evaluation(plot).PNG)
+
 
 ### Calculations
-
-![calcs frame with some data]()
+The 'Calculations' tab displays a text log of the evaluation of all tests with a ticked 'Include on Report' box. This log is automatically exported next to the report file when you click the 'Export' button.
 
 ### Generating a report
 
 You can export a report at any time by clicking the 'Export' button.
 
 ## Running tests concurrently
-To run tests concurrently, click 'Add System' from the menu bar. A new tab will appear on the main menu, and can be used normally. 
+To run tests concurrently, click 'Add System' from the menu bar. A new tab will appear on the main menu, and can be used normally.
+
+![two systems](../img/main_menu(concurrent).PNG)
 
 At the time of writing, a particular project may only be loaded to one system at a time. Loading the same project to more than one system may result in data loss. 
 
