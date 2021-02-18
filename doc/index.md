@@ -40,7 +40,7 @@ When you click 'Save' the project will be automatically loaded to the current Sy
 ## Collecting data
 Now that we've got our project file we are ready to collect some data. 
 
-If you don't already have a project loaded, click the 'Project' > 'Load existing' from the menu bar. If a project is currently loaded, it's name will be displayed as shown below.
+If you don't already have a project loaded, click 'Project' > 'Load existing' from the menu bar. If a project is currently loaded, it's name will be displayed as shown below.
 
 ![main menu with loaded project](../img/main_menu(loaded).PNG)
 
@@ -49,13 +49,12 @@ Use the 'Devices' dropdown boxes to select the serial ports the pumps are connec
 Use the 'Test Type' radio buttons to choose the appropriate test type. This property cannot be changed once the test begins.
 
 ### Blanks
-If you are running a blank, enter a name for it. This cannot be changed later. The 'Notes' property may be changed later.
-
+If you are running a blank, enter a name for it. The notes field may be used to store any other relevant information.
 ![trial entry](../img/main_menu(blank).PNG)
 
 
 ### Trials
-If you are running a chemical performance trial, some additional entries will appear. Enter the chemical name, and the treating rate to the nearest whole part per million. Use the 'Clarity' dropdown box to select the treated brine's water quality, or type in your own description. These properties cannot be changed later (except for 'Notes').
+If you are running a chemical performance trial, some additional entries will appear. Enter the chemical name and the treating rate to the nearest whole part per million. Use the 'Clarity' dropdown box to select the treated brine's water quality, or type in your own description.
 
 ![trial entry](../img/main_menu(trial).PNG)
 
