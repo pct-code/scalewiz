@@ -25,7 +25,12 @@ class MenuBar(tk.Frame):
 
         menubar = tk.Menu()
         menubar.add_command(label="Add System", command=lambda: parent.addTestHandler())
-        menubar.add_command(label="Project", command=lambda: self.requestProjectEdit())
+
+        projMenu = tk.Menu(tearoff=0)
+        projMenu.add_command(label='New/Edit', command=lambda: self.requestProjectEdit())
+        projMenu.add_command(label='Load existing', command=lambda: self.requestProjectLoad())
+
+        menubar.add_cascade(label="Project", menu=projMenu)
         menubar.add_command(label="Evaluation", command=lambda: self.requestEvalutaionWindow())
         menubar.add_command(label="Log", command=lambda: self.showLogWindow())
         menubar.add_command(label="Rinse", command=lambda: self.showRinse())
@@ -50,6 +55,12 @@ class MenuBar(tk.Frame):
             messagebox.showwarning("No Project File", "The requested Project file has not yet been saved, or is missing")
         else:
             self.evalProj(widget.handler)
+
+    def requestProjectLoad(self):
+        currentTab = self.parent.tabControl.select()
+        widget = self.parent.nametowidget(currentTab)
+        widget.handler.loadProj()
+        widget.build()
 
     def showLogWindow(self):
         # todo this is not elegant

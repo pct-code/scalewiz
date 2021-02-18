@@ -53,9 +53,9 @@ class TestHandlerView(ttk.Frame):
 
         # row 1 ---------------------------------------------------------------
         projLbl = ttk.Label(self.iFrm, text="Project:")
-        projBtn = ttk.Button(self.iFrm, 
-            textvariable=self.handler.projBtnText,
-            command=lambda: self.handler.loadProj()
+        projBtn = ttk.Label(self.iFrm, 
+            textvariable=self.handler.project.name,
+            anchor='center'
         )
         self.inputs.append(projBtn)
         self.render(projLbl, projBtn, 1)
