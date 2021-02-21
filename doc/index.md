@@ -13,6 +13,8 @@ This is the project editor screen. You'll mostly just use it for making new proj
 ### Project info
 This will be used to make the report later. Fill out the form with as much information as you have available. The 'Project name' field will auto-populate based on the given inputs, but you are free to rename it as you wish. 
 
+If you need to clear a date field, just click its label.
+
 ![project editor](../img/project_editor.PNG)
 
 ### Experiment parameters

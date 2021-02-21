@@ -44,6 +44,7 @@ class ProjectInfo(ttk.Frame):
         sampleDateLbl = ttk.Label(self, text="Date sampled:")
         d = parent.editorProject.sampleDate.get()
         sampleDateEnt = tkcal.DateEntry(self, textvariable=parent.editorProject.sampleDate, date_pattern='mm/dd/Y')
+        sampleDateLbl.bind('<Button-1>', lambda _: parent.editorProject.sampleDate.set(""))
         parent.editorProject.sampleDate.set(d)
         parent.render(sampleDateLbl, sampleDateEnt, 6)
         
@@ -51,6 +52,7 @@ class ProjectInfo(ttk.Frame):
         recDateLbl = ttk.Label(self, text="Date received:")
         d = parent.editorProject.recDate.get()
         recDateEnt = tkcal.DateEntry(self, textvariable=parent.editorProject.recDate, date_pattern='mm/dd/yyyy')
+        recDateLbl.bind('<Button-1>', lambda _: parent.editorProject.recDate.set(""))
         parent.editorProject.recDate.set(d)
         parent.render(recDateLbl, recDateEnt, 7)
 
@@ -58,6 +60,7 @@ class ProjectInfo(ttk.Frame):
         compDateLbl = ttk.Label(self, text="Date completed:")
         d = parent.editorProject.compDate.get()
         compDateEnt = tkcal.DateEntry(self, textvariable=parent.editorProject.compDate, date_pattern='mm/dd/yyyy')
+        compDateLbl.bind('<Button-1>', lambda _: parent.editorProject.compDate.set(""))
         parent.editorProject.compDate.set(d)
         parent.render(compDateLbl, compDateEnt,8)
 
@@ -81,3 +84,4 @@ class ProjectInfo(ttk.Frame):
         # pathLbl = ttk.Label(self, text="File path:")
         # pathEnt = ttk.Entry(self, textvariable=parent.editorProject.path)
         # parent.render(pathLbl, pathEnt, 12)
+    
