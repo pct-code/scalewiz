@@ -14,6 +14,7 @@ class RinseFrame(BaseFrame):
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
+        self.winfo_toplevel().title(self.handler.name)
 
         self.t = tk.IntVar()
         self.t.set(3)
