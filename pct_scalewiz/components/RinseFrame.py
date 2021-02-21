@@ -28,7 +28,8 @@ class RinseFrame(BaseFrame):
 
 
     def requestRinse(self):
-        self.pool.submit(self.rinse)
+        if not self.handler.isRunning.get():
+            self.pool.submit(self.rinse)
 
     def rinse(self):
         try:
