@@ -14,6 +14,7 @@ class RinseFrame(BaseFrame):
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
+        self.winfo_toplevel().title(self.handler.name)
 
         self.t = tk.IntVar()
         self.t.set(3)
@@ -26,9 +27,12 @@ class RinseFrame(BaseFrame):
         self.button = ttk.Button(window, textvariable=self.txt, command=lambda: self.requestRinse())
         self.button.grid(row=2, column=0, columnspan=2)
 
-
     def requestRinse(self):
-        self.pool.submit(self.rinse)
+        # todo #5 don't do this
+        if not self.handler.isRunning.get():
+            self.pool.submit(self.rinse)
+        elif self.handler.isDone.get():
+            self.pool.submit(self.rinse)
 
     def rinse(self):
         try:
