@@ -6,8 +6,6 @@
 #7 refactor state management in the test handler
 
 
-
-
 don't allow a project to be loaded to more than one system
     OR allow it but ensure data loss can't occur
 entry validation 
