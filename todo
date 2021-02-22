@@ -3,6 +3,7 @@
 #4 support for program settings stored in TOML or similar
 #5 don't do this
 #6 entry validation in experiment params (ints/doubles)
+#7 refactor state management in the test handler
 
 
 

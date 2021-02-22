@@ -35,6 +35,7 @@ class TestHandler():
 
         self.editors = []
 
+        # todo #7 refactor needed. this is too messy, and can't account for rinse/uptake cycles. need new way to manage state
         # UI concerns
         self.isRunning = tk.BooleanVar()
         self.isDone = tk.BooleanVar()
