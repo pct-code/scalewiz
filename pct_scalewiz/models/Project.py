@@ -23,7 +23,6 @@ class Project:
         self.recDate = tk.StringVar()
         self.compDate = tk.StringVar()
         self.name = tk.StringVar()
-        self.defaultName = tk.StringVar()
         self.analyst = tk.StringVar()
         self.numbers = tk.StringVar()
         self.path = tk.StringVar()
@@ -52,7 +51,8 @@ class Project:
         self.sample.trace('w', self.makeName)
 
         # set defaults
-        # todo abstract these out into some TOML or something
+        # todo #3 abstract these out into some TOML or something
+
         self.baseline.set(75)
         self.limitPSI.set(1500)
         self.limitMin.set(90)
@@ -63,11 +63,6 @@ class Project:
 
     def makeName(self, *args):
 
-        # if self.productionCo.get() != "":
-        #     initial = f"{self.editorProject.productionCo.get()} - {self.editorProject.field.get()} ({self.editorProject.sample.get()})"
-        # else:
-        #     initial = f"{self.editorProject.customer.get()} - {self.editorProject.field.get()} ({self.editorProject.sample.get()})"
-        
         s = ""
         if self.productionCo.get() != "":
             s = self.productionCo.get().strip()
@@ -77,9 +72,6 @@ class Project:
             s = f"{s} - {self.field.get()}".strip()
         if self.sample.get() != "":
             s = f"{s} ({self.sample.get()})".strip()
-        # todo we hold on to this -- no use for it yet ! (should probably get rid of it)
-        self.defaultName.set(s)
-        self.name.set(self.defaultName.get())
 
     def trimNames(self):
         for test in self.tests:
