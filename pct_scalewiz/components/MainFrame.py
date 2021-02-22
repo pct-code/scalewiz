@@ -36,7 +36,7 @@ class MainFrame(BaseFrame):
         handler = TestHandler(name) 
         # plug it in 🔌
         view = TestHandlerView(self.tabControl, handler) 
-        # todo why this assignment?
+        # todo why this assignment? the handler's 'parent' isn't a view. this can't be right, there must be a better way
         handler.parent = view # 😬
         # add it to the tab control then rename
         self.tabControl.add(view, sticky='nsew') 

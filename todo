@@ -1,3 +1,12 @@
+#1 refactor TestHandlerView
+#2 entry validation in project info (filename chars)
+#4 support for program settings stored in TOML or similar
+#5 don't do this
+#6 entry validation in experiment params (ints/doubles)
+
+
+
+
 don't allow a project to be loaded to more than one system
     OR allow it but ensure data loss can't occur
 entry validation 

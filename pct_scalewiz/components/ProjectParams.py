@@ -3,6 +3,9 @@
 import tkinter as tk
 from tkinter import ttk
 
+# todo #6 implement some form of entry validation targeting non-whole number inputs (or make allowances for doubles)
+
+
 class ProjectParams(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)

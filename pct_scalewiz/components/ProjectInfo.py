@@ -5,6 +5,8 @@ from tkinter import ttk
 import tkcalendar as tkcal
 from datetime import datetime
 
+# todo #2 implement some form of entry validation targeting disallowed chars for a filepath
+
 class ProjectInfo(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
