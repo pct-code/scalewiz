@@ -16,6 +16,7 @@ pyserial = "^3.5"
 tkcalendar = "^1.6.1"
 Markdown = "^3.3.3"
 Pillow = "^8.1.0"
+pandas = "^1.2.2"
 
 
 [tool.poetry.scripts]
