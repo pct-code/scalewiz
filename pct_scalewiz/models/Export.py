@@ -17,7 +17,6 @@ def export_report(self, project):
         self.save()
         logger.debug(f"{project.name.get()} was saved to its json file")
 
-
         template = project.template.get()
         if not os.path.isfile(template):
             msg = f"No valid template file found at {template}"
