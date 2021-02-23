@@ -42,3 +42,7 @@ def export(proj: Project):
     ylim = project.limitPSI.get()
     max_psis = [trial.maxPSI.get() for trial in trials]
     clarities = [trial.clarity.get() for trial in trials]
+
+    brine_comp = f"Synthetic Field Brine, Chlorides = {project.chlorides.get():,} mg/L"
+    if project.bicarbsIncreased.get():
+        brine_comp += f" (Bicarbs increased to {project.bicarbs.get():,} mg/L)"
