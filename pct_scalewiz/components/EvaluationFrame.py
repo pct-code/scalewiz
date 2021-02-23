@@ -18,31 +18,41 @@ from components.TestResultRow import TestResultRow
 from components.ProjectInfo import ProjectInfo
 from components.ProjectParams import ProjectParams
 from components.ProjectReport import ProjectReport
+from models.TestHandler import TestHandler
 from models.Project import Project
 from models.Export import export_report
 
 class EvaluationFrame(BaseFrame):
-    def __init__(self, parent, handler):
+    """Frame for analyzing data. Reproduces some Project editor tabs simply to take advantage of the space available."""
+
+    def __init__(self: BaseFrame, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler 
         # self.project = Project.loadJson(handler.project.path.get())
         # self.editorProject = self.project
+        # todo #8 refactor this. need to rename across all the ProjectX classes
         self.project = handler.project
         self.editorProject = self.project
         parent.winfo_toplevel().title(self.project.name.get())
         self.build()
 
-    def trace(self):
+    def trace(self: BaseFrame) -> None:
+        """Applies a tkVar trace to properties on every test object."""
+
         for test in self.editorProject.tests:
             test.reportAs.trace('w', self.score)
             test.toConsider.trace('w', self.score)
             test.includeOnRep.trace('w', self.score)
 
-    def render(self, label, entry, row):
+    def render(self: BaseFrame, label: ttk.Label, entry: ttk.Entry, row: int)  -> None:
+        """Renders a given label and entry on the passed row."""
+
         label.grid(row=row, column=0, sticky='e')
         entry.grid(row=row, column=1, sticky='new', padx=(5, 550), pady=2)
 
-    def build(self):
+    def build(self: BaseFrame)  -> None:
+        """Destroys all child widgets, then builds the UI."""
+
         for child in self.winfo_children():
             child.destroy()
 
@@ -56,7 +66,7 @@ class EvaluationFrame(BaseFrame):
         # header row
         labels = []
         labels.append(tk.Label(testsFrm, text="Name", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Report as", font=bold_font))
+        labels.append(tk.Label(testsFrm, text="Label", font=bold_font))
         labels.append(tk.Label(testsFrm, text="Minutes", font=bold_font))
         labels.append(tk.Label(testsFrm, text="Pump", font=bold_font))
         labels.append(tk.Label(testsFrm, text="Baseline", font=bold_font))
@@ -118,7 +128,10 @@ class EvaluationFrame(BaseFrame):
         # update results
         self.score()
 
-    def plot(self):
+
+    def plot(self: BaseFrame) -> None:
+        """Destroys the old plot frame if it exists, then makes a new one."""
+
         # close all pyplots to prevent memory leak
         plt.close('all')
         # get rid of our old plot tab if we have one
@@ -160,13 +173,14 @@ class EvaluationFrame(BaseFrame):
             self.axis.legend(loc=0)
             self.axis.margins(0)
             plt.tight_layout()
-           
             
         # finally, add to parent control
         self.tabControl.add(self.pltFrm, text="   Plot   ")
         self.tabControl.insert(1, self.pltFrm)
 
-    def save(self):
+    def save(self: BaseFrame) -> None:
+        """Saves the project to file, as well as the most recent plot and calculations log."""
+       
         # update image 
         out = f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} Scale Block Analysis (Graph).png"
         out = os.path.join(os.path.dirname(self.project.path.get()), out)
@@ -187,7 +201,9 @@ class EvaluationFrame(BaseFrame):
         # how about a call to build instead?
         self.build()
 
-    def score(self, *args):
+    def score(self: BaseFrame, *args) -> None:
+        """Updates the result for every Test in the Project. Accepts event args passed from the tkVar trace."""
+
         startTime = time.time()
         self.log = []
         # scoring props
@@ -275,7 +291,9 @@ class EvaluationFrame(BaseFrame):
             self.log.append(msg)
         self.toLog(self.log)
 
-    def toLog(self, log):
+    def toLog(self: BaseFrame, log: list[str]) -> None:
+        """Adds the passed log message to the Text widget in the Calculations frame."""
+
         self.logText.configure(state='normal')
         self.logText.delete(1.0, 'end')
         for i in log:
