@@ -28,10 +28,7 @@ class RinseFrame(BaseFrame):
         self.button.grid(row=2, column=0, columnspan=2)
 
     def requestRinse(self):
-        # todo #5 don't do this
-        if not self.handler.isRunning.get():
-            self.pool.submit(self.rinse)
-        elif self.handler.isDone.get():
+        if not self.handler.isRunning.get() or self.handler.isDone.get():
             self.pool.submit(self.rinse)
 
     def rinse(self):
@@ -46,7 +43,7 @@ class RinseFrame(BaseFrame):
         duration = self.t.get() * 60
         for i in range(duration):
                 if not self.stop:
-                    self.txt.set(f"{i}/{duration} s")
+                    self.txt.set(f"{i+1}/{duration} s")
                     time.sleep(1)
                 else:
                     break
