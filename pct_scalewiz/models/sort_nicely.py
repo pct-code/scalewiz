@@ -3,7 +3,8 @@
 import re
 def sort_nicely(things) -> list:
     """ Sort the given list in the way that humans expect."""
-    new_list = [thing for thing in things]
+    
+    new_list = things.copy()
     convert = lambda text: int(text) if text.isdigit() else text
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
     new_list.sort( key=alphanum_key )
