@@ -24,6 +24,12 @@ class LivePlot(ttk.Frame):
         self.ani = FuncAnimation(fig, self.animate, interval=interval)
 
     def animate(self, interval):
+        """Animates the live plot."""
+
+        # we can just skip this if the test isn't running
+        if self.handler.isDone.get() or not self.handler.isRunning.get():
+            return
+        
         # data access here 😳
         start = time.time()
         logger.debug(f"{self.handler.name}: Drawing a new plot ...")
