@@ -18,14 +18,14 @@ from components.TestResultRow import TestResultRow
 from components.ProjectInfo import ProjectInfo
 from components.ProjectParams import ProjectParams
 from components.ProjectReport import ProjectReport
-from models.TestHandler import TestHandler
+# from models.TestHandler import TestHandler
 from models.Project import Project
 from models.Export import export_report
 
 class EvaluationFrame(BaseFrame):
     """Frame for analyzing data. Reproduces some Project editor tabs simply to take advantage of the space available."""
 
-    def __init__(self: BaseFrame, parent: tk.Toplevel, handler: TestHandler) -> None:
+    def __init__(self: BaseFrame, parent: tk.Toplevel, handler: 'TestHandler') -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler 
         # self.project = Project.loadJson(handler.project.path.get())
