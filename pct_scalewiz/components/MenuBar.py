@@ -15,6 +15,8 @@ from components.EvaluationFrame import EvaluationFrame
 from components.RinseFrame import RinseFrame
 from components.ProjectEditor import ProjectEditor
 
+# todo #9 port over the old chlorides / ppm calculators 
+
 logger = logging.getLogger('scalewiz')
 
 class MenuBar(tk.Frame):
