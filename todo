@@ -7,6 +7,8 @@
 #8 refactor that Project vs editorProject silliness 
 #9 port over the old chlorides / ppm calculators
 
+check into appdirs
+
 
 don't allow a project to be loaded to more than one system
     OR allow it but ensure data loss can't occur
