@@ -3,6 +3,7 @@
 # util
 import tkinter as tk
 
+
 class Test:
     def __init__(self):
         # serializable props
@@ -20,27 +21,26 @@ class Test:
         self.maxPSI = tk.IntVar()
         self.obsBaseline = tk.IntVar()
 
-        self.chemical.trace('w', self.makeName)
-        self.rate.trace('w', self.makeName)
-        self.name.trace('w', self.makeRepAs)
-        self.toConsider.trace('w', self.getObsPSI)
+        self.chemical.trace("w", self.makeName)
+        self.rate.trace("w", self.makeName)
+        self.name.trace("w", self.makeRepAs)
+        self.toConsider.trace("w", self.getObsPSI)
 
         # todo abstract this out to some TOML
-        self.toConsider.set('pump 1') 
+        self.toConsider.set("pump 1")
         self.isBlank.set(True)
 
     def makeName(self, *args):
-        if not (
-            self.chemical.get() == ""
-            or self.rate.get() == 0
-        ):
+        if not (self.chemical.get() == "" or self.rate.get() == 0):
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
-    
+
     def makeRepAs(self, *args):
         self.reportAs.set(self.name.get())
-    
+
     def getObsPSI(self, *args):
-        pressures = [self.readings[i][self.toConsider.get()] for i in range(len(self.readings))]
+        pressures = [
+            self.readings[i][self.toConsider.get()] for i in range(len(self.readings))
+        ]
         if not len(pressures) == 0:
             self.maxPSI.set(max(pressures))
             baselines = pressures[0:4]
@@ -62,19 +62,19 @@ class Test:
             "readings": self.readings,
         }
         return this
-    
+
     def loadJson(self, obj):
-        self.name.set(obj['name'])
-        self.isBlank.set(obj['isBlank'])
+        self.name.set(obj["name"])
+        self.isBlank.set(obj["isBlank"])
         self.chemical.set(obj["chemical"])
-        self.rate.set(obj['rate'])
-        self.reportAs.set(obj['reportAs'])
-        self.clarity.set(obj['clarity'])
-        self.notes.set(obj['notes'])
-        self.toConsider.set(obj['toConsider'])
-        self.includeOnRep.set(obj['includeOnRep'])
-        self.result.set(obj['result'])
-        self.readings = obj['readings']
+        self.rate.set(obj["rate"])
+        self.reportAs.set(obj["reportAs"])
+        self.clarity.set(obj["clarity"])
+        self.notes.set(obj["notes"])
+        self.toConsider.set(obj["toConsider"])
+        self.includeOnRep.set(obj["includeOnRep"])
+        self.result.set(obj["result"])
+        self.readings = obj["readings"]
         self.getObsPSI()
 
     def getReadings(self) -> [int]:

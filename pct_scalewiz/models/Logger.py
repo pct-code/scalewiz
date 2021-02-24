@@ -1,6 +1,7 @@
 import logging
-from logging.handlers import QueueHandler
 import queue
+from logging.handlers import QueueHandler
+
 
 class Logger:
     """Sets default logging behavior for the program.
@@ -8,7 +9,7 @@ class Logger:
     Holds a ref to a queue. The LogFrame depends on access to this.
 
     Use from anywhere by calling logging.getLogger('scalewiz')
-    """ 
+    """
 
     def __init__(self):
         """The LogWindow depends on access to the .loq_queue attribute."""
@@ -16,7 +17,10 @@ class Logger:
         # set default logging behavior. could be moved to json. see dictConfig ?
         logging.basicConfig(level=logging.DEBUG)
         queue_handler = QueueHandler(self.log_queue)
-        formatter = logging.Formatter('%(asctime)s - %(thread)d - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
+        formatter = logging.Formatter(
+            "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
+            "%Y-%m-%d %H:%M:%S",
+        )
         queue_handler.setFormatter(formatter)
         queue_handler.setLevel(logging.INFO)
-        logging.getLogger('scalewiz').addHandler(queue_handler)
+        logging.getLogger("scalewiz").addHandler(queue_handler)

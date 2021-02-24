@@ -13,7 +13,11 @@ class ProjectReport(ttk.Frame):
         self.parent = parent
 
         templateLbl = ttk.Label(self, text="Export format:")
-        templateEnt = ttk.Combobox(self, values=["JSON", "CSV"], textvariable=parent.editorProject.output_format)
+        templateEnt = ttk.Combobox(
+            self,
+            values=["JSON", "CSV"],
+            textvariable=parent.editorProject.output_format,
+        )
         # templateEnt = tk.Message(self, textvariable=parent.editorProject.template, aspect=750)
         # templateEnt.bind("<Button-1>", self.loadTemplate)
         parent.render(templateLbl, templateEnt, 0)
@@ -29,18 +33,10 @@ class ProjectReport(ttk.Frame):
 
     def loadTemplate(self, *args):
         path = filedialog.askopenfilename(
-            initialdir="C:\"",
+            initialdir='C:"',
             title="Select report template:",
-            filetypes=[("Excel files", "*.xlsx")]
+            filetypes=[("Excel files", "*.xlsx")],
         )
 
         if not (path == ""):
             self.parent.editorProject.template.set(path)
-
-
-
-
-
-
-
-

@@ -7,11 +7,13 @@ from tkinter import ttk
 
 # internal
 from models.TestHandler import TestHandler
+
 from components.BaseFrame import BaseFrame
 from components.MenuBar import MenuBar
 from components.TestHandlerView import TestHandlerView
 
-logger = logging.getLogger('scalewiz')
+logger = logging.getLogger("scalewiz")
+
 
 class MainFrame(BaseFrame):
     """Main Frame for the application."""
@@ -26,20 +28,22 @@ class MainFrame(BaseFrame):
         MenuBar(self)  # this will apply itself to the current Toplevel
 
         self.tabControl = ttk.Notebook(self)
-        self.tabControl.grid(sticky='nsew')
+        self.tabControl.grid(sticky="nsew")
         self.addTestHandler()
-    
+
     def addTestHandler(self):
         # make a new handler 🤠
         system_name = f"  System {len(self.tabControl.tabs()) + 1}  "
-        name = system_name.strip() # todo perhaps we could pass this as arg to TestHandler init
-        handler = TestHandler(name) 
+        name = (
+            system_name.strip()
+        )  # todo perhaps we could pass this as arg to TestHandler init
+        handler = TestHandler(name)
         # plug it in 🔌
-        view = TestHandlerView(self.tabControl, handler) 
+        view = TestHandlerView(self.tabControl, handler)
         # todo why this assignment? the handler's 'parent' isn't a view. this can't be right, there must be a better way
-        handler.parent = view # 😬
+        handler.parent = view  # 😬
         # add it to the tab control then rename
-        self.tabControl.add(view, sticky='nsew') 
+        self.tabControl.add(view, sticky="nsew")
         self.tabControl.tab(view, text=system_name)
         logger.info(f"Added {handler.name} to main window")
 
@@ -48,6 +52,8 @@ class MainFrame(BaseFrame):
             widget = self.nametowidget(tab)
             if widget.handler.isRunning.get():
                 if not widget.handler.isDone.get():
-                    logger.warning(f"Attempted to close while a test was running on {widget.handler.name}")
+                    logger.warning(
+                        f"Attempted to close while a test was running on {widget.handler.name}"
+                    )
                     return
-        exit() 
+        exit()

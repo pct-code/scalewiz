@@ -8,7 +8,8 @@ from models.get_resource import get_resource
 from models.sort_nicely import sort_nicely
 from models.Test import Test
 
-logger = logging.getLogger('scalewiz')
+logger = logging.getLogger("scalewiz")
+
 
 class Project:
     def __init__(self):
@@ -18,7 +19,7 @@ class Project:
         self.productionCo = tk.StringVar()
         self.field = tk.StringVar()
         self.sample = tk.StringVar()
-  
+
         self.sampleDate = tk.StringVar()
         self.recDate = tk.StringVar()
         self.compDate = tk.StringVar()
@@ -46,10 +47,10 @@ class Project:
         self.tests = []
 
         # maintain live fields
-        self.customer.trace('w', self.makeName)
-        self.productionCo.trace('w', self.makeName)
-        self.field.trace('w', self.makeName)
-        self.sample.trace('w', self.makeName)
+        self.customer.trace("w", self.makeName)
+        self.productionCo.trace("w", self.makeName)
+        self.field.trace("w", self.makeName)
+        self.sample.trace("w", self.makeName)
 
         # set defaults
         # todo #3 abstract these out into some TOML or something
@@ -60,7 +61,7 @@ class Project:
         self.interval.set(3)
         self.uptake.set(60)
         # todo clean out this old template stuff ?
-        t = get_resource(r'../../assets/template.xlsx')
+        t = get_resource(r"../../assets/template.xlsx")
         self.template.set(t)
         self.output_format.set("CSV")
 
@@ -83,22 +84,21 @@ class Project:
 
             if test.reportAs.get().strip() != test.reportAs.get():
                 test.reportAs.set(test.reportAs.get().strip())
-            
 
     @staticmethod
     def dumpJson(project, path) -> None:
         project.trimNames()
 
         # filter the data alphanumerically
-        _blanks = {} # put in dicts to allow for popping later
+        _blanks = {}  # put in dicts to allow for popping later
         _trials = {}
         keys = []
         for test in project.tests:
-            key = test.reportAs.get().lower() # eliminate capitalization discrepancies
-            while key in keys: # checking for duplicate values
+            key = test.reportAs.get().lower()  # eliminate capitalization discrepancies
+            while key in keys:  # checking for duplicate values
                 test.reportAs.set(test.reportAs.get() + " - copy")
                 key = test.reportAs.get().lower()
-            
+
             keys.append(key)
 
             if test.isBlank.get():
@@ -106,18 +106,22 @@ class Project:
             else:
                 _trials[key] = test
 
-        blankNames = sort_nicely([blank.reportAs.get().lower() for blank in list(_blanks.values())])
+        blankNames = sort_nicely(
+            [blank.reportAs.get().lower() for blank in list(_blanks.values())]
+        )
         blanks = [_blanks.pop(name) for name in blankNames]
-                
-        # instead, sort by chem name then by conc magnitude     
-        trialNames = sort_nicely([trial.reportAs.get().lower() for trial in list(_trials.values())])
+
+        # instead, sort by chem name then by conc magnitude
+        trialNames = sort_nicely(
+            [trial.reportAs.get().lower() for trial in list(_trials.values())]
+        )
         trials = [_trials.pop(name) for name in trialNames]
 
         # would prefer to keep all the tests together
         project.tests = [*blanks, *trials]
 
         this = {
-            "info":{
+            "info": {
                 "customer": project.customer.get(),
                 "submittedBy": project.submittedBy.get(),
                 "productionCo": project.productionCo.get(),
@@ -130,7 +134,7 @@ class Project:
                 "analyst": project.analyst.get(),
                 "numbers": project.numbers.get(),
                 "path": os.path.abspath(project.path.get()),
-                "notes": project.notes.get()
+                "notes": project.notes.get(),
             },
             "params": {
                 "bicarbonates": project.bicarbs.get(),
@@ -141,63 +145,60 @@ class Project:
                 "limitPSI": project.limitPSI.get(),
                 "limitMin": project.limitMin.get(),
                 "interval": project.interval.get(),
-                "uptake": project.uptake.get()
+                "uptake": project.uptake.get(),
             },
             "tests": [test.dumpJson() for test in project.tests],
             "template": project.template.get(),
             "output_format": project.output_format.get(),
-            "plot": os.path.abspath(project.plot.get())
+            "plot": os.path.abspath(project.plot.get()),
         }
-        
+
         with open(project.path.get(), "w") as file:
             json.dump(this, file, indent=4)
-        
+
         logger.info(f"Saved {project.name.get()} to {project.path.get()}")
 
     @staticmethod
-    def loadJson(path) -> 'Project':
+    def loadJson(path) -> "Project":
         logger.info(f"Loading from {path}")
         with open(path, "r") as file:
             obj = json.load(file)
 
         this = Project()
-        info = obj.get('info')
-        this.customer.set(info.get('customer'))
-        this.submittedBy.set(info.get('submittedBy'))
-        this.productionCo.set(info.get('productionCo'))
-        this.field.set(info.get('field'))
-        this.sample.set(info.get('sample'))
-        this.sampleDate.set(info.get('sampleDate'))
-        this.recDate.set(info.get('recDate'))
-        this.compDate.set(info.get('compDate'))
-        this.name.set(info.get('name'))
-        this.numbers.set(info.get('numbers'))
-        this.analyst.set(info.get('analyst'))
-        this.path.set(info.get('path'))
-        this.notes.set(info.get('notes'))
-       
-        params = obj.get('params')
-        this.bicarbs.set(params.get('bicarbonates'))
-        this.bicarbsIncreased.set(params.get('bicarbsIncreased'))
-        this.chlorides.set(params.get('chlorides'))
-        this.baseline.set(params.get('baseline'))
-        this.temperature.set(params.get('temperature'))
-        this.limitPSI.set(params.get('limitPSI'))
-        this.limitMin.set(params.get('limitMin'))
-        this.interval.set(params.get('interval'))
-        this.uptake.set(params.get('uptake'))
+        info = obj.get("info")
+        this.customer.set(info.get("customer"))
+        this.submittedBy.set(info.get("submittedBy"))
+        this.productionCo.set(info.get("productionCo"))
+        this.field.set(info.get("field"))
+        this.sample.set(info.get("sample"))
+        this.sampleDate.set(info.get("sampleDate"))
+        this.recDate.set(info.get("recDate"))
+        this.compDate.set(info.get("compDate"))
+        this.name.set(info.get("name"))
+        this.numbers.set(info.get("numbers"))
+        this.analyst.set(info.get("analyst"))
+        this.path.set(info.get("path"))
+        this.notes.set(info.get("notes"))
 
-        this.template.set(obj.get('template'))
-        this.plot.set(obj.get('plot'))
-        this.output_format.set(obj.get('output_format'))
-        
+        params = obj.get("params")
+        this.bicarbs.set(params.get("bicarbonates"))
+        this.bicarbsIncreased.set(params.get("bicarbsIncreased"))
+        this.chlorides.set(params.get("chlorides"))
+        this.baseline.set(params.get("baseline"))
+        this.temperature.set(params.get("temperature"))
+        this.limitPSI.set(params.get("limitPSI"))
+        this.limitMin.set(params.get("limitMin"))
+        this.interval.set(params.get("interval"))
+        this.uptake.set(params.get("uptake"))
+
+        this.template.set(obj.get("template"))
+        this.plot.set(obj.get("plot"))
+        this.output_format.set(obj.get("output_format"))
+
         # todo probably a smarter way to enumerate over these
-        for i in range(len(obj.get('tests'))):
+        for i in range(len(obj.get("tests"))):
             test = Test()
-            test.loadJson(obj.get('tests')[i])
-         
+            test.loadJson(obj.get("tests")[i])
+
             this.tests.append(test)
         return this
-
-
-

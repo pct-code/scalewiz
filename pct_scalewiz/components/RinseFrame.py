@@ -1,9 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
 import time
+import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
+from tkinter import ttk
 
 from components.BaseFrame import BaseFrame
+
 
 class RinseFrame(BaseFrame):
     def __init__(self, handler, window):
@@ -24,7 +25,9 @@ class RinseFrame(BaseFrame):
         lbl.grid(row=0, column=0)
         ent = ttk.Spinbox(window, textvariable=self.t, from_=3, to=60)
         ent.grid(row=0, column=1)
-        self.button = ttk.Button(window, textvariable=self.txt, command=lambda: self.requestRinse())
+        self.button = ttk.Button(
+            window, textvariable=self.txt, command=lambda: self.requestRinse()
+        )
         self.button.grid(row=2, column=0, columnspan=2)
 
     def requestRinse(self):
@@ -39,24 +42,24 @@ class RinseFrame(BaseFrame):
         self.handler.pump1.run()
         self.handler.pump2.run()
 
-        self.button.configure(state='disabled')
+        self.button.configure(state="disabled")
         duration = self.t.get() * 60
         for i in range(duration):
-                if not self.stop:
-                    self.txt.set(f"{i+1}/{duration} s")
-                    time.sleep(1)
-                else:
-                    break
-        
+            if not self.stop:
+                self.txt.set(f"{i+1}/{duration} s")
+                time.sleep(1)
+            else:
+                break
+
         self.terminate()
-        self.button.configure(state='normal')
-    
+        self.button.configure(state="normal")
+
     def terminate(self):
         if self.handler.pump1.port.isOpen():
             self.handler.pump1.stop()
             self.handler.pump1.close()
             # logger.info(f"{self.name}: Stopped and closed the device @ {self.pump1.port.port}")
-        
+
         if self.handler.pump2.port.isOpen():
             self.handler.pump2.stop()
             self.handler.pump2.close()

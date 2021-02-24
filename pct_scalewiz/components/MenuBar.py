@@ -2,22 +2,24 @@
 
 # util
 import logging
-import markdown
-from markdown.extensions.toc import TocExtension
 import os
 import tempfile
 import tkinter as tk
-from tkinter import messagebox, ttk
 import webbrowser
+from tkinter import messagebox, ttk
+
+import markdown
+from markdown.extensions.toc import TocExtension
 
 # internal
 from components.EvaluationFrame import EvaluationFrame
-from components.RinseFrame import RinseFrame
 from components.ProjectEditor import ProjectEditor
+from components.RinseFrame import RinseFrame
 
-# todo #9 port over the old chlorides / ppm calculators 
+# todo #9 port over the old chlorides / ppm calculators
 
-logger = logging.getLogger('scalewiz')
+logger = logging.getLogger("scalewiz")
+
 
 class MenuBar(tk.Frame):
     def __init__(self, parent):
@@ -29,11 +31,17 @@ class MenuBar(tk.Frame):
         menubar.add_command(label="Add System", command=lambda: parent.addTestHandler())
 
         projMenu = tk.Menu(tearoff=0)
-        projMenu.add_command(label='New/Edit', command=lambda: self.requestProjectEdit())
-        projMenu.add_command(label='Load existing', command=lambda: self.requestProjectLoad())
+        projMenu.add_command(
+            label="New/Edit", command=lambda: self.requestProjectEdit()
+        )
+        projMenu.add_command(
+            label="Load existing", command=lambda: self.requestProjectLoad()
+        )
 
         menubar.add_cascade(label="Project", menu=projMenu)
-        menubar.add_command(label="Evaluation", command=lambda: self.requestEvalutaionWindow())
+        menubar.add_command(
+            label="Evaluation", command=lambda: self.requestEvalutaionWindow()
+        )
         menubar.add_command(label="Log", command=lambda: self.showLogWindow())
         menubar.add_command(label="Rinse", command=lambda: self.showRinse())
         menubar.add_command(label="Help", command=lambda: self.showHelp())
@@ -54,7 +62,10 @@ class MenuBar(tk.Frame):
         # if widget.handler.isRunning.get():
         #     messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
         if not os.path.isfile(widget.handler.project.path.get()):
-            messagebox.showwarning("No Project File", "The requested Project file has not yet been saved, or is missing")
+            messagebox.showwarning(
+                "No Project File",
+                "The requested Project file has not yet been saved, or is missing",
+            )
         else:
             self.evalProj(widget.handler)
 
@@ -66,7 +77,7 @@ class MenuBar(tk.Frame):
 
     def showLogWindow(self):
         # todo this is not elegant
-        self.parent.parent.log_window.deiconify() # woof
+        self.parent.parent.log_window.deiconify()  # woof
 
     def showRinse(self):
         currentTab = self.parent.tabControl.select()
@@ -83,22 +94,21 @@ class MenuBar(tk.Frame):
         htmlfile = os.path.abspath(r"../doc/index.html")
 
         markdown.markdownFromFile(
-        input=mdfile,
-        output=htmlfile,
-        extensions=[TocExtension(toc_depth="2-6")],
-        encoding="utf8"
+            input=mdfile,
+            output=htmlfile,
+            extensions=[TocExtension(toc_depth="2-6")],
+            encoding="utf8",
         )
 
         webbrowser.open_new(os.path.abspath(htmlfile))
 
-
-
-
-# todo move close editors method off of testhandler
+    # todo move close editors method off of testhandler
 
     def modProj(self, handler):
-        if len(handler.editors) > 0: 
-            messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
+        if len(handler.editors) > 0:
+            messagebox.showwarning(
+                "Project is locked", "Can't modify a Project while it is being accessed"
+            )
             return
         window = tk.Toplevel()
         window.protocol("WM_DELETE_WINDOW", lambda: handler.closeEditors())
@@ -106,11 +116,15 @@ class MenuBar(tk.Frame):
         handler.editors.append(window)
         editor = ProjectEditor(window, handler)
         editor.grid()
-        logger.info(f"{handler.name}: Opened an editor window for {handler.project.name.get()}")
+        logger.info(
+            f"{handler.name}: Opened an editor window for {handler.project.name.get()}"
+        )
 
     def evalProj(self, handler):
-        if len(handler.editors) > 0: 
-            messagebox.showwarning("Project is locked", "Can't modify a Project while it is being accessed")
+        if len(handler.editors) > 0:
+            messagebox.showwarning(
+                "Project is locked", "Can't modify a Project while it is being accessed"
+            )
             return
         window = tk.Toplevel()
         window.protocol("WM_DELETE_WINDOW", lambda: handler.closeEditors())
@@ -118,4 +132,6 @@ class MenuBar(tk.Frame):
         handler.editors.append(window)
         editor = EvaluationFrame(window, handler)
         editor.grid()
-        logger.info(f"{handler.name}: Opened an evaluation window for {handler.project.name.get()}")
+        logger.info(
+            f"{handler.name}: Opened an evaluation window for {handler.project.name.get()}"
+        )

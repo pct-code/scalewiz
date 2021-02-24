@@ -3,14 +3,16 @@
 # util
 import os.path
 import tkinter as tk
-from tkinter import ttk, filedialog 
+from tkinter import filedialog, ttk
 
 # internal
 from models.Project import Project
+
 from components.BaseFrame import BaseFrame
 from components.ProjectInfo import ProjectInfo
 from components.ProjectParams import ProjectParams
 from components.ProjectReport import ProjectReport
+
 
 class ProjectEditor(BaseFrame):
     def __init__(self, parent, handler):
@@ -28,14 +30,20 @@ class ProjectEditor(BaseFrame):
         tabControl = ttk.Notebook(self)
         tabControl.grid(row=0, column=0)
 
-        tabControl.add(ProjectInfo(self), text='Project info')
-        tabControl.add(ProjectParams(self), text='Experiment parameters')
-        tabControl.add(ProjectReport(self), text='Report settings')
+        tabControl.add(ProjectInfo(self), text="Project info")
+        tabControl.add(ProjectParams(self), text="Experiment parameters")
+        tabControl.add(ProjectReport(self), text="Report settings")
 
         btnFrm = ttk.Frame(self)
-        ttk.Button(btnFrm, text="Save", width=7, command=lambda: self.save()).grid(row=0, column=0, padx=5)
-        ttk.Button(btnFrm, text="Save as", width=7, command=lambda: self.saveAs()).grid(row=0, column=1, padx=10)
-        ttk.Button(btnFrm, text="New", width=7, command=lambda: self.new()).grid(row=0, column=2, padx=5 )
+        ttk.Button(btnFrm, text="Save", width=7, command=lambda: self.save()).grid(
+            row=0, column=0, padx=5
+        )
+        ttk.Button(btnFrm, text="Save as", width=7, command=lambda: self.saveAs()).grid(
+            row=0, column=1, padx=10
+        )
+        ttk.Button(btnFrm, text="New", width=7, command=lambda: self.new()).grid(
+            row=0, column=2, padx=5
+        )
         btnFrm.grid(row=1, column=0)
 
     def render(self, label, entry, row):
@@ -47,7 +55,7 @@ class ProjectEditor(BaseFrame):
         self.build()
 
     def save(self):
-        if(self.editorProject.path.get() == ""):
+        if self.editorProject.path.get() == "":
             self.saveAs()
         else:
             Project.dumpJson(self.editorProject, self.editorProject.path.get())
@@ -59,7 +67,7 @@ class ProjectEditor(BaseFrame):
         file = filedialog.asksaveasfilename(
             title="Save Project As:",
             filetypes=[("JSON files", "*.json")],
-            initialfile=f"{self.editorProject.name.get()}.json"
+            initialfile=f"{self.editorProject.name.get()}.json",
         )
 
         if not (file == ""):
