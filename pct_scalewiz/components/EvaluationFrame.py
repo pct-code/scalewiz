@@ -20,7 +20,7 @@ from components.ProjectParams import ProjectParams
 from components.ProjectReport import ProjectReport
 # from models.TestHandler import TestHandler
 from models.Project import Project
-from models.Export import export_report
+from models.export_csv import export_csv
 
 class EvaluationFrame(BaseFrame):
     """Frame for analyzing data. Reproduces some Project editor tabs simply to take advantage of the space available."""
@@ -123,7 +123,7 @@ class EvaluationFrame(BaseFrame):
             
         btnFrm = ttk.Frame(self)
         ttk.Button(btnFrm, text="Save", command=lambda: self.save(), width=10).grid(row=0, column=0, padx=5)
-        ttk.Button(btnFrm, text="Export", command=lambda: export_report(self, self.project), width=10).grid(row=0, column=1, padx=5)
+        ttk.Button(btnFrm, text="Export", command=lambda: export_csv(self.project), width=10).grid(row=0, column=1, padx=5)
         btnFrm.grid(row=1, column=0, pady=5)
         # update results
         self.score()

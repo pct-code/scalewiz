@@ -10,9 +10,10 @@ class ProjectReport(ttk.Frame):
         self.grid_columnconfigure(1, weight=1)
         self.parent = parent
 
-        templateLbl = ttk.Label(self, text="Report template:")
-        templateEnt = tk.Message(self, textvariable=parent.editorProject.template, aspect=750)
-        templateEnt.bind("<Button-1>", self.loadTemplate)
+        templateLbl = ttk.Label(self, text="Export format:")
+        templateEnt = ttk.Combobox(self, values=["JSON", "CSV"], textvariable=parent.editorProject.output_format)
+        # templateEnt = tk.Message(self, textvariable=parent.editorProject.template, aspect=750)
+        # templateEnt.bind("<Button-1>", self.loadTemplate)
         parent.render(templateLbl, templateEnt, 0)
 
         # todo implement color selection

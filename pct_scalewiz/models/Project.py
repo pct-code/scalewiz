@@ -1,6 +1,6 @@
 """Model object for a project. Provides a JSON/Tk mapping."""
 import logging
-import os.path
+import os
 import tkinter as tk
 import json as json
 
@@ -39,6 +39,7 @@ class Project:
         self.uptake = tk.IntVar()
         # report stuff
         self.template = tk.StringVar()
+        self.output_format = tk.StringVar()
         self.plot = tk.StringVar()
 
         # list of JSON objects
@@ -58,8 +59,10 @@ class Project:
         self.limitMin.set(90)
         self.interval.set(3)
         self.uptake.set(60)
+        # todo clean out this old template stuff ?
         t = get_resource(r'../../assets/template.xlsx')
         self.template.set(t)
+        self.output_format.set("CSV")
 
     def makeName(self, *args):
         s = ""
@@ -126,7 +129,7 @@ class Project:
                 "name": project.name.get(),
                 "analyst": project.analyst.get(),
                 "numbers": project.numbers.get(),
-                "path": project.path.get(),
+                "path": os.path.abspath(project.path.get()),
                 "notes": project.notes.get()
             },
             "params": {
@@ -142,7 +145,8 @@ class Project:
             },
             "tests": [test.dumpJson() for test in project.tests],
             "template": project.template.get(),
-            "plot": project.plot.get()
+            "output_format": project.output_format.get(),
+            "plot": os.path.abspath(project.plot.get())
         }
         
         with open(project.path.get(), "w") as file:
@@ -185,6 +189,7 @@ class Project:
 
         this.template.set(obj.get('template'))
         this.plot.set(obj.get('plot'))
+        this.output_format.set(obj.get('output_format'))
         
         # todo probably a smarter way to enumerate over these
         for i in range(len(obj.get('tests'))):
