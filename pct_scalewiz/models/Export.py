@@ -14,8 +14,8 @@ logger = logging.getLogger('scalewiz')
 def export_report(self, project):
         logger.info(f"Beginning export of {project.name.get()}")
         # save the report
-        self.save()
-        logger.debug(f"{project.name.get()} was saved to its json file")
+        # self.save()
+        # logger.debug(f"{project.name.get()} was saved to its json file")
 
         template = project.template.get()
         if not os.path.isfile(template):
@@ -81,6 +81,9 @@ def export_report(self, project):
         brine_comp = f"Synthetic Field Brine, Chlorides = {project.chlorides.get():,} mg/L"
         if project.bicarbsIncreased.get():
             brine_comp += f" (Bicarbs increased to {project.bicarbs.get():,} mg/L)"
+        
+        
+        
         ws['D12'] = brine_comp
         ws['D10'] = project.temperature.get()
         ws['C4'] = project.customer.get()

@@ -1,9 +1,11 @@
 #1 refactor TestHandlerView
 #2 entry validation in project info (filename chars)
 #4 support for program settings stored in TOML or similar
-#5 don't do this
+#5 don't do this (what is 'this' ???)
 #6 entry validation in experiment params (ints/doubles)
 #7 refactor state management in the test handler
+#8 refactor that Project vs editorProject silliness 
+#9 port over the old chlorides / ppm calculators
 
 
 don't allow a project to be loaded to more than one system
@@ -13,4 +15,3 @@ entry validation
 'add system' -> 'system' > 'add new', 'remove current'
 anything called 'Report as' either in code or UI should be renamed to something like 'label'
 
-new screenshots for rinse frame
