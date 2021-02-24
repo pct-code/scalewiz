@@ -17,7 +17,7 @@ class ProjectEditor(BaseFrame):
         BaseFrame.__init__(self, parent)
         self.handler = handler
         self.grid_columnconfigure(0, weight=1)
-        if(os.path.isfile(handler.project.path.get())):
+        if os.path.isfile(handler.project.path.get()):
             self.editorProject = Project.loadJson(handler.project.path.get())
             self.editorProject.path.set(handler.project.path.get())
         else:
@@ -53,8 +53,7 @@ class ProjectEditor(BaseFrame):
             Project.dumpJson(self.editorProject, self.editorProject.path.get())
             self.handler.project = Project.loadJson(self.editorProject.path.get())
             # todo how about a call to build instead?
-            self.handler.update_BtnText()
-            self.handler.closeEditors()
+            self.handler.parent.build()
 
     def saveAs(self):
         file = filedialog.asksaveasfilename(

@@ -62,7 +62,6 @@ class Project:
         self.template.set(t)
 
     def makeName(self, *args):
-
         s = ""
         if self.productionCo.get() != "":
             s = self.productionCo.get().strip()
@@ -72,6 +71,7 @@ class Project:
             s = f"{s} - {self.field.get()}".strip()
         if self.sample.get() != "":
             s = f"{s} ({self.sample.get()})".strip()
+        self.name.set(s)
 
     def trimNames(self):
         for test in self.tests:
