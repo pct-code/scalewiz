@@ -6,9 +6,7 @@ from datetime import datetime
 from tkinter import messagebox
 from xml.dom.minidom import parseString
 
-from dicttoxml import dicttoxml
 import json
-import pandas as pd
 from pandas import DataFrame
 import PIL
 
@@ -18,7 +16,7 @@ from models.Test import Test
 logger = logging.getLogger('scalewiz')
 
 def export_csv(project: Project) -> None:
-    """Generates a report for the passed Project in a flattened CSV format."""
+    """Generates a report for the passed Project in a flattened CSV format (or ugly JSON)."""
     start_time = time.time()
     logger.info(f"Beginning export of {project.name.get()}")
 
@@ -69,7 +67,7 @@ def export_csv(project: Project) -> None:
     
     with open(out, 'w') as output:
         if project.output_format.get() == "CSV":
-            df = pd.DataFrame.from_dict(output_dict)
+            df = DataFrame.from_dict(output_dict)
             df.to_csv(out, encoding='utf-8')
         elif project.output_format.get() == "JSON":
             json.dump(output_dict, output, indent=4)
