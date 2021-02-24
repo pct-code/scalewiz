@@ -1,14 +1,13 @@
+import json
 import logging
 import os
 import time
 import tkinter
 from datetime import datetime
 from tkinter import messagebox
-from xml.dom.minidom import parseString
 
-import json
-from pandas import DataFrame
 import PIL
+from pandas import DataFrame
 
 from models.Project import Project
 from models.Test import Test

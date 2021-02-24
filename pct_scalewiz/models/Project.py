@@ -1,12 +1,12 @@
 """Model object for a project. Provides a JSON/Tk mapping."""
+import json as json
 import logging
 import os
 import tkinter as tk
-import json as json
 
-from models.Test import Test
-from models.sort_nicely import sort_nicely
 from models.get_resource import get_resource
+from models.sort_nicely import sort_nicely
+from models.Test import Test
 
 logger = logging.getLogger('scalewiz')
 

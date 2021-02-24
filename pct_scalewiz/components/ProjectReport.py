@@ -1,8 +1,10 @@
 """Editor for Project reporting settings."""
 
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import filedialog, ttk
+
 import tkcalendar as tkcal
+
 
 class ProjectReport(ttk.Frame):
     def __init__(self, parent):
