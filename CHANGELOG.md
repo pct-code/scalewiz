@@ -7,10 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
  - clicking a date entry label in the 'Project info' view will clear its contents
+ - report export as CSV (default)
+ - report export as JSON 
 ### Changed
  - rinse windows will be titled after the system they control
  - requests for rinse cycles will be ignored if a test is already running
- - the Live Plot stops updating (clearing itself) at the end of a test
+ - the Live Plot stops updating (clearing itself) at the end of a 
+### Removed
+ - dependency on openpyxl
+ - dependency on PIL
+ - ability to export report as .xlsx
 
 ## [v0.1.0]
 ### Added
