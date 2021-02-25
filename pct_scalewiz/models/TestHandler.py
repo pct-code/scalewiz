@@ -10,6 +10,7 @@ from datetime import date
 from tkinter import filedialog, messagebox
 
 from components.EvaluationFrame import EvaluationFrame
+
 # internal
 from components.ProjectEditor import ProjectEditor
 from serial import Serial, SerialException

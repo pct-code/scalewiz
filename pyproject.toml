@@ -22,14 +22,16 @@ scalewiz = "pct_scalewiz.main:main"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
-flake8 = "^3.8.4"
+pylint = "^2.7.1"
 
 [tool.black]
 line-length = 88
 
-[flake8]
+[tool.pylint.reports]
+output-format = "colorized"
+
+[tool.pylint.format]
 max-line-length = 88
-extend-ignore = "E203"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
