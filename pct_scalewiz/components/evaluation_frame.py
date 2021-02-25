@@ -239,10 +239,10 @@ class EvaluationFrame(BaseFrame):
         maxReadings = round(
             self.project.limitMin.get() * 60 / self.project.interval.get()
         )
-        self.log.append(f"Max readings: limitMin * 60 / reading interval")
+        self.log.append("Max readings: limitMin * 60 / reading interval")
         self.log.append(f"Max readings: {maxReadings}")
         baselineArea = round(self.project.baseline.get() * maxReadings)
-        self.log.append(f"Baseline area: baseline PSI * max readings")
+        self.log.append("Baseline area: baseline PSI * max readings")
         self.log.append(f"Baseline area: {self.project.baseline.get()} * {maxReadings}")
         self.log.append(f"Baseline area: {baselineArea}")
         self.log.append("-" * 80)
@@ -280,7 +280,7 @@ class EvaluationFrame(BaseFrame):
         self.log.append(f"Average area over blanks: {avgBlankArea}")
         avgProtectableArea = self.project.limitPSI.get() * maxReadings - avgBlankArea
         self.log.append(
-            f"Average protectable area: limitPSI * maxReadings - average area over blanks"
+            "Average protectable area: limitPSI * maxReadings - average area over blanks"
         )
         self.log.append(
             f"Average protectable area: {self.project.limitPSI.get()} * {maxReadings} - {avgBlankArea}"
@@ -308,7 +308,7 @@ class EvaluationFrame(BaseFrame):
             self.log.append(f"Integral PSI: {intPSI}")
             result = round(1 - (intPSI - baselineArea) / avgProtectableArea, 3)
             self.log.append(
-                f"Result: 1 - (integral PSI - baseline area) / avg protectable area"
+                "Result: 1 - (integral PSI - baseline area) / avg protectable area"
             )
             self.log.append(
                 f"Result: 1 - ({intPSI} - {baselineArea}) / {avgProtectableArea}"

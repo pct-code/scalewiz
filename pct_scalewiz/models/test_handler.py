@@ -34,8 +34,7 @@ class TestHandler:
         self.queue = []
         self.progress = tk.IntVar()
         self.elapsed = tk.StringVar()
-
-        self.editors = []
+        self.editors = []  # list of views displaying the project
 
         # todo #7 refactor needed. this can't account for rinse/uptake cycles
         # need new way to manage state
@@ -46,7 +45,7 @@ class TestHandler:
         self.update_BtnText()
 
         # logging
-        # todo add another handler here and set it to a file in logs/ next to the project.json
+        # todo add handler here and set to a file in logs/ next to the project.json
 
     # todo stop doing this method pls
     def canRun(self) -> bool:
@@ -64,7 +63,7 @@ class TestHandler:
     def maxReadings(self) -> int:
         return round(self.project.limitMin.get() * 60 / self.project.interval.get()) + 1
 
-    def loadProj(self, path=None):
+    def loadProj(self, path: str = None) -> None:
         if path is None:
             path = filedialog.askopenfilename(
                 initialdir='C:"',
@@ -75,6 +74,7 @@ class TestHandler:
         if path != "":
             self.closeEditors()
             self.project = Project.loadJson(path)
+            # todo #10 this if should probably just be in Project.loadJson, right?
             if path != self.project.path.get():
                 logger.warning(
                     f"{self.name} opened a Project whose actual path didn't match its path property"
@@ -182,8 +182,8 @@ class TestHandler:
         interval = self.project.interval.get()
         snooze = round(interval * 0.9, 2)
         # assigning these vars isnt just to make them shorter
-        # since we don't expect the values to change referencing them this way
-        # is slightly less expensive than requesting the value from its tkVar on each iteration
+        # since we don't expect the values to change, referencing them this way
+        # slightly less expensive than getting the value from its tkVar each iteration
         # startTime = time.time()
         # set this here so we can take a reading on the firt iteration
         # not anymore ? emulating do while

@@ -65,7 +65,7 @@ class Project:
         self.template.set(t)
         self.output_format.set("CSV")
 
-    def makeName(self, event):
+    def makeName(self, _):
         s = ""
         if self.productionCo.get() != "":
             s = self.productionCo.get().strip()
@@ -86,7 +86,7 @@ class Project:
                 test.reportAs.set(test.reportAs.get().strip())
 
     @staticmethod
-    def dumpJson(project, path) -> None:
+    def dumpJson(project, path: str) -> None:
         project.trimNames()
 
         # filter the data alphanumerically
@@ -156,7 +156,7 @@ class Project:
         with open(project.path.get(), "w") as file:
             json.dump(this, file, indent=4)
 
-        logger.info(f"Saved {project.name.get()} to {project.path.get()}")
+        logger.info("Saved %s to %s", project.name.get(), project.path.get())
 
     @staticmethod
     def loadJson(path) -> "Project":
