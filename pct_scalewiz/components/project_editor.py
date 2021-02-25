@@ -6,12 +6,11 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 
 # internal
-from models.Project import Project
-
-from components.BaseFrame import BaseFrame
-from components.ProjectInfo import ProjectInfo
-from components.ProjectParams import ProjectParams
-from components.ProjectReport import ProjectReport
+from pct_scalewiz.models.project import Project
+from pct_scalewiz.components.base_frame import BaseFrame
+from pct_scalewiz.components.project_info import ProjectInfo
+from pct_scalewiz.components.project_params import ProjectParams
+from pct_scalewiz.components.project_report import ProjectReport
 
 
 class ProjectEditor(BaseFrame):
@@ -73,7 +72,7 @@ class ProjectEditor(BaseFrame):
         if not (file == ""):
             # make sure it is JSON extension
             ext = file[-5:]
-            if not (ext == ".json" or ext == ".JSON"):
+            if not ext in (".json", ".JSON"):
                 file = f"{file}.json"
             self.editorProject.path.set(file)
             self.save()

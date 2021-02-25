@@ -2,15 +2,10 @@ import json
 import logging
 import os
 import time
-import tkinter
-from datetime import datetime
-from tkinter import messagebox
 
-import PIL
 from pandas import DataFrame
 
-from models.Project import Project
-from models.Test import Test
+from pct_scalewiz.models.project import Project
 
 logger = logging.getLogger("scalewiz")
 

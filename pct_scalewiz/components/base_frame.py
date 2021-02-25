@@ -3,7 +3,7 @@ import tkinter as tk
 from os import path
 from tkinter import ttk
 
-from models.get_resource import get_resource
+from pct_scalewiz.helpers.get_resource import get_resource
 
 
 class BaseFrame(ttk.Frame):

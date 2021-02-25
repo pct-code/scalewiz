@@ -3,7 +3,7 @@ import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
 from tkinter import ttk
 
-from components.BaseFrame import BaseFrame
+from pct_scalewiz.components.base_frame import BaseFrame
 
 
 class RinseFrame(BaseFrame):

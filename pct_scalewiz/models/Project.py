@@ -1,12 +1,12 @@
 """Model object for a project. Provides a JSON/Tk mapping."""
-import json as json
+import json
 import logging
 import os
 import tkinter as tk
 
-from models.get_resource import get_resource
-from models.sort_nicely import sort_nicely
-from models.Test import Test
+from pct_scalewiz.helpers.get_resource import get_resource
+from pct_scalewiz.helpers.sort_nicely import sort_nicely
+from pct_scalewiz.models.test import Test
 
 logger = logging.getLogger("scalewiz")
 
@@ -65,7 +65,7 @@ class Project:
         self.template.set(t)
         self.output_format.set("CSV")
 
-    def makeName(self, *args):
+    def makeName(self, event):
         s = ""
         if self.productionCo.get() != "":
             s = self.productionCo.get().strip()

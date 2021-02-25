@@ -8,7 +8,7 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 import serial.tools.list_ports as list_ports
 
-from components.LivePlot import LivePlot
+from pct_scalewiz.components.live_plot import LivePlot
 
 logger = logging.getLogger("scalewiz")
 
@@ -182,7 +182,7 @@ class TestHandlerView(ttk.Frame):
 
     # todo shouldn't this be held by the test handler?
     def update_DevList(self, *args):
-        old = [i for i in self.devList]
+        old = self.devList.copy()
         self.devList = sorted([i.device for i in list_ports.comports()])
         if len(self.devList) < 1:
             self.devList.append("None found")

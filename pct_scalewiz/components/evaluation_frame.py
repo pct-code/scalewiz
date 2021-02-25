@@ -1,9 +1,5 @@
 """Evaluation window for a Project."""
 
-COLORS = "orange, blue, red, mediumseagreen, darkgoldenrod, indigo, mediumvioletred, darkcyan, maroon, darkslategrey".split(
-    ", "
-)
-
 import os
 import time
 import tkinter as tk
@@ -15,14 +11,25 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
-from models.export_csv import export_csv
-from models.Project import Project
 
-from components.BaseFrame import BaseFrame
-from components.ProjectInfo import ProjectInfo
-from components.ProjectParams import ProjectParams
-from components.ProjectReport import ProjectReport
-from components.TestResultRow import TestResultRow
+from pct_scalewiz.components.base_frame import BaseFrame
+from pct_scalewiz.components.test_evaluation_row import TestResultRow
+from pct_scalewiz.helpers.export_csv import export_csv
+from pct_scalewiz.models.project import Project
+
+
+COLORS = [
+    "orange",
+    "blue",
+    "red",
+    "mediumseagreen",
+    "darkgoldenrod",
+    "indigo",
+    "mediumvioletred",
+    "darkcyan",
+    "maroon",
+    "darkslategrey",
+]
 
 
 class EvaluationFrame(BaseFrame):
@@ -124,16 +131,16 @@ class EvaluationFrame(BaseFrame):
         self.logText.grid(sticky="ew")
         self.tabControl.add(logFrm, text="   Calculations   ")
 
-        # info
-        self.tabControl.add(ProjectInfo(self), text="   Project Info   ", sticky="nsew")
-        # params
-        self.tabControl.add(
-            ProjectParams(self), text="   Experiment Parameters   ", sticky="nsew"
-        )
-        # report settings
-        self.tabControl.add(
-            ProjectReport(self), text="   Report Settings  ", sticky="nsew"
-        )
+        # # info
+        # self.tabControl.add(ProjectInfo(self), text="   Project Info   ", sticky="nsew")
+        # # params
+        # self.tabControl.add(
+        #     ProjectParams(self), text="   Experiment Parameters   ", sticky="nsew"
+        # )
+        # # report settings
+        # self.tabControl.add(
+        #     ProjectReport(self), text="   Report Settings  ", sticky="nsew"
+        # )
 
         btnFrm = ttk.Frame(self)
         ttk.Button(btnFrm, text="Save", command=lambda: self.save(), width=10).grid(
@@ -257,10 +264,10 @@ class EvaluationFrame(BaseFrame):
             readings = blank.getReadings()
             self.log.append(f"Total readings: {len(readings)}")
             intPSI = sum(readings)
-            self.log.append(f"Integral PSI: sum of all pressure readings")
+            self.log.append("Integral PSI: sum of all pressure readings")
             self.log.append(f"Integral PSI: {intPSI}")
             area = self.project.limitPSI.get() * len(readings) - intPSI
-            self.log.append(f"Area over blank: limitPSI * # of readings - integral PSI")
+            self.log.append("Area over blank: limitPSI * # of readings - integral PSI")
             self.log.append(
                 f"Area over blank: {self.project.limitPSI.get()} * {len(readings)} - {intPSI}"
             )

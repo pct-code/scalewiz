@@ -5,12 +5,11 @@ import logging
 import tkinter as tk
 from tkinter import ttk
 
-# internal
-from models.TestHandler import TestHandler
+from pct_scalewiz.components.base_frame import BaseFrame
+from pct_scalewiz.components.menu_bar import MenuBar
+from pct_scalewiz.components.test_handler_view import TestHandlerView
+from pct_scalewiz.models.test_handler import TestHandler
 
-from components.BaseFrame import BaseFrame
-from components.MenuBar import MenuBar
-from components.TestHandlerView import TestHandlerView
 
 logger = logging.getLogger("scalewiz")
 
@@ -45,7 +44,7 @@ class MainFrame(BaseFrame):
         # add it to the tab control then rename
         self.tabControl.add(view, sticky="nsew")
         self.tabControl.tab(view, text=system_name)
-        logger.info(f"Added {handler.name} to main window")
+        logger.info("Added %s to main window", handler.name)
 
     def close(self):
         for tab in self.tabControl.tabs():
@@ -53,7 +52,8 @@ class MainFrame(BaseFrame):
             if widget.handler.isRunning.get():
                 if not widget.handler.isDone.get():
                     logger.warning(
-                        f"Attempted to close while a test was running on {widget.handler.name}"
+                        "Attempted to close while a test was running on %s",
+                        widget.handler.name,
                     )
                     return
         exit()

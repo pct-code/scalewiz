@@ -8,14 +8,15 @@ from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
 # internal
-from components.BaseFrame import BaseFrame
+from pct_scalewiz.components.base_frame import BaseFrame
+from pct_scalewiz.models.logger import Logger
 
 # thanks https://github.com/beenje/tkinter-logging-text-widget
 
 
 class LogFrame(BaseFrame):
     # expects parent to be a toplevel window
-    def __init__(self, parent, logger):
+    def __init__(self: BaseFrame, parent: tk.Toplevel, logger: Logger):
         BaseFrame.__init__(self, parent)
         self.winfo_toplevel().title("Log Window")
         # replace the window closing behavior with withdrawing instead 🐱‍👤

@@ -1,12 +1,13 @@
 """Editor for Project params."""
 
-import tkinter as tk
 from tkinter import ttk
 
 # todo #6 implement some form of entry validation targeting non-whole number inputs (or make allowances for doubles)
 
 
 class ProjectParams(ttk.Frame):
+    """A form for mutating experiment-relevant attributes of the Project."""
+
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
         self.grid_columnconfigure(1, weight=1)

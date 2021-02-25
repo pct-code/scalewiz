@@ -1,6 +1,7 @@
+"""Renders data from a TestHandler as it is collected."""
+
 import logging
 import time
-import tkinter as tk
 from tkinter import ttk
 
 import matplotlib.pyplot as plt
@@ -12,7 +13,10 @@ logger = logging.getLogger("scalewiz")
 
 
 class LivePlot(ttk.Frame):
-    def __init__(self, parent, handler):
+    """Renders data from a TestHandler as it is collected."""
+
+    def __init__(self, parent: TestHandlerView, handler: TestHandler) -> None:
+        """Initialize a LivePlot."""
         ttk.Frame.__init__(self, parent)
         self.handler = handler
 
@@ -25,7 +29,7 @@ class LivePlot(ttk.Frame):
         interval = handler.project.interval.get() * 1000  # ms
         self.ani = FuncAnimation(fig, self.animate, interval=interval)
 
-    def animate(self, interval):
+    def animate(self, interval) -> None:
         """Animates the live plot."""
 
         # we can just skip this if the test isn't running

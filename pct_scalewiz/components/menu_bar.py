@@ -5,16 +5,14 @@ import logging
 import os
 import tempfile
 import tkinter as tk
-import webbrowser
 from tkinter import messagebox, ttk
 
-import markdown
-from markdown.extensions.toc import TocExtension
 
 # internal
-from components.EvaluationFrame import EvaluationFrame
-from components.ProjectEditor import ProjectEditor
-from components.RinseFrame import RinseFrame
+from pct_scalewiz.components.evaluation_frame import EvaluationFrame
+from pct_scalewiz.components.project_editor import ProjectEditor
+from pct_scalewiz.components.rinse_frame import RinseFrame
+from pct_scalewiz.helpers.show_help import show_help
 
 # todo #9 port over the old chlorides / ppm calculators
 
@@ -44,7 +42,7 @@ class MenuBar(tk.Frame):
         )
         menubar.add_command(label="Log", command=lambda: self.showLogWindow())
         menubar.add_command(label="Rinse", command=lambda: self.showRinse())
-        menubar.add_command(label="Help", command=lambda: self.showHelp())
+        menubar.add_command(label="Help", command=lambda: show_help())
 
         parent.winfo_toplevel().config(menu=menubar)
 
@@ -87,20 +85,6 @@ class MenuBar(tk.Frame):
         rinse = RinseFrame(widget.handler, window)
         rinse.grid()
         window.resizable(0, 0)
-
-    def showHelp(self):
-        print(os.getcwd())
-        mdfile = os.path.abspath(r"../doc/index.md")
-        htmlfile = os.path.abspath(r"../doc/index.html")
-
-        markdown.markdownFromFile(
-            input=mdfile,
-            output=htmlfile,
-            extensions=[TocExtension(toc_depth="2-6")],
-            encoding="utf8",
-        )
-
-        webbrowser.open_new(os.path.abspath(htmlfile))
 
     # todo move close editors method off of testhandler
 

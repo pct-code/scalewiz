@@ -7,10 +7,10 @@ import tkinter as tk
 from tkinter import font, ttk
 
 # internal
-from components.BaseFrame import BaseFrame
-from components.LogFrame import LogFrame
-from components.MainFrame import MainFrame
-from models.Logger import Logger
+from pct_scalewiz.components.base_frame import BaseFrame
+from pct_scalewiz.components.log_frame import LogFrame
+from pct_scalewiz.components.main_frame import MainFrame
+from pct_scalewiz.models.logger import Logger
 
 
 class ScaleWiz(BaseFrame):
@@ -48,13 +48,14 @@ class ScaleWiz(BaseFrame):
         self.log_window = tk.Toplevel(self)
         self.log_window.parent = self  # tacky ?
         LogFrame(self.log_window, Logger()).grid()
-        logging.getLogger("scalewiz").info(f"Starting in {os.getcwd()}")
+        logging.getLogger("scalewiz").info("Starting in %s", os.getcwd())
         self.log_window.withdraw()  # 🏌️‍♀️👋
 
         MainFrame(self).grid()  # this will hijack the window closing protocol
 
 
 def main():
+    """The Tkinter entry point of the program; enters mainloop."""
     root = tk.Tk()
     ScaleWiz(root).grid()
     root.mainloop()

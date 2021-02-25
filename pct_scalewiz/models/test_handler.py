@@ -9,15 +9,14 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from tkinter import filedialog, messagebox
 
-from components.EvaluationFrame import EvaluationFrame
-
-# internal
-from components.ProjectEditor import ProjectEditor
 from serial import Serial, SerialException
 
-from models.Project import Project
-from models.TeledynePump import TeledynePump
-from models.Test import Test
+from pct_scalewiz.models.project import Project
+from pct_scalewiz.models.teledyne_pump import TeledynePump
+from pct_scalewiz.models.test import Test
+
+# internal
+
 
 logger = logging.getLogger("scalewiz")
 
@@ -38,7 +37,8 @@ class TestHandler:
 
         self.editors = []
 
-        # todo #7 refactor needed. this is too messy, and can't account for rinse/uptake cycles. need new way to manage state
+        # todo #7 refactor needed. this can't account for rinse/uptake cycles
+        # need new way to manage state
         # UI concerns
         self.isRunning = tk.BooleanVar()
         self.isDone = tk.BooleanVar()
@@ -46,7 +46,7 @@ class TestHandler:
         self.update_BtnText()
 
         # logging
-        # todo add another logging handler here and set it to a file in logs/ next to the project.json
+        # todo add another handler here and set it to a file in logs/ next to the project.json
 
     # todo stop doing this method pls
     def canRun(self) -> bool:
@@ -72,7 +72,7 @@ class TestHandler:
                 filetypes=[("JSON files", "*.json")],
             )
 
-        if not (path == ""):
+        if path != "":
             self.closeEditors()
             self.project = Project.loadJson(path)
             if path != self.project.path.get():
