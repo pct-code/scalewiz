@@ -22,4 +22,3 @@ class BaseFrame(ttk.Frame):
 
         if path.isfile(icon_path):
             self.winfo_toplevel().wm_iconbitmap(icon_path)
-            print(self.winfo_toplevel().wm_iconbitmap())
