@@ -35,11 +35,11 @@ class Test:
         self.toConsider.set("pump 1")
         self.is_blank.set(True)
 
-    def makeName(self, _) -> None:
+    def makeName(self, *args) -> None:
         if not (self.chemical.get() == "" or self.rate.get() == 0):
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
 
-    def makeRepAs(self, _) -> None:
+    def makeRepAs(self, *args) -> None:
         self.report_as.set(self.name.get())
 
     def getObsPSI(self, *args) -> None:

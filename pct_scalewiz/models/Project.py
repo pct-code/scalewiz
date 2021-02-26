@@ -64,7 +64,7 @@ class Project:
         # todo clean out this old template stuff ?
         self.output_format.set("CSV")
 
-    def makeName(self, *_) -> None:
+    def makeName(self, *args) -> None:
         """Constructs a default name for the Project."""
         name = ""
         if self.client.get() != "":
@@ -77,17 +77,14 @@ class Project:
             name = f"{name} ({self.sample.get()})".strip()
         self.name.set(name)
 
-    def trimNames(self) -> None:
-        for test in self.tests:
+    @staticmethod
+    def dumpJson(project, path: str) -> None:
+        for test in project.tests:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())
 
-            if test.report_ass.get().strip() != testreport_asas.get():
-                test.report_ass.set(testreport_asas.get().strip())
-
-    @staticmethod
-    def dumpJson(project, path: str) -> None:
-        project.trimNames()
+            if test.report_as.get().strip() != test.report_as.get():
+                test.report_as.set(test.report_as.get().strip())
 
         # filter the data alphanumerically by label
         _blanks = {}  # put in dicts to allow for popping later
@@ -95,11 +92,11 @@ class Project:
         keys = []
         for test in project.tests:
             key = (
-                test.report_ass.get().lower()
+                test.report_as.get().lower()
             )  # eliminate capitalization discrepancies
             while key in keys:  # checking for duplicate values
-                test.report_ass.set(testreport_asas.get() + " - copy")
-                key = test.report_ass.get().lower()
+                test.report_as.set(test.report_as.get() + " - copy")
+                key = test.report_as.get().lower()
 
             keys.append(key)
 
@@ -109,13 +106,13 @@ class Project:
                 _trials[key] = test
 
         blankNames = sort_nicely(
-            [blank.report_ass.get().lower() for blank in list(_blanks.values())]
+            [blank.report_as.get().lower() for blank in list(_blanks.values())]
         )
         blanks = [_blanks.pop(name) for name in blankNames]
 
         # instead, sort by label then by conc magnitude
         trialNames = sort_nicely(
-            [trial.report_ass.get().lower() for trial in list(_trials.values())]
+            [trial.report_as.get().lower() for trial in list(_trials.values())]
         )
         trials = [_trials.pop(name) for name in trialNames]
 
@@ -164,6 +161,13 @@ class Project:
         with open(path, "r") as file:
             obj = json.load(file)
 
+        json_path = obj.get("info").get("path")
+        if path != json_path:
+            logger.warning(
+                "Opened a Project whose actual path didn't match its path property"
+            )
+            obj["info"]["path"] = path
+
         this = Project()
         info = obj.get("info")
         this.customer.set(info.get("customer"))
@@ -195,6 +199,8 @@ class Project:
         this.output_format.set(obj.get("outputFormat"))
 
         for entry in obj.get("tests"):
-            this.tests.append(Test().loadJson(entry))
+            test = Test()
+            test.loadJson(entry)
+            this.tests.append(test)
 
         return this

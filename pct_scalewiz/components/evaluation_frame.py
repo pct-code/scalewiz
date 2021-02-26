@@ -49,6 +49,9 @@ class EvaluationFrame(BaseFrame):
     def trace(self: BaseFrame) -> None:
         """Applies a tkVar trace to properties on every test object."""
         for test in self.editorProject.tests:
+            print(len(self.editorProject.tests))
+            print(self.editorProject.tests)
+            print(type(test))
             test.report_as.trace("w", self.score)
             test.toConsider.trace("w", self.score)
             test.includeOnRep.trace("w", self.score)

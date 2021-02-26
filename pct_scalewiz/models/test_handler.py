@@ -70,13 +70,6 @@ class TestHandler:
         if path != "":
             self.close_editors()
             self.project = Project.loadJson(path)
-            # todo #10 this if should probably just be in Project.loadJson, right?
-            if path != self.project.path.get():
-                logger.warning(
-                    f"{self.name} opened a Project whose actual path didn't match its path property"
-                )
-                self.project.path.set(path)
-                Project.dumpJson(self.project, path)
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
     def start_test(self) -> None:

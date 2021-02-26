@@ -1,11 +1,12 @@
 """Component for displaying a Test in a gridlike fashion."""
 
-import tkinter as tk
 from tkinter import messagebox, ttk
 
 
 class TestResultRow(ttk.Frame):
-    def __init__(self, parent, test, project, row):
+    """Component for displaying a Test in a gridlike fashion."""
+
+    def __init__(self, parent, test, project, row) -> None:
         ttk.Frame.__init__(self, parent)
         self.test = test
         self.parent = parent
@@ -13,7 +14,8 @@ class TestResultRow(ttk.Frame):
         self.row = row
         self.build()
 
-    def build(self):
+    def build(self) -> None:
+        """Make the UI."""
         cols = []
         # col 0 - name
         cols.append(ttk.Label(self.parent, textvariable=self.test.name))

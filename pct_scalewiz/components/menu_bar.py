@@ -63,6 +63,7 @@ class MenuBar(tk.Frame):
                 "No Project File",
                 "The requested Project file has not yet been saved, or is missing",
             )
+            print("no file at %s", widget.handler.project.path.get())
         else:
             self.evalProj(widget.handler)
 

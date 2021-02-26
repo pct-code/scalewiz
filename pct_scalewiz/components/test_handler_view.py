@@ -122,10 +122,10 @@ class TestHandlerView(ttk.Frame):
         self.inputs.append(self.blankEnt)
 
         # row 4 ---------------------------------------------------------------
-        notesLbl = ttk.Label(self.iFrm, text="Notes:")
-        notesEnt = ttk.Entry(self.iFrm, textvariable=self.handler.test.notes)
-        self.inputs.append(notesEnt)
-        self.render(notesLbl, notesEnt, 4)
+        lbl = ttk.Label(self.iFrm, text="Notes:")
+        ent = ttk.Entry(self.iFrm, textvariable=self.handler.test.notes)
+        self.inputs.append(ent)
+        self.render(lbl, ent, 4)
 
         # iFrm end ------------------------------------------------------------
 
