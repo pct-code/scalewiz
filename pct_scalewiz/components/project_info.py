@@ -50,32 +50,35 @@ class ProjectInfo(ttk.Frame):
 
         # row 6 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date sampled:")
+        # this is to refresh the entry later
+        d = parent.editorProject.sample_date.get()
         ent = tkcal.DateEntry(
             self, textvariable=parent.editorProject.sample_date, date_pattern="mm/dd/Y"
         )
         lbl.bind("<Button-1>", lambda _: parent.editorProject.sample_date.set(""))
-        # this is to refresh the entry
-        parent.editorProject.sample_date.set(parent.editorProject.sample_date.get())
+        parent.editorProject.sample_date.set(d)
         parent.render(lbl, ent, 6)
 
         # row 7 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date received:")
+        d = parent.editorProject.received_date.get()
         ent = tkcal.DateEntry(
             self,
             textvariable=parent.editorProject.received_date,
             date_pattern="mm/dd/yyyy",
         )
         lbl.bind("<Button-1>", lambda _: parent.editorProject.received_date.set(""))
-        parent.editorProject.received_date.set(parent.editorProject.received_date.get())
+        parent.editorProject.received_date.set(d)
         parent.render(lbl, ent, 7)
 
         # row 8 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date completed:")
+        d = parent.editorProject.compDate.get()
         ent = tkcal.DateEntry(
             self, textvariable=parent.editorProject.compDate, date_pattern="mm/dd/yyyy"
         )
         lbl.bind("<Button-1>", lambda _: parent.editorProject.compDate.set(""))
-        parent.editorProject.compDate.set(parent.editorProject.compDate.get())
+        parent.editorProject.compDate.set(d)
         parent.render(lbl, ent, 8)
 
         # row 9 ---------------------------------------------------------------

@@ -64,7 +64,7 @@ class Project:
         # todo clean out this old template stuff ?
         self.output_format.set("CSV")
 
-    def makeName(self, _) -> None:
+    def makeName(self, *_) -> None:
         """Constructs a default name for the Project."""
         name = ""
         if self.client.get() != "":
@@ -75,6 +75,7 @@ class Project:
             name = f"{name} - {self.field.get()}".strip()
         if self.sample.get() != "":
             name = f"{name} ({self.sample.get()})".strip()
+        print(name)
         self.name.set(name)
 
     def trimNames(self) -> None:

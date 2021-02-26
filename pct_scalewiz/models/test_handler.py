@@ -79,7 +79,6 @@ class TestHandler:
                 )
                 self.project.path.set(path)
                 Project.dumpJson(self.project, path)
-            self.update_BtnText()
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
     def start_test(self):
