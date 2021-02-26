@@ -8,10 +8,11 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from tkinter import filedialog, messagebox
 
+from serial import Serial, SerialException
+
 from pct_scalewiz.models.project import Project
 from pct_scalewiz.models.teledyne_pump import TeledynePump
 from pct_scalewiz.models.test import Test
-from serial import Serial, SerialException
 
 logger = logging.getLogger("scalewiz")
 
