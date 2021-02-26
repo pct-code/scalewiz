@@ -46,6 +46,7 @@ class ProjectEditor(BaseFrame):
         btnFrm.grid(row=1, column=0)
 
     def render(self, label, entry, row):
+        """Render the passed label and entry on the passed row."""
         label.grid(row=row, column=0, sticky=tk.E)
         entry.grid(row=row, column=1, sticky=tk.E + tk.W, pady=1)
 
@@ -69,7 +70,7 @@ class ProjectEditor(BaseFrame):
             initialfile=f"{self.editorProject.name.get()}.json",
         )
 
-        if not (file == ""):
+        if not file == "":
             # make sure it is JSON extension
             ext = file[-5:]
             if not ext in (".json", ".JSON"):

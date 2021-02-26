@@ -8,6 +8,9 @@ from tkinter import ttk
 from pct_scalewiz.components.base_frame import BaseFrame
 
 
+logger = logging.getLogger("pct-scalewiz")
+
+
 class RinseFrame(BaseFrame):
     """Simple frame that starts and stops the pumps on a timer."""
 
@@ -26,7 +29,7 @@ class RinseFrame(BaseFrame):
         self.txt = tk.StringVar()
         self.txt.set("Rinse")
 
-        # build 
+        # build
         lbl = ttk.Label(window, text="Rinse duration (min).:")
         lbl.grid(row=0, column=0)
         ent = ttk.Spinbox(window, textvariable=self.t, from_=3, to=60)
@@ -38,7 +41,7 @@ class RinseFrame(BaseFrame):
         self.button.grid(row=2, column=0, columnspan=2)
 
     def request_rinse(self):
-        if not self.handler.isRunning.get() or self.handler.isDone.get():
+        if not self.handler.is_running.get() or self.handler.isDone.get():
             self.pool.submit(self.rinse)
 
     def rinse(self):

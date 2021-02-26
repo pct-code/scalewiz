@@ -49,7 +49,7 @@ class MainFrame(BaseFrame):
     def close(self):
         for tab in self.tabControl.tabs():
             widget = self.nametowidget(tab)
-            if widget.handler.isRunning.get():
+            if widget.handler.is_running.get():
                 if not widget.handler.isDone.get():
                     logger.warning(
                         "Attempted to close while a test was running on %s",

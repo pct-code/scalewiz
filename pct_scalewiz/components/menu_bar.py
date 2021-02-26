@@ -30,35 +30,34 @@ class MenuBar(tk.Frame):
 
         projMenu = tk.Menu(tearoff=0)
         projMenu.add_command(
-            label="New/Edit", command=lambda: self.requestProjectEdit()
+            label="New/Edit", command=lambda: self.request_project_edit()
         )
         projMenu.add_command(
-            label="Load existing", command=lambda: self.requestProjectLoad()
+            label="Load existing", command=lambda: self.request_project_load()
         )
 
         menubar.add_cascade(label="Project", menu=projMenu)
         menubar.add_command(
-            label="Evaluation", command=lambda: self.requestEvalutaionWindow()
+            label="Evaluation", command=lambda: self.request_eval_window()
         )
-        menubar.add_command(label="Log", command=lambda: self.showLogWindow())
+        menubar.add_command(
+            label="Log", command=lambda: self.parent.parent.log_window.deiconify()
+        )
         menubar.add_command(label="Rinse", command=lambda: self.showRinse())
         menubar.add_command(label="Help", command=lambda: show_help())
 
         parent.winfo_toplevel().config(menu=menubar)
 
-    def requestProjectEdit(self):
+    def request_project_edit(self) -> None:
+        """Requests to open an editor window for the currently selected Project."""
         currentTab = self.parent.tabControl.select()
         widget = self.parent.nametowidget(currentTab)
-        # if (widget.handler.isRunning.get()):
-        #     messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
-        # else:
         self.modProj(widget.handler)
 
-    def requestEvalutaionWindow(self):
+    def request_eval_window(self) -> None:
+        """Requests to open an evalutaion window for the currently selected Project."""
         currentTab = self.parent.tabControl.select()
         widget = self.parent.nametowidget(currentTab)
-        # if widget.handler.isRunning.get():
-        #     messagebox.showwarning("Experiment Running", "Can't modify a Project while an experiment is running")
         if not os.path.isfile(widget.handler.project.path.get()):
             messagebox.showwarning(
                 "No Project File",
@@ -67,17 +66,15 @@ class MenuBar(tk.Frame):
         else:
             self.evalProj(widget.handler)
 
-    def requestProjectLoad(self):
+    def request_project_load(self) -> None:
+        """Request that the currently selected TestHandler load a Project."""
         currentTab = self.parent.tabControl.select()
         widget = self.parent.nametowidget(currentTab)
-        widget.handler.loadProj()
+        widget.handler.load_project()
         widget.build()
 
-    def showLogWindow(self):
-        # todo this is not elegant
-        self.parent.parent.log_window.deiconify()  # woof
-
-    def showRinse(self):
+    def showRinse(self) -> None:
+        """Shows a RinseFrame in a new Toplevel."""
         currentTab = self.parent.tabControl.select()
         widget = self.parent.nametowidget(currentTab)
 
@@ -95,7 +92,7 @@ class MenuBar(tk.Frame):
             )
             return
         window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", lambda: handler.closeEditors())
+        window.protocol("WM_DELETE_WINDOW", lambda: handler.close_editors())
         window.resizable(0, 0)
         handler.editors.append(window)
         editor = ProjectEditor(window, handler)
@@ -111,7 +108,7 @@ class MenuBar(tk.Frame):
             )
             return
         window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", lambda: handler.closeEditors())
+        window.protocol("WM_DELETE_WINDOW", lambda: handler.close_editors())
         window.resizable(0, 0)
         handler.editors.append(window)
         editor = EvaluationFrame(window, handler)

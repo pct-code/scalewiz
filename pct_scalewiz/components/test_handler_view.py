@@ -25,10 +25,10 @@ class TestHandlerView(ttk.Frame):
         self.build()
 
     def setBindings(self):
-        self.handler.test.isBlank.trace(
+        self.handler.test.is_blank.trace(
             "w", self.update_TestType
         )  # might have to retrace on new test
-        self.handler.isRunning.trace("w", self.update_InputFrame)
+        self.handler.is_running.trace("w", self.update_InputFrame)
         self.handler.isDone.trace("w", self.update_InitBtn)
         self.handler.dev1.trace("w", self.update_DevList)
         self.handler.dev2.trace("w", self.update_DevList)
@@ -72,7 +72,7 @@ class TestHandlerView(ttk.Frame):
         entFrm = ttk.Frame(self.iFrm)
         entFrm.grid_columnconfigure(0, weight=1)
         entFrm.grid_columnconfigure(1, weight=1)
-        foo = self.handler.test.isBlank
+        foo = self.handler.test.is_blank
         blankRadio = ttk.Radiobutton(entFrm, text="Blank", variable=foo, value=True)
         blankRadio.grid(row=0, column=0)
         trialRadio = ttk.Radiobutton(entFrm, text="Trial", variable=foo, value=False)
@@ -132,7 +132,7 @@ class TestHandlerView(ttk.Frame):
         # row 1 ---------------------------------------------------------------
         frame = ttk.Frame(self)
         self.startBtn = ttk.Button(
-            frame, text="Start", command=lambda: self.handler.startTest()
+            frame, text="Start", command=lambda: self.handler.start_test()
         )
         stopBtn = ttk.Button(
             frame, text="Stop", command=lambda: self.handler.requestStop()
@@ -194,7 +194,7 @@ class TestHandlerView(ttk.Frame):
 
     def update_InputFrame(self, *args):
         for child in self.inputs:
-            if self.handler.isRunning.get():
+            if self.handler.is_running.get():
                 child.configure(state="disabled")
             else:
                 child.configure(state="normal")
@@ -208,7 +208,7 @@ class TestHandlerView(ttk.Frame):
             self.startBtn.grid(row=0, column=0)
 
     def update_TestType(self, *args):
-        if self.handler.test.isBlank.get():
+        if self.handler.test.is_blank.get():
             self.trialLblFrm.grid_remove()
             self.trialEntFrm.grid_remove()
             self.render(self.blankLbl, self.blankEnt, 3)

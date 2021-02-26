@@ -12,6 +12,8 @@ import tkcalendar as tkcal
 
 
 class ProjectInfo(ttk.Frame):
+    """Editor for Project metadata."""
+
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
         self.grid_columnconfigure(1, weight=1)
@@ -28,7 +30,7 @@ class ProjectInfo(ttk.Frame):
 
         # row 2 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Production company:")
-        ent = ttk.Entry(self, textvariable=parent.editorProject.productionCo)
+        ent = ttk.Entry(self, textvariable=parent.editorProject.client)
         parent.render(lbl, ent, 2)
 
         # row 3 ---------------------------------------------------------------
@@ -59,10 +61,12 @@ class ProjectInfo(ttk.Frame):
         # row 7 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date received:")
         ent = tkcal.DateEntry(
-            self, textvariable=parent.editorProject.recDate, date_pattern="mm/dd/yyyy"
+            self,
+            textvariable=parent.editorProject.received_date,
+            date_pattern="mm/dd/yyyy",
         )
-        lbl.bind("<Button-1>", lambda _: parent.editorProject.recDate.set(""))
-        parent.editorProject.recDate.set(parent.editorProject.recDate.get())
+        lbl.bind("<Button-1>", lambda _: parent.editorProject.received_date.set(""))
+        parent.editorProject.received_date.set(parent.editorProject.received_date.get())
         parent.render(lbl, ent, 7)
 
         # row 8 ---------------------------------------------------------------

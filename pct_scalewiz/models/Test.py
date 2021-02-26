@@ -12,7 +12,7 @@ class Test:
 
     def __init__(self) -> None:
         # serializable props
-        self.isBlank = tk.BooleanVar()
+        self.is_blank = tk.BooleanVar()
         self.name = tk.StringVar()
         self.chemical = tk.StringVar()
         self.rate = tk.IntVar()
@@ -33,7 +33,7 @@ class Test:
 
         # todo abstract this out to some TOML
         self.toConsider.set("pump 1")
-        self.isBlank.set(True)
+        self.is_blank.set(True)
 
     def makeName(self, _) -> None:
         if not (self.chemical.get() == "" or self.rate.get() == 0):
@@ -54,7 +54,7 @@ class Test:
     def dumpJson(self) -> dict:
         return {
             "name": self.name.get(),
-            "isBlank": self.isBlank.get(),
+            "isBlank": self.is_blank.get(),
             "chemical": self.chemical.get(),
             "rate": self.rate.get(),
             "reportAs": self.reportAs.get(),
@@ -69,7 +69,7 @@ class Test:
 
     def loadJson(self, obj: dict) -> None:
         self.name.set(obj["name"])
-        self.isBlank.set(obj["isBlank"])
+        self.is_blank.set(obj["isBlank"])
         self.chemical.set(obj["chemical"])
         self.rate.set(obj["rate"])
         self.reportAs.set(obj["reportAs"])

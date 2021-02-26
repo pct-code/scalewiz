@@ -39,29 +39,29 @@ class TestHandler:
         # todo #7 refactor needed. this can't account for rinse/uptake cycles
         # need new way to manage state
         # UI concerns
-        self.isRunning = tk.BooleanVar()
+        self.is_running = tk.BooleanVar()
         self.isDone = tk.BooleanVar()
 
         # logging
         # todo add handler here and set to a file in logs/ next to the project.json
 
     # todo stop doing this method pls
-    def canRun(self) -> bool:
+    def can_run(self) -> bool:
         value = (
             (
-                self.maxPSI1 <= self.project.limitPSI.get()
-                or self.maxPSI2 <= self.project.limitPSI.get()
+                self.maxPSI1 <= self.project.limit_psi.get()
+                or self.maxPSI2 <= self.project.limit_psi.get()
             )
-            and len(self.queue) < self.maxReadings()
+            and len(self.queue) < self.max_readings()
             and not self.stop_requested
         )
         return value
 
     # todo why is this a method ????
-    def maxReadings(self) -> int:
+    def max_readings(self) -> int:
         return round(self.project.limitMin.get() * 60 / self.project.interval.get()) + 1
 
-    def loadProj(self, path: str = None) -> None:
+    def load_project(self, path: str = None) -> None:
         if path is None:
             path = filedialog.askopenfilename(
                 initialdir='C:"',
@@ -70,7 +70,7 @@ class TestHandler:
             )
 
         if path != "":
-            self.closeEditors()
+            self.close_editors()
             self.project = Project.loadJson(path)
             # todo #10 this if should probably just be in Project.loadJson, right?
             if path != self.project.path.get():
@@ -82,8 +82,8 @@ class TestHandler:
             self.update_BtnText()
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
-    def startTest(self):
-        if self.isRunning.get():
+    def start_test(self):
+        if self.is_running.get():
             return
 
         if self.dev1.get() == "" or self.dev1.get() == "None found":
@@ -112,7 +112,7 @@ class TestHandler:
             return
 
         if self.test.clarity.get() == "":
-            if self.test.isBlank.get():
+            if self.test.is_blank.get():
                 return
             msg = "Water clarity cannot be blank"
             messagebox.showwarning("Missing Water Clarity", msg)
@@ -131,10 +131,10 @@ class TestHandler:
             return
 
         # close any open editors
-        self.closeEditors()
+        self.close_editors()
         self.stop_requested = False
         self.isDone.set(False)
-        self.isRunning.set(True)
+        self.is_running.set(True)
         self.progress.set(0)
         # make a new log file
         fileName = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
@@ -168,7 +168,7 @@ class TestHandler:
         self.pump2.run()
         uptake = self.project.uptake.get()
         for i in range(uptake):
-            if self.canRun():
+            if self.can_run():
                 self.elapsed.set(f"{uptake - i} s")
                 self.progress.set(round(i / uptake * 100))
                 time.sleep(1)
@@ -176,7 +176,7 @@ class TestHandler:
                 self.stopTest()
                 break
 
-        self.toLog("")
+        self.to_log("")
         interval = self.project.interval.get()
         snooze = round(interval * 0.9, 2)
         # assigning these vars isnt just to make them shorter
@@ -190,7 +190,7 @@ class TestHandler:
         reading_start = test_start_time - interval
 
         # readings loop -------------------------------------------------------
-        while self.canRun():
+        while self.can_run():
             if time.time() - reading_start >= interval:
                 reading_start = time.time()
                 elapsedMin = round((time.time() - test_start_time) / 60, 2)
@@ -210,7 +210,7 @@ class TestHandler:
 
                 # make a message for the log in the test handler view
                 msg = f"@ {elapsedMin:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
-                self.toLog(msg)
+                self.to_log(msg)
                 logger.info(f"{self.name} - {msg}")
 
                 # todo this is janky
@@ -219,7 +219,7 @@ class TestHandler:
                 self.queue.append(reading)
 
                 self.elapsed.set(f"{elapsedMin:.2f} min.")
-                self.progress.set(round(len(self.queue) / self.maxReadings() * 100))
+                self.progress.set(round(len(self.queue) / self.max_readings() * 100))
 
                 if psi1 > self.maxPSI1:
                     self.maxPSI1 = psi1
@@ -240,10 +240,10 @@ class TestHandler:
         # compare to the most recent elapsedMin value
         if trueElapsed != elapsedMin:
             # maybe make a dialog pop up instead?
-            self.toLog(f"The test says it took {elapsedMin} min.")
-            self.toLog(f"but really it took {trueElapsed} min. (I counted)")
+            self.to_log(f"The test says it took {elapsedMin} min.")
+            self.to_log(f"but really it took {trueElapsed} min. (I counted)")
             logger.warning(
-                f"{self.name} - {elapsedMin} was really {trueElapsed} ({len(self.queue)}/{self.maxReadings()})"
+                f"{self.name} - {elapsedMin} was really {trueElapsed} ({len(self.queue)}/{self.max_readings()})"
             )
 
         self.stopTest()
@@ -253,10 +253,10 @@ class TestHandler:
     # beacuse of this, we have to interact with it in a somewhat backhanded way
     # this method is intended to be called from the test handler view module on a UI button click
     def requestStop(self):
-        if not self.isRunning.get():
+        if not self.is_running.get():
             return
 
-        if self.isRunning.get():
+        if self.is_running.get():
             # the readings loop thread checks this flag on each iteration
             self.stop_requested = True
             logger.info(f"{self.name}: Received a stop request")
@@ -290,9 +290,9 @@ class TestHandler:
         logger.info(
             f"{self.name}: Saved {self.project.name.get()} to {self.project.path.get()}"
         )
-        self.loadProj(path=self.project.path.get())
+        self.load_project(path=self.project.path.get())
         # todo ask them to rebuild instead
-        self.closeEditors()
+        self.close_editors()
 
     def setupPumps(self):
         # the timeout values are an alternative to using TextIOWrapper
@@ -313,7 +313,7 @@ class TestHandler:
     def new_test(self):
         logger.info(f"{self.name}: Initialized a new test")
         self.test = Test()
-        self.isRunning.set(False)
+        self.is_running.set(False)
         self.isDone.set(False)
         self.elapsed.set("")
         # todo why is this here?
@@ -322,13 +322,13 @@ class TestHandler:
         self.parent.build()
 
     # todo give this a better name
-    def closeEditors(self):
+    def close_editors(self):
         for window in self.editors:
             self.editors.remove(window)
             window.destroy()
         logger.info(f"{self.name} has closed all editor windows")
 
-    def toLog(self, msg):
+    def to_log(self, msg):
         self.logText.configure(state="normal")
         self.logText.insert("end", msg + "\n")
         self.logText.configure(state="disabled")

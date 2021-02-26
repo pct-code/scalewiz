@@ -36,7 +36,7 @@ class LivePlot(ttk.Frame):
         """Animates the live plot."""
 
         # we can just skip this if the test isn't running
-        if self.handler.isDone.get() or not self.handler.isRunning.get():
+        if self.handler.isDone.get() or not self.handler.is_running.get():
             return
 
         # data access here 😳
@@ -48,7 +48,7 @@ class LivePlot(ttk.Frame):
             self.axis.clear()
             self.axis.set_xlabel("Time (min)")
             self.axis.set_ylabel("Pressure (psi)")
-            self.axis.set_ylim(top=self.handler.project.limitPSI.get())
+            self.axis.set_ylim(top=self.handler.project.limit_psi.get())
             self.axis.yaxis.set_major_locator(MultipleLocator(100))
             self.axis.set_xlim((0, None), auto=True)
             self.axis.margins(0)

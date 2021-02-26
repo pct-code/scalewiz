@@ -33,7 +33,7 @@ COLORS = [
 
 
 class EvaluationFrame(BaseFrame):
-    """Frame for analyzing data. Reproduces some Project editor tabs simply to take advantage of the space available."""
+    """Frame for analyzing data."""
 
     def __init__(self: BaseFrame, parent: tk.Toplevel, handler: "TestHandler") -> None:
         BaseFrame.__init__(self, parent)
@@ -92,13 +92,13 @@ class EvaluationFrame(BaseFrame):
 
         self.blanks = []
         for test in self.project.tests:
-            if test.isBlank.get():
+            if test.is_blank.get():
                 self.blanks.append(test)
 
         # select the trials
         self.trials = []
         for test in self.project.tests:
-            if not test.isBlank.get():
+            if not test.is_blank.get():
                 self.trials.append(test)
 
         tk.Label(testsFrm, text="Blanks:", font=bold_font).grid(
@@ -130,17 +130,6 @@ class EvaluationFrame(BaseFrame):
         )
         self.logText.grid(sticky="ew")
         self.tabControl.add(logFrm, text="   Calculations   ")
-
-        # # info
-        # self.tabControl.add(ProjectInfo(self), text="   Project Info   ", sticky="nsew")
-        # # params
-        # self.tabControl.add(
-        #     ProjectParams(self), text="   Experiment Parameters   ", sticky="nsew"
-        # )
-        # # report settings
-        # self.tabControl.add(
-        #     ProjectReport(self), text="   Report Settings  ", sticky="nsew"
-        # )
 
         btnFrm = ttk.Frame(self)
         ttk.Button(btnFrm, text="Save", command=lambda: self.save(), width=10).grid(
@@ -197,7 +186,7 @@ class EvaluationFrame(BaseFrame):
 
             self.axis.set_xlabel("Time (min)")
             self.axis.set_ylabel("Pressure (psi)")
-            self.axis.set_ylim(top=self.project.limitPSI.get())
+            self.axis.set_ylim(top=self.project.limit_psi.get())
             self.axis.yaxis.set_major_locator(MultipleLocator(100))
             self.axis.set_xlim((0, self.project.limitMin.get()))
             self.axis.legend(loc=0)
@@ -236,14 +225,16 @@ class EvaluationFrame(BaseFrame):
         self.log = []
         # scoring props
 
-        maxReadings = round(
+        max_readings = round(
             self.project.limitMin.get() * 60 / self.project.interval.get()
         )
         self.log.append("Max readings: limitMin * 60 / reading interval")
-        self.log.append(f"Max readings: {maxReadings}")
-        baselineArea = round(self.project.baseline.get() * maxReadings)
+        self.log.append(f"Max readings: {max_readings}")
+        baselineArea = round(self.project.baseline.get() * max_readings)
         self.log.append("Baseline area: baseline PSI * max readings")
-        self.log.append(f"Baseline area: {self.project.baseline.get()} * {maxReadings}")
+        self.log.append(
+            f"Baseline area: {self.project.baseline.get()} * {max_readings}"
+        )
         self.log.append(f"Baseline area: {baselineArea}")
         self.log.append("-" * 80)
         self.log.append("")
@@ -251,7 +242,7 @@ class EvaluationFrame(BaseFrame):
         # select the blanks
         blanks = []
         for test in self.project.tests:
-            if test.isBlank.get() and test.includeOnRep.get():
+            if test.is_blank.get() and test.includeOnRep.get():
                 blanks.append(test)
 
         if len(blanks) < 1:
@@ -266,10 +257,10 @@ class EvaluationFrame(BaseFrame):
             intPSI = sum(readings)
             self.log.append("Integral PSI: sum of all pressure readings")
             self.log.append(f"Integral PSI: {intPSI}")
-            area = self.project.limitPSI.get() * len(readings) - intPSI
-            self.log.append("Area over blank: limitPSI * # of readings - integral PSI")
+            area = self.project.limit_psi.get() * len(readings) - intPSI
+            self.log.append("Area over blank: limit_psi * # of readings - integral PSI")
             self.log.append(
-                f"Area over blank: {self.project.limitPSI.get()} * {len(readings)} - {intPSI}"
+                f"Area over blank: {self.project.limit_psi.get()} * {len(readings)} - {intPSI}"
             )
             self.log.append(f"Area over blank: {area}")
             self.log.append("")
@@ -278,12 +269,12 @@ class EvaluationFrame(BaseFrame):
         # get protectable area
         avgBlankArea = round(sum(areasOverBlanks) / len(areasOverBlanks))
         self.log.append(f"Average area over blanks: {avgBlankArea}")
-        avgProtectableArea = self.project.limitPSI.get() * maxReadings - avgBlankArea
+        avgProtectableArea = self.project.limit_psi.get() * max_readings - avgBlankArea
         self.log.append(
-            "Average protectable area: limitPSI * maxReadings - average area over blanks"
+            "Average protectable area: limit_psi * max_readings - average area over blanks"
         )
         self.log.append(
-            f"Average protectable area: {self.project.limitPSI.get()} * {maxReadings} - {avgBlankArea}"
+            f"Average protectable area: {self.project.limit_psi.get()} * {max_readings} - {avgBlankArea}"
         )
         self.log.append(f"Average protectable area: {avgProtectableArea}")
         self.log.append("-" * 80)
@@ -292,7 +283,7 @@ class EvaluationFrame(BaseFrame):
         # select trials
         trials = []
         for test in self.project.tests:
-            if not test.isBlank.get():
+            if not test.is_blank.get():
                 trials.append(test)
 
         # get readings
@@ -302,7 +293,7 @@ class EvaluationFrame(BaseFrame):
             readings = trial.getReadings()
             self.log.append(f"Total readings: {len(readings)}")
             intPSI = sum(readings) + (
-                (maxReadings - len(readings)) * self.project.limitPSI.get()
+                (max_readings - len(readings)) * self.project.limit_psi.get()
             )
             self.log.append(f"Integral PSI: sum of all pressure readings")
             self.log.append(f"Integral PSI: {intPSI}")
@@ -330,9 +321,9 @@ class EvaluationFrame(BaseFrame):
         self.log.append("")
         for msg in self._log:
             self.log.append(msg)
-        self.toLog(self.log)
+        self.to_log(self.log)
 
-    def toLog(self: BaseFrame, log: list[str]) -> None:
+    def to_log(self: BaseFrame, log: list[str]) -> None:
         """Adds the passed log message to the Text widget in the Calculations frame."""
         self.logText.configure(state="normal")
         self.logText.delete(1.0, "end")

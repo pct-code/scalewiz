@@ -18,12 +18,12 @@ def export_csv(project: Project) -> None:
     output_dict = {
         "customer": project.customer.get(),
         "submitted by": project.submitted_by.get(),
-        "prod. co": project.productionCo.get(),
+        "prod. co": project.client.get(),
         "field": project.field.get(),
         "sample point": project.sample.get(),
         "analysis nos.": project.numbers.get(),
         "date sampled": project.sample_date.get(),
-        "date received": project.recDate.get(),
+        "date received": project.received_date.get(),
         "date completed": project.compDate.get(),
         "test temp F": project.temperature.get(),
         "baseline psi": project.baseline.get(),
@@ -31,9 +31,9 @@ def export_csv(project: Project) -> None:
         "bicarbs increase": project.bicarbsIncreased.get(),
         "chlorides": project.chlorides.get(),
         "time limit min": project.limitMin.get(),
-        "limit psi": project.limitPSI.get(),
+        "limit psi": project.limit_psi.get(),
         "name": [],
-        "isBlank": [],
+        "is_blank": [],
         "chemical": [],
         "rate": [],
         "duration": [],
@@ -44,17 +44,19 @@ def export_csv(project: Project) -> None:
     }
 
     blanks = [
-        test for test in project.tests if test.includeOnRep.get() and test.isBlank.get()
+        test
+        for test in project.tests
+        if test.includeOnRep.get() and test.is_blank.get()
     ]
     trials = [
         test
         for test in project.tests
-        if test.includeOnRep.get() and not test.isBlank.get()
+        if test.includeOnRep.get() and not test.is_blank.get()
     ]
     tests = blanks + trials
 
     output_dict["name"] = [test.name.get() for test in tests]
-    output_dict["isBlank"] = [test.isBlank.get() for test in tests]
+    output_dict["is_blank"] = [test.is_blank.get() for test in tests]
     output_dict["chemical"] = [test.chemical.get() for test in tests]
     output_dict["rate"] = [test.rate.get() for test in tests]
     output_dict["duration"] = [

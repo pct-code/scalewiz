@@ -18,12 +18,12 @@ class Project:
         # serializable test info
         self.customer = tk.StringVar()
         self.submitted_by = tk.StringVar()
-        self.productionCo = tk.StringVar()
+        self.client = tk.StringVar()
         self.field = tk.StringVar()
         self.sample = tk.StringVar()
 
         self.sample_date = tk.StringVar()
-        self.recDate = tk.StringVar()
+        self.received_date = tk.StringVar()
         self.compDate = tk.StringVar()
         self.name = tk.StringVar()
         self.analyst = tk.StringVar()
@@ -36,7 +36,7 @@ class Project:
         self.chlorides = tk.IntVar()
         self.baseline = tk.IntVar()
         self.temperature = tk.IntVar()
-        self.limitPSI = tk.IntVar()
+        self.limit_psi = tk.IntVar()
         self.limitMin = tk.IntVar()
         self.interval = tk.IntVar()
         self.uptake = tk.IntVar()
@@ -49,7 +49,7 @@ class Project:
 
         # maintain live fields
         self.customer.trace("w", self.makeName)
-        self.productionCo.trace("w", self.makeName)
+        self.client.trace("w", self.makeName)
         self.field.trace("w", self.makeName)
         self.sample.trace("w", self.makeName)
 
@@ -57,7 +57,7 @@ class Project:
         # todo #3 abstract these out into some TOML or something
 
         self.baseline.set(75)
-        self.limitPSI.set(1500)
+        self.limit_psi.set(1500)
         self.limitMin.set(90)
         self.interval.set(3)
         self.uptake.set(60)
@@ -67,8 +67,8 @@ class Project:
     def makeName(self, _) -> None:
         """Constructs a default name for the Project."""
         name = ""
-        if self.productionCo.get() != "":
-            name = self.productionCo.get().strip()
+        if self.client.get() != "":
+            name = self.client.get().strip()
         else:
             name = self.customer.get().strip()
         if self.field.get() != "":
@@ -101,7 +101,7 @@ class Project:
 
             keys.append(key)
 
-            if test.isBlank.get():
+            if test.is_blank.get():
                 _blanks[key] = test
             else:
                 _trials[key] = test
@@ -123,11 +123,11 @@ class Project:
             "info": {
                 "customer": project.customer.get(),
                 "submittedBy": project.submitted_by.get(),
-                "productionCo": project.productionCo.get(),
+                "productionCo": project.client.get(),
                 "field": project.field.get(),
                 "sample": project.sample.get(),
                 "sampleDate": project.sample_date.get(),
-                "recDate": project.recDate.get(),
+                "recDate": project.received_date.get(),
                 "compDate": project.compDate.get(),
                 "name": project.name.get(),
                 "analyst": project.analyst.get(),
@@ -141,7 +141,7 @@ class Project:
                 "chlorides": project.chlorides.get(),
                 "baseline": project.baseline.get(),
                 "temperature": project.temperature.get(),
-                "limitPSI": project.limitPSI.get(),
+                "limitPSI": project.limit_psi.get(),
                 "limitMin": project.limitMin.get(),
                 "interval": project.interval.get(),
                 "uptake": project.uptake.get(),
@@ -166,11 +166,11 @@ class Project:
         info = obj.get("info")
         this.customer.set(info.get("customer"))
         this.submitted_by.set(info.get("submittedBy"))
-        this.productionCo.set(info.get("productionCo"))
+        this.client.set(info.get("productionCo"))
         this.field.set(info.get("field"))
         this.sample.set(info.get("sample"))
         this.sample_date.set(info.get("sampleDate"))
-        this.recDate.set(info.get("recDate"))
+        this.received_date.set(info.get("recDate"))
         this.compDate.set(info.get("compDate"))
         this.name.set(info.get("name"))
         this.numbers.set(info.get("numbers"))
@@ -184,7 +184,7 @@ class Project:
         this.chlorides.set(params.get("chlorides"))
         this.baseline.set(params.get("baseline"))
         this.temperature.set(params.get("temperature"))
-        this.limitPSI.set(params.get("limitPSI"))
+        this.limit_psi.set(params.get("limitPSI"))
         this.limitMin.set(params.get("limitMin"))
         this.interval.set(params.get("interval"))
         this.uptake.set(params.get("uptake"))

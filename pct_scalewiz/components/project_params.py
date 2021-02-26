@@ -24,12 +24,12 @@ class ProjectParams(ttk.Frame):
         ent = ttk.Frame(self)
         ent.grid_columnconfigure(0, weight=1)
         ent.grid_columnconfigure(1, weight=1)
-        ttk.Radiobutton(ent, text="Yes", variable=parent.editorProject.bicarbsIncreased, value=True).grid(
-            row=0, column=0
-        )
-        ttk.Radiobutton(ent, text="No", variable=parent.editorProject.bicarbsIncreased, value=False).grid(
-            row=0, column=1
-        )
+        ttk.Radiobutton(
+            ent, text="Yes", variable=parent.editorProject.bicarbsIncreased, value=True
+        ).grid(row=0, column=0)
+        ttk.Radiobutton(
+            ent, text="No", variable=parent.editorProject.bicarbsIncreased, value=False
+        ).grid(row=0, column=1)
         parent.render(lbl, ent, 1)
 
         # row 2 ---------------------------------------------------------------
@@ -56,7 +56,7 @@ class ProjectParams(ttk.Frame):
         # row 5 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Limiting pressure (PSI):")
         ent = ttk.Spinbox(
-            self, textvariable=parent.editorProject.limitPSI, from_=0, to=9999
+            self, textvariable=parent.editorProject.limit_psi, from_=0, to=9999
         )
         parent.render(lbl, ent, 5)
 
