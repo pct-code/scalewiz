@@ -49,7 +49,7 @@ class EvaluationFrame(BaseFrame):
     def trace(self: BaseFrame) -> None:
         """Applies a tkVar trace to properties on every test object."""
         for test in self.editorProject.tests:
-            test.reportAs.trace("w", self.score)
+            test.report_as.trace("w", self.score)
             test.toConsider.trace("w", self.score)
             test.includeOnRep.trace("w", self.score)
 
@@ -171,7 +171,7 @@ class EvaluationFrame(BaseFrame):
                     self.axis.plot(
                         elapsed,
                         blank.getReadings(),
-                        label=blank.reportAs.get(),
+                        label=blank.report_as.get(),
                         linestyle=("-."),
                     )
 
@@ -181,7 +181,7 @@ class EvaluationFrame(BaseFrame):
                     for i, reading in enumerate(trial.readings):
                         elapsed.append(trial.readings[i]["elapsedMin"])
                     self.axis.plot(
-                        elapsed, trial.getReadings(), label=trial.reportAs.get()
+                        elapsed, trial.getReadings(), label=trial.report_as.get()
                     )
 
             self.axis.set_xlabel("Time (min)")

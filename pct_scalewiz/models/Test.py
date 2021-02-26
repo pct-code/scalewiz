@@ -16,7 +16,7 @@ class Test:
         self.name = tk.StringVar()
         self.chemical = tk.StringVar()
         self.rate = tk.IntVar()
-        self.reportAs = tk.StringVar()
+        self.report_as = tk.StringVar()
         self.clarity = tk.StringVar()
         self.notes = tk.StringVar()
         self.toConsider = tk.StringVar()
@@ -40,7 +40,7 @@ class Test:
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
 
     def makeRepAs(self, _) -> None:
-        self.reportAs.set(self.name.get())
+        self.report_as.set(self.name.get())
 
     def getObsPSI(self, *args) -> None:
         pressures = [
@@ -57,7 +57,7 @@ class Test:
             "isBlank": self.is_blank.get(),
             "chemical": self.chemical.get(),
             "rate": self.rate.get(),
-            "reportAs": self.reportAs.get(),
+            "reportAs": self.report_as.get(),
             "clarity": self.clarity.get(),
             "notes": self.notes.get(),
             "toConsider": self.toConsider.get(),
@@ -72,7 +72,7 @@ class Test:
         self.is_blank.set(obj["isBlank"])
         self.chemical.set(obj["chemical"])
         self.rate.set(obj["rate"])
-        self.reportAs.set(obj["reportAs"])
+        self.report_as.set(obj["reportAs"])
         self.clarity.set(obj["clarity"])
         self.notes.set(obj["notes"])
         self.toConsider.set(obj["toConsider"])

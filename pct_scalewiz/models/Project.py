@@ -75,7 +75,6 @@ class Project:
             name = f"{name} - {self.field.get()}".strip()
         if self.sample.get() != "":
             name = f"{name} ({self.sample.get()})".strip()
-        print(name)
         self.name.set(name)
 
     def trimNames(self) -> None:
@@ -83,8 +82,8 @@ class Project:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())
 
-            if test.reportAs.get().strip() != test.reportAs.get():
-                test.reportAs.set(test.reportAs.get().strip())
+            if test.report_ass.get().strip() != testreport_asas.get():
+                test.report_ass.set(testreport_asas.get().strip())
 
     @staticmethod
     def dumpJson(project, path: str) -> None:
@@ -95,10 +94,10 @@ class Project:
         _trials = {}
         keys = []
         for test in project.tests:
-            key = test.reportAs.get().lower()  # eliminate capitalization discrepancies
+            key = test.report_ass.get().lower()  # eliminate capitalization discrepancies
             while key in keys:  # checking for duplicate values
-                test.reportAs.set(test.reportAs.get() + " - copy")
-                key = test.reportAs.get().lower()
+                test.report_ass.set(testreport_asas.get() + " - copy")
+                key = test.report_ass.get().lower()
 
             keys.append(key)
 
@@ -108,13 +107,13 @@ class Project:
                 _trials[key] = test
 
         blankNames = sort_nicely(
-            [blank.reportAs.get().lower() for blank in list(_blanks.values())]
+            [blank.report_ass.get().lower() for blank in list(_blanks.values())]
         )
         blanks = [_blanks.pop(name) for name in blankNames]
 
         # instead, sort by label then by conc magnitude
         trialNames = sort_nicely(
-            [trial.reportAs.get().lower() for trial in list(_trials.values())]
+            [trial.report_ass.get().lower() for trial in list(_trials.values())]
         )
         trials = [_trials.pop(name) for name in trialNames]
 

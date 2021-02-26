@@ -18,7 +18,7 @@ class TestResultRow(ttk.Frame):
         # col 0 - name
         cols.append(ttk.Label(self.parent, textvariable=self.test.name))
         # col 1 - report as
-        cols.append(ttk.Entry(self.parent, textvariable=self.test.reportAs, width=25))
+        cols.append(ttk.Entry(self.parent, textvariable=self.test.report_as, width=25))
         # col 2 - duration
         duration = round(len(self.test.readings) * self.project.interval.get() / 60, 2)
         cols.append(
