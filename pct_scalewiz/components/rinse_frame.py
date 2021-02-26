@@ -1,12 +1,12 @@
 """Simple frame that starts and stops the pumps on a timer."""
 
+import logging
 import time
 import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
 from tkinter import ttk
 
 from pct_scalewiz.components.base_frame import BaseFrame
-
 
 logger = logging.getLogger("pct-scalewiz")
 

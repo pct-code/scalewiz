@@ -1,7 +1,10 @@
 """Renders data from a TestHandler as it is collected."""
 
+from __future__ import annotations
+
 import logging
 import time
+import typing
 from tkinter import ttk
 
 import matplotlib.pyplot as plt
@@ -9,8 +12,9 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
-from pct_scalewiz.components.test_handler_view import TestHandlerView
-from pct_scalewiz.models.test_handler import TestHandler
+if typing.TYPE_CHECKING:
+    from pct_scalewiz.components.test_handler_view import TestHandlerView
+    from pct_scalewiz.models.test_handler import TestHandler
 
 logger = logging.getLogger("scalewiz")
 
