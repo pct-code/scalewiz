@@ -1,22 +1,27 @@
 """Evaluation window for a Project."""
 
+from __future__ import annotations
+# stdlib
 import os
 import time
 import tkinter as tk
 import tkinter.scrolledtext
+import typing
 from tkinter import font, ttk
-
+# 3rd party
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
-
+# internal 
 from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.test_evaluation_row import TestResultRow
 from pct_scalewiz.helpers.export_csv import export_csv
 from pct_scalewiz.models.project import Project
 
+if typing.TYPE_CHECKING:
+    from pct_scalewiz.models.test_handler import TestHandler
 
 COLORS = [
     "orange",
@@ -35,7 +40,7 @@ COLORS = [
 class EvaluationFrame(BaseFrame):
     """Frame for analyzing data."""
 
-    def __init__(self: BaseFrame, parent: tk.Toplevel, handler: "TestHandler") -> None:
+    def __init__(self: BaseFrame, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
         # self.project = Project.loadJson(handler.project.path.get())

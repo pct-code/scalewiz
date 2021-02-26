@@ -12,11 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - rinse windows will be titled after the system they control
  - requests for rinse cycles will be ignored if a test is already running
- - the Live Plot stops updating (clearing itself) at the end of a 
+ - the Live Plot stops updating (clearing itself) at the end of a test
 ### Removed
  - dependency on openpyxl
  - dependency on PIL
  - ability to export report as .xlsx
+ - redundant windows from EvaluationFrame
 
 ## [v0.1.0]
 ### Added

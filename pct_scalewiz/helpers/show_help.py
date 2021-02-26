@@ -1,5 +1,6 @@
 """Displays the documentation."""
 
+import logging
 import os
 import webbrowser
 
@@ -7,11 +8,14 @@ from markdown import markdownFromFile
 from markdown.extensions.toc import TocExtension
 from pct_scalewiz.helpers.get_resource import get_resource
 
+logger = logging.getLogger("scalewiz")
+
 
 def show_help() -> None:
     """Displays the documentation in a web browser."""
-    mdfile = get_resource(r"../doc/index.md")
-    htmlfile = get_resource(r"../doc/index.html")
+    logger.info("Opening the help file")
+    mdfile = get_resource(r"../../doc/index.md")
+    htmlfile = get_resource(r"../../doc/index.html")
     markdownFromFile(
         input=mdfile,
         output=htmlfile,

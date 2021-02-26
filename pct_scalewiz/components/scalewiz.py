@@ -1,4 +1,4 @@
-"""The entry point for the program."""
+"""Core object for the application."""
 
 # utils
 import logging
@@ -52,14 +52,3 @@ class ScaleWiz(BaseFrame):
         self.log_window.withdraw()  # 🏌️‍♀️👋
 
         MainFrame(self).grid()  # this will hijack the window closing protocol
-
-
-def main():
-    """The Tkinter entry point of the program; enters mainloop."""
-    root = tk.Tk()
-    ScaleWiz(root).grid()
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    main()

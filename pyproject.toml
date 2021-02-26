@@ -17,7 +17,7 @@ Markdown = "^3.3.3"
 pandas = "^1.2.2"
 
 [tool.poetry.scripts]
-scalewiz = "pct_scalewiz.main:main"
+scalewiz = "pct_scalewiz.__main__:main"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
