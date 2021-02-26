@@ -19,7 +19,7 @@ class TeledynePump:
             psi = response.split(",")[1][:-1]
             return int(psi)
         except Exception as e:
-            if self.logger != None:
+            if self.logger is not None:
                 self.logger.critical(f"Reading failed on {self.port.port}")
                 self.logger.exception(e)
             return -1

@@ -1,6 +1,5 @@
 """Handles a test."""
 
-# util
 import logging
 import os
 import time
@@ -9,20 +8,18 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from tkinter import filedialog, messagebox
 
-from serial import Serial, SerialException
-
 from pct_scalewiz.models.project import Project
 from pct_scalewiz.models.teledyne_pump import TeledynePump
 from pct_scalewiz.models.test import Test
-
-# internal
-
+from serial import Serial, SerialException
 
 logger = logging.getLogger("scalewiz")
 
 
 class TestHandler:
-    def __init__(self, name="Nemo"):
+    """Handles a Test."""
+
+    def __init__(self, name="Nemo") -> None:
         # local state vars
         self.name = name
         self.project = Project()
@@ -49,8 +46,8 @@ class TestHandler:
     def can_run(self) -> bool:
         value = (
             (
-                self.maxPSI1 <= self.project.limit_psi.get()
-                or self.maxPSI2 <= self.project.limit_psi.get()
+                self.max_psi_1 <= self.project.limit_psi.get()
+                or self.max_psi_2 <= self.project.limit_psi.get()
             )
             and len(self.queue) < self.max_readings()
             and not self.stop_requested
@@ -81,7 +78,7 @@ class TestHandler:
                 Project.dumpJson(self.project, path)
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
-    def start_test(self):
+    def start_test(self) -> None:
         if self.is_running.get():
             return
 
@@ -158,10 +155,10 @@ class TestHandler:
         logger.info(f"{self.name} is starting a test for {self.project.name.get()}")
         self.pool.submit(self.takeReadings)
 
-    def takeReadings(self):
+    def takeReadings(self) -> None:
         # set default values for this instance of the test loop
         self.queue = []
-        self.maxPSI1 = self.maxPSI2 = 0
+        self.max_psi_1 = self.max_psi_2 = 0
         # start the pumps
         self.pump1.run()
         self.pump2.run()
@@ -220,10 +217,10 @@ class TestHandler:
                 self.elapsed.set(f"{elapsedMin:.2f} min.")
                 self.progress.set(round(len(self.queue) / self.max_readings() * 100))
 
-                if psi1 > self.maxPSI1:
-                    self.maxPSI1 = psi1
-                if psi2 > self.maxPSI2:
-                    self.maxPSI2 = psi2
+                if psi1 > self.max_psi_1:
+                    self.max_psi_1 = psi1
+                if psi2 > self.max_psi_2:
+                    self.max_psi_2 = psi2
                 logger.debug(
                     f"Finished doing everything else in {time.time() - reading_start - collected} s"
                 )
@@ -251,7 +248,7 @@ class TestHandler:
     # because the readings loop is blocking, it is handled on a separate thread
     # beacuse of this, we have to interact with it in a somewhat backhanded way
     # this method is intended to be called from the test handler view module on a UI button click
-    def requestStop(self):
+    def requestStop(self) -> None:
         if not self.is_running.get():
             return
 
@@ -260,7 +257,7 @@ class TestHandler:
             self.stop_requested = True
             logger.info(f"{self.name}: Received a stop request")
 
-    def stopTest(self):
+    def stopTest(self) -> None:
         if self.pump1.port.isOpen():
             self.pump1.stop()
             self.pump1.close()
@@ -280,7 +277,7 @@ class TestHandler:
         self.elapsed.set("")
         logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
 
-    def saveTestToProject(self):
+    def saveTestToProject(self) -> None:
         for reading in self.queue:
             self.test.readings.append(reading)
         self.queue.clear()
@@ -293,7 +290,7 @@ class TestHandler:
         # todo ask them to rebuild instead
         self.close_editors()
 
-    def setupPumps(self):
+    def setupPumps(self) -> None:
         # the timeout values are an alternative to using TextIOWrapper
         # the values chosen were suggested by the pump's documentation
         try:
@@ -309,7 +306,7 @@ class TestHandler:
             messagebox.showwarning("Serial Exception", e)
 
     # methods that affect UI
-    def new_test(self):
+    def new_test(self) -> None:
         logger.info(f"{self.name}: Initialized a new test")
         self.test = Test()
         self.is_running.set(False)
@@ -321,13 +318,13 @@ class TestHandler:
         self.parent.build()
 
     # todo give this a better name
-    def close_editors(self):
+    def close_editors(self) -> None:
         for window in self.editors:
             self.editors.remove(window)
             window.destroy()
         logger.info(f"{self.name} has closed all editor windows")
 
-    def to_log(self, msg):
+    def to_log(self, msg) -> None:
         self.logText.configure(state="normal")
         self.logText.insert("end", msg + "\n")
         self.logText.configure(state="disabled")

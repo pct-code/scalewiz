@@ -94,7 +94,9 @@ class Project:
         _trials = {}
         keys = []
         for test in project.tests:
-            key = test.report_ass.get().lower()  # eliminate capitalization discrepancies
+            key = (
+                test.report_ass.get().lower()
+            )  # eliminate capitalization discrepancies
             while key in keys:  # checking for duplicate values
                 test.report_ass.set(testreport_asas.get() + " - copy")
                 key = test.report_ass.get().lower()
