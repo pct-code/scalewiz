@@ -1,6 +1,7 @@
 """Evaluation window for a Project."""
 
 from __future__ import annotations
+
 # stdlib
 import os
 import time
@@ -8,13 +9,15 @@ import tkinter as tk
 import tkinter.scrolledtext
 import typing
 from tkinter import font, ttk
+
 # 3rd party
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
-# internal 
+
+# internal
 from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.test_evaluation_row import TestResultRow
 from pct_scalewiz.helpers.export_csv import export_csv
@@ -43,7 +46,7 @@ class EvaluationFrame(BaseFrame):
     def __init__(self: BaseFrame, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
-        # self.project = Project.loadJson(handler.project.path.get())
+        # self.project = Project.load_json(handler.project.path.get())
         # self.editorProject = self.project
         # todo #8 refactor this. need to rename across all the ProjectX classes
         self.project = handler.project
@@ -216,8 +219,8 @@ class EvaluationFrame(BaseFrame):
         with open(out, "w") as file:
             file.write(log)
 
-        Project.dumpJson(self.project, self.project.path.get())
-        self.handler.project = Project.loadJson(self.project.path.get())
+        Project.dump_json(self.project, self.project.path.get())
+        self.handler.project = Project.load_json(self.project.path.get())
         self.project = self.handler.project
         self.editorProject = self.project
 

@@ -25,10 +25,10 @@ class ProjectParams(ttk.Frame):
         ent.grid_columnconfigure(0, weight=1)
         ent.grid_columnconfigure(1, weight=1)
         ttk.Radiobutton(
-            ent, text="Yes", variable=parent.editorProject.bicarbsIncreased, value=True
+            ent, text="Yes", variable=parent.editorProject.bicarbs_increased, value=True
         ).grid(row=0, column=0)
         ttk.Radiobutton(
-            ent, text="No", variable=parent.editorProject.bicarbsIncreased, value=False
+            ent, text="No", variable=parent.editorProject.bicarbs_increased, value=False
         ).grid(row=0, column=1)
         parent.render(lbl, ent, 1)
 

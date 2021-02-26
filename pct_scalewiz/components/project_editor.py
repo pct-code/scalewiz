@@ -19,7 +19,7 @@ class ProjectEditor(BaseFrame):
         self.handler = handler
         self.grid_columnconfigure(0, weight=1)
         if os.path.isfile(handler.project.path.get()):
-            self.editorProject = Project.loadJson(handler.project.path.get())
+            self.editorProject = Project.load_json(handler.project.path.get())
             self.editorProject.path.set(handler.project.path.get())
         else:
             self.editorProject = Project()
@@ -58,8 +58,8 @@ class ProjectEditor(BaseFrame):
         if self.editorProject.path.get() == "":
             self.saveAs()
         else:
-            Project.dumpJson(self.editorProject, self.editorProject.path.get())
-            self.handler.project = Project.loadJson(self.editorProject.path.get())
+            Project.dump_json(self.editorProject, self.editorProject.path.get())
+            self.handler.project = Project.load_json(self.editorProject.path.get())
             # todo how about a call to build instead?
             self.handler.parent.build()
 

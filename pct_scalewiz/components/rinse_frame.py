@@ -73,7 +73,7 @@ class RinseFrame(BaseFrame):
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.handler.name,
-                self.pump1.port.port,
+                self.handler.pump1.port.port,
             )
 
         if self.handler.pump2.port.isOpen():
@@ -82,7 +82,7 @@ class RinseFrame(BaseFrame):
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.handler.name,
-                self.pump1.port.port,
+                self.handler.pump1.port.port,
             )
 
     def close(self) -> None:

@@ -24,7 +24,7 @@ class Project:
 
         self.sample_date = tk.StringVar()
         self.received_date = tk.StringVar()
-        self.compDate = tk.StringVar()
+        self.completed_deted_date = tk.StringVar()
         self.name = tk.StringVar()
         self.analyst = tk.StringVar()
         self.numbers = tk.StringVar()
@@ -32,7 +32,7 @@ class Project:
         self.notes = tk.StringVar()
         # serializable test params
         self.bicarbs = tk.IntVar()
-        self.bicarbsIncreased = tk.BooleanVar()
+        self.bicarbs_increasedd = tk.BooleanVar()
         self.chlorides = tk.IntVar()
         self.baseline = tk.IntVar()
         self.temperature = tk.IntVar()
@@ -78,7 +78,7 @@ class Project:
         self.name.set(name)
 
     @staticmethod
-    def dumpJson(project, path: str) -> None:
+    def dump_json(project, path: str) -> None:
         for test in project.tests:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())
@@ -91,9 +91,7 @@ class Project:
         _trials = {}
         keys = []
         for test in project.tests:
-            key = (
-                test.report_as.get().lower()
-            )  # eliminate capitalization discrepancies
+            key = test.report_as.get().lower()  # eliminate capitalization discrepancies
             while key in keys:  # checking for duplicate values
                 test.report_as.set(test.report_as.get() + " - copy")
                 key = test.report_as.get().lower()
@@ -127,7 +125,7 @@ class Project:
                 "sample": project.sample.get(),
                 "sampleDate": project.sample_date.get(),
                 "recDate": project.received_date.get(),
-                "compDate": project.compDate.get(),
+                "compDate": project.completed_deted_date.get(),
                 "name": project.name.get(),
                 "analyst": project.analyst.get(),
                 "numbers": project.numbers.get(),
@@ -136,7 +134,7 @@ class Project:
             },
             "params": {
                 "bicarbonates": project.bicarbs.get(),
-                "bicarbsIncreased": project.bicarbsIncreased.get(),
+                "bicarbsIncreased": project.bicarbs_increasedd.get(),
                 "chlorides": project.chlorides.get(),
                 "baseline": project.baseline.get(),
                 "temperature": project.temperature.get(),
@@ -145,7 +143,7 @@ class Project:
                 "interval": project.interval.get(),
                 "uptake": project.uptake.get(),
             },
-            "tests": [test.dumpJson() for test in project.tests],
+            "tests": [test.dump_json() for test in project.tests],
             "outputFormat": project.output_format.get(),
             "plot": os.path.abspath(project.plot.get()),
         }
@@ -156,7 +154,7 @@ class Project:
         logger.info("Saved %s to %s", project.name.get(), project.path.get())
 
     @staticmethod
-    def loadJson(path) -> "Project":
+    def load_json(path: str) -> "Project":
         logger.info(f"Loading from {path}")
         with open(path, "r") as file:
             obj = json.load(file)
@@ -177,7 +175,7 @@ class Project:
         this.sample.set(info.get("sample"))
         this.sample_date.set(info.get("sampleDate"))
         this.received_date.set(info.get("recDate"))
-        this.compDate.set(info.get("compDate"))
+        this.completed_deted_date.set(info.get("compDate"))
         this.name.set(info.get("name"))
         this.numbers.set(info.get("numbers"))
         this.analyst.set(info.get("analyst"))
@@ -186,7 +184,7 @@ class Project:
 
         params = obj.get("params")
         this.bicarbs.set(params.get("bicarbonates"))
-        this.bicarbsIncreased.set(params.get("bicarbsIncreased"))
+        this.bicarbs_increasedd.set(params.get("bicarbsIncreased"))
         this.chlorides.set(params.get("chlorides"))
         this.baseline.set(params.get("baseline"))
         this.temperature.set(params.get("temperature"))
@@ -200,7 +198,7 @@ class Project:
 
         for entry in obj.get("tests"):
             test = Test()
-            test.loadJson(entry)
+            test.load_json(entry)
             this.tests.append(test)
 
         return this

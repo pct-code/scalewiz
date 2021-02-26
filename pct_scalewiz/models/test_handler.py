@@ -69,7 +69,7 @@ class TestHandler:
 
         if path != "":
             self.close_editors()
-            self.project = Project.loadJson(path)
+            self.project = Project.load_json(path)
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
     def start_test(self) -> None:
@@ -276,7 +276,7 @@ class TestHandler:
             self.test.readings.append(reading)
         self.queue.clear()
         self.project.tests.append(self.test)
-        Project.dumpJson(self.project, self.project.path.get())
+        Project.dump_json(self.project, self.project.path.get())
         logger.info(
             f"{self.name}: Saved {self.project.name.get()} to {self.project.path.get()}"
         )

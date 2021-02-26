@@ -73,12 +73,14 @@ class ProjectInfo(ttk.Frame):
 
         # row 8 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date completed:")
-        d = parent.editorProject.compDate.get()
+        d = parent.editorProject.completed_date.get()
         ent = tkcal.DateEntry(
-            self, textvariable=parent.editorProject.compDate, date_pattern="mm/dd/yyyy"
+            self,
+            textvariable=parent.editorProject.completed_date,
+            date_pattern="mm/dd/yyyy",
         )
-        lbl.bind("<Button-1>", lambda _: parent.editorProject.compDate.set(""))
-        parent.editorProject.compDate.set(d)
+        lbl.bind("<Button-1>", lambda _: parent.editorProject.completed_date.set(""))
+        parent.editorProject.completed_date.set(d)
         parent.render(lbl, ent, 8)
 
         # row 9 ---------------------------------------------------------------

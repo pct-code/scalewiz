@@ -13,7 +13,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.components.test_handler_view import TestHandlerView
     from pct_scalewiz.models.test_handler import TestHandler
 
 logger = logging.getLogger("scalewiz")
@@ -22,7 +21,7 @@ logger = logging.getLogger("scalewiz")
 class LivePlot(ttk.Frame):
     """Renders data from a TestHandler as it is collected."""
 
-    def __init__(self, parent: TestHandlerView, handler: TestHandler) -> None:
+    def __init__(self, parent: ttk.Frame, handler: TestHandler) -> None:
         """Initialize a LivePlot."""
         ttk.Frame.__init__(self, parent)
         self.handler = handler

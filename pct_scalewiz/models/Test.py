@@ -51,7 +51,7 @@ class Test:
             baselines = pressures[0:4]
             self.obsBaseline.set(round(sum(baselines) / 5))
 
-    def dumpJson(self) -> dict:
+    def dump_json(self) -> dict:
         return {
             "name": self.name.get(),
             "isBlank": self.is_blank.get(),
@@ -67,7 +67,7 @@ class Test:
             "readings": self.readings,
         }
 
-    def loadJson(self, obj: dict) -> None:
+    def load_json(self, obj: dict) -> None:
         self.name.set(obj["name"])
         self.is_blank.set(obj["isBlank"])
         self.chemical.set(obj["chemical"])

@@ -64,7 +64,7 @@ class TestResultRow(ttk.Frame):
         cols.append(
             ttk.Button(
                 self.parent,
-                command=lambda: self.removeFromProject(),
+                command=lambda: self.remove_from_project(),
                 text="Delete",
                 width=7,
             )
@@ -84,7 +84,8 @@ class TestResultRow(ttk.Frame):
                     pady=1,
                 )
 
-    def removeFromProject(self):
+    def remove_from_project(self) -> None:
+        """Removes a Test from the parent Project, then tries to rebuild the UI."""
         msg = f"You are about to delete {self.test.name.get()} from {self.project.name.get()}."
         msg += "\nThis will become permanent once you save the project. \nDo you wish to continue?"
         remove = messagebox.askyesno("Delete test", msg)

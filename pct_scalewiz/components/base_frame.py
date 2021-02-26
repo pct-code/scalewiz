@@ -1,7 +1,5 @@
 """A base frame class to be used by most of the other UI elements."""
 
-import sys
-import tkinter as tk
 from os import path
 from tkinter import ttk
 
@@ -11,7 +9,7 @@ from pct_scalewiz.helpers.get_resource import get_resource
 class BaseFrame(ttk.Frame):
     """A base frame class to be used by most of the other UI elements."""
 
-    def __init__(self, parent):
+    def __init__(self, parent: ttk.Frame) -> None:
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
