@@ -5,7 +5,12 @@ import tkinter as tk
 
 
 class Test:
-    def __init__(self):
+    """
+    Object for holding all the data associated with a Test.
+    Basically a dict of tkVars.
+    """
+
+    def __init__(self) -> None:
         # serializable props
         self.isBlank = tk.BooleanVar()
         self.name = tk.StringVar()
@@ -30,14 +35,14 @@ class Test:
         self.toConsider.set("pump 1")
         self.isBlank.set(True)
 
-    def makeName(self, *args):
+    def makeName(self, _) -> None:
         if not (self.chemical.get() == "" or self.rate.get() == 0):
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
 
-    def makeRepAs(self, *args):
+    def makeRepAs(self, _) -> None:
         self.reportAs.set(self.name.get())
 
-    def getObsPSI(self, *args):
+    def getObsPSI(self, *args) -> None:
         pressures = [
             self.readings[i][self.toConsider.get()] for i in range(len(self.readings))
         ]
@@ -47,7 +52,7 @@ class Test:
             self.obsBaseline.set(round(sum(baselines) / 5))
 
     def dumpJson(self) -> dict:
-        this = {
+        return {
             "name": self.name.get(),
             "isBlank": self.isBlank.get(),
             "chemical": self.chemical.get(),
@@ -61,9 +66,8 @@ class Test:
             "obsBaseline": self.obsBaseline.get(),
             "readings": self.readings,
         }
-        return this
 
-    def loadJson(self, obj):
+    def loadJson(self, obj: dict) -> None:
         self.name.set(obj["name"])
         self.isBlank.set(obj["isBlank"])
         self.chemical.set(obj["chemical"])
@@ -77,7 +81,7 @@ class Test:
         self.readings = obj["readings"]
         self.getObsPSI()
 
-    def getReadings(self) -> [int]:
+    def getReadings(self) -> list[int]:
         result = []
         for reading in self.readings:
             result.append(reading[self.toConsider.get()])

@@ -17,12 +17,12 @@ def export_csv(project: Project) -> None:
 
     output_dict = {
         "customer": project.customer.get(),
-        "submitted by": project.submittedBy.get(),
+        "submitted by": project.submitted_by.get(),
         "prod. co": project.productionCo.get(),
         "field": project.field.get(),
         "sample point": project.sample.get(),
         "analysis nos.": project.numbers.get(),
-        "date sampled": project.sampleDate.get(),
+        "date sampled": project.sample_date.get(),
         "date received": project.recDate.get(),
         "date completed": project.compDate.get(),
         "test temp F": project.temperature.get(),

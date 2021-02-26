@@ -151,7 +151,7 @@ class TestHandlerView(ttk.Frame):
         self.elapsed.grid(row=1, column=1)
         frame.grid(row=1, column=0, padx=1, pady=1, sticky="n")
         self.initBtn = ttk.Button(
-            frame, text="New", command=lambda: self.handler.newTest()
+            frame, text="New", command=lambda: self.handler.new_test()
         )
 
         # rows 0-1 -------------------------------------------------------------

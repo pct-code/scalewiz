@@ -2,6 +2,7 @@
 
 # util
 import logging
+import sys
 import tkinter as tk
 from tkinter import ttk
 
@@ -9,7 +10,6 @@ from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.menu_bar import MenuBar
 from pct_scalewiz.components.test_handler_view import TestHandlerView
 from pct_scalewiz.models.test_handler import TestHandler
-
 
 logger = logging.getLogger("scalewiz")
 
@@ -56,4 +56,4 @@ class MainFrame(BaseFrame):
                         widget.handler.name,
                     )
                     return
-        exit()
+        sys.exit()

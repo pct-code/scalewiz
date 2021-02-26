@@ -12,15 +12,17 @@ logger = logging.getLogger("scalewiz")
 
 
 class Project:
-    def __init__(self):
+    """Model object for a project. Provides a JSON/tkVar mapping."""
+
+    def __init__(self) -> None:
         # serializable test info
         self.customer = tk.StringVar()
-        self.submittedBy = tk.StringVar()
+        self.submitted_by = tk.StringVar()
         self.productionCo = tk.StringVar()
         self.field = tk.StringVar()
         self.sample = tk.StringVar()
 
-        self.sampleDate = tk.StringVar()
+        self.sample_date = tk.StringVar()
         self.recDate = tk.StringVar()
         self.compDate = tk.StringVar()
         self.name = tk.StringVar()
@@ -39,7 +41,6 @@ class Project:
         self.interval = tk.IntVar()
         self.uptake = tk.IntVar()
         # report stuff
-        self.template = tk.StringVar()
         self.output_format = tk.StringVar()
         self.plot = tk.StringVar()
 
@@ -61,23 +62,22 @@ class Project:
         self.interval.set(3)
         self.uptake.set(60)
         # todo clean out this old template stuff ?
-        t = get_resource(r"../../assets/template.xlsx")
-        self.template.set(t)
         self.output_format.set("CSV")
 
-    def makeName(self, _):
-        s = ""
+    def makeName(self, _) -> None:
+        """Constructs a default name for the Project."""
+        name = ""
         if self.productionCo.get() != "":
-            s = self.productionCo.get().strip()
+            name = self.productionCo.get().strip()
         else:
-            s = self.customer.get().strip()
+            name = self.customer.get().strip()
         if self.field.get() != "":
-            s = f"{s} - {self.field.get()}".strip()
+            name = f"{name} - {self.field.get()}".strip()
         if self.sample.get() != "":
-            s = f"{s} ({self.sample.get()})".strip()
-        self.name.set(s)
+            name = f"{name} ({self.sample.get()})".strip()
+        self.name.set(name)
 
-    def trimNames(self):
+    def trimNames(self) -> None:
         for test in self.tests:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())
@@ -89,7 +89,7 @@ class Project:
     def dumpJson(project, path: str) -> None:
         project.trimNames()
 
-        # filter the data alphanumerically
+        # filter the data alphanumerically by label
         _blanks = {}  # put in dicts to allow for popping later
         _trials = {}
         keys = []
@@ -111,23 +111,22 @@ class Project:
         )
         blanks = [_blanks.pop(name) for name in blankNames]
 
-        # instead, sort by chem name then by conc magnitude
+        # instead, sort by label then by conc magnitude
         trialNames = sort_nicely(
             [trial.reportAs.get().lower() for trial in list(_trials.values())]
         )
         trials = [_trials.pop(name) for name in trialNames]
 
-        # would prefer to keep all the tests together
         project.tests = [*blanks, *trials]
 
         this = {
             "info": {
                 "customer": project.customer.get(),
-                "submittedBy": project.submittedBy.get(),
+                "submittedBy": project.submitted_by.get(),
                 "productionCo": project.productionCo.get(),
                 "field": project.field.get(),
                 "sample": project.sample.get(),
-                "sampleDate": project.sampleDate.get(),
+                "sampleDate": project.sample_date.get(),
                 "recDate": project.recDate.get(),
                 "compDate": project.compDate.get(),
                 "name": project.name.get(),
@@ -148,8 +147,7 @@ class Project:
                 "uptake": project.uptake.get(),
             },
             "tests": [test.dumpJson() for test in project.tests],
-            "template": project.template.get(),
-            "output_format": project.output_format.get(),
+            "outputFormat": project.output_format.get(),
             "plot": os.path.abspath(project.plot.get()),
         }
 
@@ -167,11 +165,11 @@ class Project:
         this = Project()
         info = obj.get("info")
         this.customer.set(info.get("customer"))
-        this.submittedBy.set(info.get("submittedBy"))
+        this.submitted_by.set(info.get("submittedBy"))
         this.productionCo.set(info.get("productionCo"))
         this.field.set(info.get("field"))
         this.sample.set(info.get("sample"))
-        this.sampleDate.set(info.get("sampleDate"))
+        this.sample_date.set(info.get("sampleDate"))
         this.recDate.set(info.get("recDate"))
         this.compDate.set(info.get("compDate"))
         this.name.set(info.get("name"))
@@ -191,14 +189,10 @@ class Project:
         this.interval.set(params.get("interval"))
         this.uptake.set(params.get("uptake"))
 
-        this.template.set(obj.get("template"))
         this.plot.set(obj.get("plot"))
-        this.output_format.set(obj.get("output_format"))
+        this.output_format.set(obj.get("outputFormat"))
 
-        # todo probably a smarter way to enumerate over these
-        for i in range(len(obj.get("tests"))):
-            test = Test()
-            test.loadJson(obj.get("tests")[i])
+        for entry in obj.get("tests"):
+            this.tests.append(Test().loadJson(entry))
 
-            this.tests.append(test)
         return this

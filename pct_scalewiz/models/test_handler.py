@@ -29,7 +29,7 @@ class TestHandler:
         self.test = Test()
         self.dev1 = tk.StringVar()
         self.dev2 = tk.StringVar()
-        self.stopRequested = False
+        self.stop_requested = False
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.queue = []
         self.progress = tk.IntVar()
@@ -41,8 +41,6 @@ class TestHandler:
         # UI concerns
         self.isRunning = tk.BooleanVar()
         self.isDone = tk.BooleanVar()
-        self.projBtnText = tk.StringVar()
-        self.update_BtnText()
 
         # logging
         # todo add handler here and set to a file in logs/ next to the project.json
@@ -55,7 +53,7 @@ class TestHandler:
                 or self.maxPSI2 <= self.project.limitPSI.get()
             )
             and len(self.queue) < self.maxReadings()
-            and not self.stopRequested
+            and not self.stop_requested
         )
         return value
 
@@ -134,7 +132,7 @@ class TestHandler:
 
         # close any open editors
         self.closeEditors()
-        self.stopRequested = False
+        self.stop_requested = False
         self.isDone.set(False)
         self.isRunning.set(True)
         self.progress.set(0)
@@ -188,19 +186,18 @@ class TestHandler:
         # set this here so we can take a reading on the firt iteration
         # not anymore ? emulating do while
         # see indent on snooze call at end of while loop
-        startTime = time.time()
-        readingStart = startTime - interval
+        test_start_time = time.time()
+        reading_start = test_start_time - interval
 
         # readings loop -------------------------------------------------------
         while self.canRun():
-            if time.time() - readingStart >= interval:
-                readingStart = time.time()
-                elapsedMin = round((time.time() - startTime) / 60, 2)
-                # elapsedMin = round(len(self.queue) * interval / 60, 2)
+            if time.time() - reading_start >= interval:
+                reading_start = time.time()
+                elapsedMin = round((time.time() - test_start_time) / 60, 2)
 
                 psi1 = self.pump1.pressure()
                 psi2 = self.pump2.pressure()
-                collected = time.time() - readingStart
+                collected = time.time() - reading_start
                 logger.debug(f"{self.name} collected both PSIs in {collected} s")
                 average = round(((psi1 + psi2) / 2))
 
@@ -229,17 +226,17 @@ class TestHandler:
                 if psi2 > self.maxPSI2:
                     self.maxPSI2 = psi2
                 logger.debug(
-                    f"Finished doing everything else in {time.time() - readingStart - collected} s"
+                    f"Finished doing everything else in {time.time() - reading_start - collected} s"
                 )
                 logger.debug(
-                    f"{self.name} collected data in {time.time() - readingStart}"
+                    f"{self.name} collected data in {time.time() - reading_start}"
                 )
                 # todo try asyncio - called defer or await or s/t
                 time.sleep(snooze)
         # end of readings loop ------------------------------------------------
 
         # find the actual elapsed time
-        trueElapsed = round((time.time() - startTime) / 60, 2)
+        trueElapsed = round((time.time() - test_start_time) / 60, 2)
         # compare to the most recent elapsedMin value
         if trueElapsed != elapsedMin:
             # maybe make a dialog pop up instead?
@@ -261,7 +258,7 @@ class TestHandler:
 
         if self.isRunning.get():
             # the readings loop thread checks this flag on each iteration
-            self.stopRequested = True
+            self.stop_requested = True
             logger.info(f"{self.name}: Received a stop request")
 
     def stopTest(self):
@@ -313,7 +310,7 @@ class TestHandler:
             messagebox.showwarning("Serial Exception", e)
 
     # methods that affect UI
-    def newTest(self):
+    def new_test(self):
         logger.info(f"{self.name}: Initialized a new test")
         self.test = Test()
         self.isRunning.set(False)
@@ -323,13 +320,6 @@ class TestHandler:
         # self.parent.pltFrm.destroy()
         # self.parent.logFrm.destroy()
         self.parent.build()
-
-    # todo is this necessary??
-    def update_BtnText(self):
-        if self.project.name.get() == "":
-            self.projBtnText.set("Select a project")
-        else:
-            self.projBtnText.set(self.project.name.get())
 
     # todo give this a better name
     def closeEditors(self):

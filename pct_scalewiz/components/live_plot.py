@@ -9,6 +9,9 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
+from pct_scalewiz.components.test_handler_view import TestHandlerView
+from pct_scalewiz.models.test_handler import TestHandler
+
 logger = logging.getLogger("scalewiz")
 
 

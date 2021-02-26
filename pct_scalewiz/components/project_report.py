@@ -12,15 +12,14 @@ class ProjectReport(ttk.Frame):
         self.grid_columnconfigure(1, weight=1)
         self.parent = parent
 
-        templateLbl = ttk.Label(self, text="Export format:")
-        templateEnt = ttk.Combobox(
+        lbl = ttk.Label(self, text="Export format:")
+        ent = ttk.Combobox(
             self,
             values=["JSON", "CSV"],
             textvariable=parent.editorProject.output_format,
         )
-        # templateEnt = tk.Message(self, textvariable=parent.editorProject.template, aspect=750)
-        # templateEnt.bind("<Button-1>", self.loadTemplate)
-        parent.render(templateLbl, templateEnt, 0)
+
+        parent.render(lbl, ent, 0)
 
         # todo implement color selection
         # colorsLbl = ttk.Label(self, text="Plot color cycle:")

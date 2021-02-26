@@ -82,7 +82,7 @@ class TestResultRow(ttk.Frame):
                     pady=1,
                 )
 
-    def removeFromProject(self, *args):
+    def removeFromProject(self):
         msg = f"You are about to delete {self.test.name.get()} from {self.project.name.get()}."
         msg += "\nThis will become permanent once you save the project. \nDo you wish to continue?"
         remove = messagebox.askyesno("Delete test", msg)
