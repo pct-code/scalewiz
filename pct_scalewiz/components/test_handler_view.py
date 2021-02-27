@@ -2,7 +2,6 @@
 
 import logging
 import tkinter as tk
-import tkinter.scrolledtext
 from tkinter import ttk
 
 import matplotlib.pyplot as plt
@@ -29,7 +28,7 @@ class TestHandlerView(ttk.Frame):
             "w", self.update_TestType
         )  # might have to retrace on new test
         self.handler.is_running.trace("w", self.update_InputFrame)
-        self.handler.isDone.trace("w", self.update_InitBtn)
+        self.handler.is_done.trace("w", self.update_InitBtn)
         self.handler.dev1.trace("w", self.update_DevList)
         self.handler.dev2.trace("w", self.update_DevList)
 
@@ -72,10 +71,13 @@ class TestHandlerView(ttk.Frame):
         entFrm = ttk.Frame(self.iFrm)
         entFrm.grid_columnconfigure(0, weight=1)
         entFrm.grid_columnconfigure(1, weight=1)
-        foo = self.handler.test.is_blank
-        blankRadio = ttk.Radiobutton(entFrm, text="Blank", variable=foo, value=True)
+        blankRadio = ttk.Radiobutton(
+            entFrm, text="Blank", variable=self.handler.test.is_blank, value=True
+        )
         blankRadio.grid(row=0, column=0)
-        trialRadio = ttk.Radiobutton(entFrm, text="Trial", variable=foo, value=False)
+        trialRadio = ttk.Radiobutton(
+            entFrm, text="Trial", variable=self.handler.test.is_blank, value=False
+        )
         trialRadio.grid(row=0, column=1)
         self.inputs.append(blankRadio)
         self.inputs.append(trialRadio)
@@ -163,12 +165,12 @@ class TestHandlerView(ttk.Frame):
 
         # row 2 ---------------------------------------------------------------
         self.logFrm = ttk.Frame(self)
-        self.logText = tk.scrolledtext.ScrolledText(
+        self.log_text = tk.scrolledtext.ScrolledText(
             self.logFrm, background="white", height=5, width=44, state="disabled"
         )
         # todo alert alert this is not elegant
-        self.handler.logText = self.logText  # this is bad ?
-        self.logText.grid(sticky="ew")
+        self.handler.log_text = self.log_text  # this is bad ?
+        self.log_text.grid(sticky="ew")
 
         self.update_TestType()
         self.update_InitBtn()
@@ -200,7 +202,7 @@ class TestHandlerView(ttk.Frame):
                 child.configure(state="normal")
 
     def update_InitBtn(self, *args):
-        if self.handler.isDone.get():
+        if self.handler.is_done.get():
             self.startBtn.grid_remove()
             self.initBtn.grid(row=0, column=0)
         else:

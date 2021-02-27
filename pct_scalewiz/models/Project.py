@@ -24,7 +24,7 @@ class Project:
 
         self.sample_date = tk.StringVar()
         self.received_date = tk.StringVar()
-        self.completed_deted_date = tk.StringVar()
+        self.completed_date = tk.StringVar()
         self.name = tk.StringVar()
         self.analyst = tk.StringVar()
         self.numbers = tk.StringVar()
@@ -37,7 +37,7 @@ class Project:
         self.baseline = tk.IntVar()
         self.temperature = tk.IntVar()
         self.limit_psi = tk.IntVar()
-        self.limitMin = tk.IntVar()
+        self.limit_minutes = tk.IntVar()
         self.interval = tk.IntVar()
         self.uptake = tk.IntVar()
         # report stuff
@@ -48,23 +48,23 @@ class Project:
         self.tests = []
 
         # maintain live fields
-        self.customer.trace("w", self.makeName)
-        self.client.trace("w", self.makeName)
-        self.field.trace("w", self.makeName)
-        self.sample.trace("w", self.makeName)
+        self.customer.trace("w", self.make_name)
+        self.client.trace("w", self.make_name)
+        self.field.trace("w", self.make_name)
+        self.sample.trace("w", self.make_name)
 
         # set defaults
         # todo #3 abstract these out into some TOML or something
 
         self.baseline.set(75)
         self.limit_psi.set(1500)
-        self.limitMin.set(90)
+        self.limit_minutes.set(90)
         self.interval.set(3)
         self.uptake.set(60)
         # todo clean out this old template stuff ?
         self.output_format.set("CSV")
 
-    def makeName(self, *args) -> None:
+    def make_name(self, *args) -> None:
         """Constructs a default name for the Project."""
         name = ""
         if self.client.get() != "":
@@ -83,18 +83,18 @@ class Project:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())
 
-            if test.report_as.get().strip() != test.report_as.get():
-                test.report_as.set(test.report_as.get().strip())
+            if test.label.get().strip() != test.label.get():
+                test.label.set(test.label.get().strip())
 
         # filter the data alphanumerically by label
         _blanks = {}  # put in dicts to allow for popping later
         _trials = {}
         keys = []
         for test in project.tests:
-            key = test.report_as.get().lower()  # eliminate capitalization discrepancies
+            key = test.label.get().lower()  # eliminate capitalization discrepancies
             while key in keys:  # checking for duplicate values
-                test.report_as.set(test.report_as.get() + " - copy")
-                key = test.report_as.get().lower()
+                test.label.set(test.label.get() + " - copy")
+                key = test.label.get().lower()
 
             keys.append(key)
 
@@ -103,16 +103,16 @@ class Project:
             else:
                 _trials[key] = test
 
-        blankNames = sort_nicely(
-            [blank.report_as.get().lower() for blank in list(_blanks.values())]
+        blank_labels = sort_nicely(
+            [blank.label.get().lower() for blank in list(_blanks.values())]
         )
-        blanks = [_blanks.pop(name) for name in blankNames]
+        blanks = [_blanks.pop(name) for name in blank_labels]
 
         # instead, sort by label then by conc magnitude
-        trialNames = sort_nicely(
-            [trial.report_as.get().lower() for trial in list(_trials.values())]
+        trial_labels = sort_nicely(
+            [trial.label.get().lower() for trial in list(_trials.values())]
         )
-        trials = [_trials.pop(name) for name in trialNames]
+        trials = [_trials.pop(name) for name in trial_labels]
 
         project.tests = [*blanks, *trials]
 
@@ -125,7 +125,7 @@ class Project:
                 "sample": project.sample.get(),
                 "sampleDate": project.sample_date.get(),
                 "recDate": project.received_date.get(),
-                "compDate": project.completed_deted_date.get(),
+                "compDate": project.completed_date.get(),
                 "name": project.name.get(),
                 "analyst": project.analyst.get(),
                 "numbers": project.numbers.get(),
@@ -139,7 +139,7 @@ class Project:
                 "baseline": project.baseline.get(),
                 "temperature": project.temperature.get(),
                 "limitPSI": project.limit_psi.get(),
-                "limitMin": project.limitMin.get(),
+                "limitMin": project.limit_minutes.get(),
                 "interval": project.interval.get(),
                 "uptake": project.uptake.get(),
             },
@@ -175,7 +175,7 @@ class Project:
         this.sample.set(info.get("sample"))
         this.sample_date.set(info.get("sampleDate"))
         this.received_date.set(info.get("recDate"))
-        this.completed_deted_date.set(info.get("compDate"))
+        this.completed_date.set(info.get("compDate"))
         this.name.set(info.get("name"))
         this.numbers.set(info.get("numbers"))
         this.analyst.set(info.get("analyst"))
@@ -189,7 +189,7 @@ class Project:
         this.baseline.set(params.get("baseline"))
         this.temperature.set(params.get("temperature"))
         this.limit_psi.set(params.get("limitPSI"))
-        this.limitMin.set(params.get("limitMin"))
+        this.limit_minutes.set(params.get("limitMin"))
         this.interval.set(params.get("interval"))
         this.uptake.set(params.get("uptake"))
 

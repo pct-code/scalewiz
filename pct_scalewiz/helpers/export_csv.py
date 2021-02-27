@@ -30,7 +30,7 @@ def export_csv(project: Project) -> None:
         "bicarbs": project.bicarbs.get(),
         "bicarbs increase": project.bicarbs_increased.get(),
         "chlorides": project.chlorides.get(),
-        "time limit min": project.limitMin.get(),
+        "time limit min": project.limit_minutes.get(),
         "limit psi": project.limit_psi.get(),
         "name": [],
         "is_blank": [],
@@ -46,12 +46,12 @@ def export_csv(project: Project) -> None:
     blanks = [
         test
         for test in project.tests
-        if test.includeOnRep.get() and test.is_blank.get()
+        if test.include_on_report.get() and test.is_blank.get()
     ]
     trials = [
         test
         for test in project.tests
-        if test.includeOnRep.get() and not test.is_blank.get()
+        if test.include_on_report.get() and not test.is_blank.get()
     ]
     tests = blanks + trials
 
@@ -62,7 +62,7 @@ def export_csv(project: Project) -> None:
     output_dict["duration"] = [
         round(len(test.readings) * project.interval.get() / 60, 2) for test in tests
     ]
-    output_dict["max psi"] = [test.maxPSI.get() for test in tests]
+    output_dict["max psi"] = [test.max_psi.get() for test in tests]
     output_dict["result"] = [test.result.get() for test in tests]
     output_dict["clarity"] = [test.clarity.get() for test in tests]
 

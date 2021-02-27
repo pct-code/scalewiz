@@ -20,7 +20,7 @@ class TestResultRow(ttk.Frame):
         # col 0 - name
         cols.append(ttk.Label(self.parent, textvariable=self.test.name))
         # col 1 - report as
-        cols.append(ttk.Entry(self.parent, textvariable=self.test.report_as, width=25))
+        cols.append(ttk.Entry(self.parent, textvariable=self.test.label, width=25))
         # col 2 - duration
         duration = round(len(self.test.readings) * self.project.interval.get() / 60, 2)
         cols.append(
@@ -34,7 +34,7 @@ class TestResultRow(ttk.Frame):
         cols.append(
             ttk.Combobox(
                 self.parent,
-                textvariable=self.test.toConsider,
+                textvariable=self.test.pump_to_score,
                 values=["pump 1", "pump 2", "average"],
                 state="readonly",
                 width=7,
@@ -42,11 +42,13 @@ class TestResultRow(ttk.Frame):
         )
         # col 4 - obs baseline
         cols.append(
-            ttk.Label(self.parent, textvariable=self.test.obsBaseline, anchor="center")
+            ttk.Label(
+                self.parent, textvariable=self.test.observed_baseline, anchor="center"
+            )
         )
         # col 5 - max psi
         cols.append(
-            ttk.Label(self.parent, textvariable=self.test.maxPSI, anchor="center")
+            ttk.Label(self.parent, textvariable=self.test.max_psi, anchor="center")
         )
         # col 6 - clarity
         cols.append(
@@ -59,7 +61,7 @@ class TestResultRow(ttk.Frame):
             ttk.Label(self.parent, textvariable=self.test.result, anchor="center")
         )
         # col 9 - on report
-        cols.append(ttk.Checkbutton(self.parent, variable=self.test.includeOnRep))
+        cols.append(ttk.Checkbutton(self.parent, variable=self.test.include_on_report))
         # col 10 - delete
         cols.append(
             ttk.Button(

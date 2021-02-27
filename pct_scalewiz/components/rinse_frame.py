@@ -41,7 +41,7 @@ class RinseFrame(BaseFrame):
         self.button.grid(row=2, column=0, columnspan=2)
 
     def request_rinse(self):
-        if not self.handler.is_running.get() or self.handler.isDone.get():
+        if not self.handler.is_running.get() or self.handler.is_done.get():
             self.pool.submit(self.rinse)
 
     def rinse(self):

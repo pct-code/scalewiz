@@ -38,7 +38,7 @@ class TestHandler:
         # need new way to manage state
         # UI concerns
         self.is_running = tk.BooleanVar()
-        self.isDone = tk.BooleanVar()
+        self.is_done = tk.BooleanVar()
 
         # logging
         # todo add handler here and set to a file in logs/ next to the project.json
@@ -57,7 +57,10 @@ class TestHandler:
 
     # todo why is this a method ????
     def max_readings(self) -> int:
-        return round(self.project.limitMin.get() * 60 / self.project.interval.get()) + 1
+        return (
+            round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
+            + 1
+        )
 
     def load_project(self, path: str = None) -> None:
         if path is None:
@@ -123,16 +126,16 @@ class TestHandler:
         # close any open editors
         self.close_editors()
         self.stop_requested = False
-        self.isDone.set(False)
+        self.is_done.set(False)
         self.is_running.set(True)
         self.progress.set(0)
         # make a new log file
-        fileName = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
+        log_path = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
         dirName = os.path.dirname(self.project.path.get())
-        logsDir = os.path.join(dirName, "logs")
-        if not os.path.isdir(logsDir):
-            os.mkdir(logsDir)
-        logFile = os.path.join(logsDir, fileName)
+        logs_dir = os.path.join(dirName, "logs")
+        if not os.path.isdir(logs_dir):
+            os.mkdir(logs_dir)
+        logFile = os.path.join(logs_dir, log_path)
 
         # update the file handler
         if hasattr(self, "logFileHandler"):
@@ -169,13 +172,7 @@ class TestHandler:
         self.to_log("")
         interval = self.project.interval.get()
         snooze = round(interval * 0.9, 2)
-        # assigning these vars isnt just to make them shorter
-        # since we don't expect the values to change, referencing them this way
-        # slightly less expensive than getting the value from its tkVar each iteration
-        # startTime = time.time()
-        # set this here so we can take a reading on the firt iteration
-        # not anymore ? emulating do while
-        # see indent on snooze call at end of while loop
+       
         test_start_time = time.time()
         reading_start = test_start_time - interval
 
@@ -183,23 +180,23 @@ class TestHandler:
         while self.can_run():
             if time.time() - reading_start >= interval:
                 reading_start = time.time()
-                elapsedMin = round((time.time() - test_start_time) / 60, 2)
+                minutes_elapsed = round((time.time() - test_start_time) / 60, 2)
 
-                psi1 = self.pump1.pressure()
-                psi2 = self.pump2.pressure()
+                psi1 = self.pump1.get_pressure()
+                psi2 = self.pump2.get_pressure()
                 collected = time.time() - reading_start
                 logger.debug(f"{self.name} collected both PSIs in {collected} s")
                 average = round(((psi1 + psi2) / 2))
 
                 reading = {
-                    "elapsedMin": elapsedMin,
+                    "elapsedMin": minutes_elapsed,
                     "pump 1": psi1,
                     "pump 2": psi2,
                     "average": average,
                 }
 
                 # make a message for the log in the test handler view
-                msg = f"@ {elapsedMin:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
+                msg = f"@ {minutes_elapsed:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
                 self.to_log(msg)
                 logger.info(f"{self.name} - {msg}")
 
@@ -208,7 +205,7 @@ class TestHandler:
                 # -> trying to not access same obj across threads
                 self.queue.append(reading)
 
-                self.elapsed.set(f"{elapsedMin:.2f} min.")
+                self.elapsed.set(f"{minutes_elapsed:.2f} min.")
                 self.progress.set(round(len(self.queue) / self.max_readings() * 100))
 
                 if psi1 > self.max_psi_1:
@@ -226,14 +223,14 @@ class TestHandler:
         # end of readings loop ------------------------------------------------
 
         # find the actual elapsed time
-        trueElapsed = round((time.time() - test_start_time) / 60, 2)
-        # compare to the most recent elapsedMin value
-        if trueElapsed != elapsedMin:
+        actual_elapsed = round((time.time() - test_start_time) / 60, 2)
+        # compare to the most recent minutes_elapsed value
+        if actual_elapsed != minutes_elapsed:
             # maybe make a dialog pop up instead?
-            self.to_log(f"The test says it took {elapsedMin} min.")
-            self.to_log(f"but really it took {trueElapsed} min. (I counted)")
+            self.to_log(f"The test says it took {minutes_elapsed} min.")
+            self.to_log(f"but really it took {actual_elapsed} min. (I counted)")
             logger.warning(
-                f"{self.name} - {elapsedMin} was really {trueElapsed} ({len(self.queue)}/{self.max_readings()})"
+                f"{self.name} - {minutes_elapsed} was really {actual_elapsed} ({len(self.queue)}/{self.max_readings()})"
             )
 
         self.stopTest()
@@ -266,7 +263,7 @@ class TestHandler:
                 f"{self.name}: Stopped and closed the device @ {self.pump1.port.port}"
             )
 
-        self.isDone.set(True)
+        self.is_done.set(True)
         self.progress.set(0)
         self.elapsed.set("")
         logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
@@ -304,11 +301,9 @@ class TestHandler:
         logger.info(f"{self.name}: Initialized a new test")
         self.test = Test()
         self.is_running.set(False)
-        self.isDone.set(False)
+        self.is_done.set(False)
         self.elapsed.set("")
         # todo why is this here?
-        # self.parent.pltFrm.destroy()
-        # self.parent.logFrm.destroy()
         self.parent.build()
 
     # todo give this a better name
@@ -319,7 +314,7 @@ class TestHandler:
         logger.info(f"{self.name} has closed all editor windows")
 
     def to_log(self, msg) -> None:
-        self.logText.configure(state="normal")
-        self.logText.insert("end", msg + "\n")
-        self.logText.configure(state="disabled")
-        self.logText.see("end")
+        self.log_text.configure(state="normal")
+        self.log_text.insert("end", msg + "\n")
+        self.log_text.configure(state="disabled")
+        self.log_text.see("end")

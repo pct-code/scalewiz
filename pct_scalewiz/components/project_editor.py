@@ -14,6 +14,8 @@ from pct_scalewiz.components.project_report import ProjectReport
 
 
 class ProjectEditor(BaseFrame):
+    """Form for mutating Project objects."""
+
     def __init__(self, parent, handler):
         BaseFrame.__init__(self, parent)
         self.handler = handler

@@ -51,36 +51,36 @@ class ProjectInfo(ttk.Frame):
         # row 6 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date sampled:")
         # this is to refresh the entry later
-        d = parent.editorProject.sample_date.get()
+        current_value = parent.editorProject.sample_date.get()
         ent = tkcal.DateEntry(
             self, textvariable=parent.editorProject.sample_date, date_pattern="mm/dd/Y"
         )
         lbl.bind("<Button-1>", lambda _: parent.editorProject.sample_date.set(""))
-        parent.editorProject.sample_date.set(d)
+        parent.editorProject.sample_date.set(current_value)
         parent.render(lbl, ent, 6)
 
         # row 7 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date received:")
-        d = parent.editorProject.received_date.get()
+        current_value = parent.editorProject.received_date.get()
         ent = tkcal.DateEntry(
             self,
             textvariable=parent.editorProject.received_date,
             date_pattern="mm/dd/yyyy",
         )
         lbl.bind("<Button-1>", lambda _: parent.editorProject.received_date.set(""))
-        parent.editorProject.received_date.set(d)
+        parent.editorProject.received_date.set(current_value)
         parent.render(lbl, ent, 7)
 
         # row 8 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Date completed:")
-        d = parent.editorProject.completed_date.get()
+        current_value = parent.editorProject.completed_date.get()
         ent = tkcal.DateEntry(
             self,
             textvariable=parent.editorProject.completed_date,
             date_pattern="mm/dd/yyyy",
         )
         lbl.bind("<Button-1>", lambda _: parent.editorProject.completed_date.set(""))
-        parent.editorProject.completed_date.set(d)
+        parent.editorProject.completed_date.set(current_value)
         parent.render(lbl, ent, 8)
 
         # row 9 ---------------------------------------------------------------

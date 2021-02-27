@@ -2,26 +2,31 @@
 
 
 class TeledynePump:
-    def __init__(self, serialport, logger=None):
+    """Serial port wrapper for MX-class Teledyne pumps."""
+
+    def __init__(self, serialport, logger=None) -> None:
         self.port = serialport
         self.logger = logger
 
-    def run(self):
+    def run(self) -> None:
+        """Run the pump."""
         self.port.write("ru".encode())
 
-    def stop(self):
+    def stop(self) -> None:
+        """Stop the pump."""
         self.port.write("st".encode())
 
-    def pressure(self) -> int:
+    def get_pressure(self) -> int:
+        """Get the pump's current pressure."""
         try:
             self.port.write("pr".encode())
             response = self.port.readline().decode()
             psi = response.split(",")[1][:-1]
             return int(psi)
-        except Exception as e:
+        except Exception as error:
             if self.logger is not None:
-                self.logger.critical(f"Reading failed on {self.port.port}")
-                self.logger.exception(e)
+                self.logger.critical("Reading failed on %s", self.port.port)
+                self.logger.exception(error)
             return -1
 
     def close(self):

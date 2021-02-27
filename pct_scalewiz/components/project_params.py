@@ -63,7 +63,7 @@ class ProjectParams(ttk.Frame):
         # row 6 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Time limit (min.):")
         ent = ttk.Spinbox(
-            self, textvariable=parent.editorProject.limitMin, from_=0, to=9999
+            self, textvariable=parent.editorProject.limit_minutes, from_=0, to=9999
         )
         parent.render(lbl, ent, 6)
 

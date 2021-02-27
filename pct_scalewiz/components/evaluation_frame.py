@@ -57,9 +57,9 @@ class EvaluationFrame(BaseFrame):
     def trace(self: BaseFrame) -> None:
         """Applies a tkVar trace to properties on every test object."""
         for test in self.editorProject.tests:
-            test.report_as.trace("w", self.score)
-            test.toConsider.trace("w", self.score)
-            test.includeOnRep.trace("w", self.score)
+            test.label.trace("w", self.score)
+            test.pump_to_score.trace("w", self.score)
+            test.include_on_report.trace("w", self.score)
 
     def render(self: BaseFrame, label: ttk.Label, entry: ttk.Entry, row: int) -> None:
         """Renders a given label and entry on the passed row."""
@@ -72,25 +72,25 @@ class EvaluationFrame(BaseFrame):
         for child in self.winfo_children():
             child.destroy()
 
-        self.tabControl = ttk.Notebook(self)
-        self.tabControl.grid(row=0, column=0)
+        self.tab_control = ttk.Notebook(self)
+        self.tab_control.grid(row=0, column=0)
         # col config this too?
 
-        testsFrm = ttk.Frame(self)
+        tests_frame = ttk.Frame(self)
 
         bold_font = font.Font(family="Arial", weight="bold", size=10)
         # header row
         labels = []
-        labels.append(tk.Label(testsFrm, text="Name", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Label", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Minutes", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Pump", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Baseline", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Max", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Clarity", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Notes", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Result", font=bold_font))
-        labels.append(tk.Label(testsFrm, text="Report", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Name", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Label", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Minutes", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Pump", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Baseline", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Max", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Clarity", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Notes", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Result", font=bold_font))
+        labels.append(tk.Label(tests_frame, text="Report", font=bold_font))
         for i, label in enumerate(labels):
             label.grid(row=0, column=i, padx=3, sticky="w")
 
@@ -109,23 +109,23 @@ class EvaluationFrame(BaseFrame):
             if not test.is_blank.get():
                 self.trials.append(test)
 
-        tk.Label(testsFrm, text="Blanks:", font=bold_font).grid(
+        tk.Label(tests_frame, text="Blanks:", font=bold_font).grid(
             row=1, column=0, sticky="w", padx=3, pady=1
         )
-        tk.Label(testsFrm, text="Trials:", font=bold_font).grid(
+        tk.Label(tests_frame, text="Trials:", font=bold_font).grid(
             row=2 + len(self.blanks), column=0, sticky="w", padx=3, pady=1
         )
 
         for i, blank in enumerate(self.blanks):
-            TestResultRow(testsFrm, blank, self.project, i + 2).grid(
+            TestResultRow(tests_frame, blank, self.project, i + 2).grid(
                 row=i + 1, column=0, sticky="w", padx=3, pady=1
             )
         for i, trial in enumerate(self.trials):
-            TestResultRow(testsFrm, trial, self.project, i + len(self.blanks) + 3).grid(
-                row=i + len(self.blanks) + 3, column=0, sticky="w", padx=3, pady=1
-            )
+            TestResultRow(
+                tests_frame, trial, self.project, i + len(self.blanks) + 3
+            ).grid(row=i + len(self.blanks) + 3, column=0, sticky="w", padx=3, pady=1)
 
-        self.tabControl.add(testsFrm, text="   Data   ")
+        self.tab_control.add(tests_frame, text="   Data   ")
 
         # plot stuff ----------------------------------------------------------
         self.plot()
@@ -133,11 +133,11 @@ class EvaluationFrame(BaseFrame):
         # evaluation stuff ----------------------------------------------------
         logFrm = ttk.Frame(self)
         logFrm.grid_columnconfigure(0, weight=1)
-        self.logText = tk.scrolledtext.ScrolledText(
+        self.log_text = tk.scrolledtext.ScrolledText(
             logFrm, background="white", state="disabled"
         )
-        self.logText.grid(sticky="ew")
-        self.tabControl.add(logFrm, text="   Calculations   ")
+        self.log_text.grid(sticky="ew")
+        self.tab_control.add(logFrm, text="   Calculations   ")
 
         btnFrm = ttk.Frame(self)
         ttk.Button(btnFrm, text="Save", command=lambda: self.save(), width=10).grid(
@@ -158,7 +158,7 @@ class EvaluationFrame(BaseFrame):
         if hasattr(self, "pltFrm"):
             self.pltFrm.destroy()
 
-        self.pltFrm = ttk.Frame(self.tabControl)
+        self.pltFrm = ttk.Frame(self.tab_control)
         self.fig, self.axis = plt.subplots(figsize=(7.5, 4), dpi=100)
         self.fig.patch.set_facecolor("#FAFAFA")
         plt.subplots_adjust(wspace=0, hspace=0)
@@ -172,38 +172,38 @@ class EvaluationFrame(BaseFrame):
 
             # plot everything
             for blank in self.blanks:
-                if blank.includeOnRep.get():
+                if blank.include_on_report.get():
                     elapsed = []
                     for i, reading in enumerate(blank.readings):
                         elapsed.append(blank.readings[i]["elapsedMin"])
                     self.axis.plot(
                         elapsed,
                         blank.getReadings(),
-                        label=blank.report_as.get(),
+                        label=blank.label.get(),
                         linestyle=("-."),
                     )
 
             for trial in self.trials:
-                if trial.includeOnRep.get():
+                if trial.include_on_report.get():
                     elapsed = []
                     for i, reading in enumerate(trial.readings):
                         elapsed.append(trial.readings[i]["elapsedMin"])
                     self.axis.plot(
-                        elapsed, trial.getReadings(), label=trial.report_as.get()
+                        elapsed, trial.getReadings(), label=trial.label.get()
                     )
 
             self.axis.set_xlabel("Time (min)")
             self.axis.set_ylabel("Pressure (psi)")
             self.axis.set_ylim(top=self.project.limit_psi.get())
             self.axis.yaxis.set_major_locator(MultipleLocator(100))
-            self.axis.set_xlim((0, self.project.limitMin.get()))
+            self.axis.set_xlim((0, self.project.limit_minutes.get()))
             self.axis.legend(loc=0)
             self.axis.margins(0)
             plt.tight_layout()
 
         # finally, add to parent control
-        self.tabControl.add(self.pltFrm, text="   Plot   ")
-        self.tabControl.insert(1, self.pltFrm)
+        self.tab_control.add(self.pltFrm, text="   Plot   ")
+        self.tab_control.insert(1, self.pltFrm)
 
     def save(self: BaseFrame) -> None:
         """Saves the project to file, as well as the most recent plot and calculations log."""
@@ -215,7 +215,7 @@ class EvaluationFrame(BaseFrame):
         # update log
         out = f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} Scale Block Analysis (Log).txt"
         out = os.path.join(os.path.dirname(self.project.path.get()), out)
-        log = self.logText.get("1.0", "end-1c")
+        log = self.log_text.get("1.0", "end-1c")
         with open(out, "w") as file:
             file.write(log)
 
@@ -234,7 +234,7 @@ class EvaluationFrame(BaseFrame):
         # scoring props
 
         max_readings = round(
-            self.project.limitMin.get() * 60 / self.project.interval.get()
+            self.project.limit_minutes.get() * 60 / self.project.interval.get()
         )
         self.log.append("Max readings: limitMin * 60 / reading interval")
         self.log.append(f"Max readings: {max_readings}")
@@ -250,7 +250,7 @@ class EvaluationFrame(BaseFrame):
         # select the blanks
         blanks = []
         for test in self.project.tests:
-            if test.is_blank.get() and test.includeOnRep.get():
+            if test.is_blank.get() and test.include_on_report.get():
                 blanks.append(test)
 
         if len(blanks) < 1:
@@ -259,7 +259,7 @@ class EvaluationFrame(BaseFrame):
         areasOverBlanks = []
         for blank in blanks:
             self.log.append(f"Evaluating {blank.name.get()}")
-            self.log.append(f"Considering data: {blank.toConsider.get()}")
+            self.log.append(f"Considering data: {blank.pump_to_score.get()}")
             readings = blank.getReadings()
             self.log.append(f"Total readings: {len(readings)}")
             intPSI = sum(readings)
@@ -297,7 +297,7 @@ class EvaluationFrame(BaseFrame):
         # get readings
         for trial in trials:
             self.log.append(f"Evaluating {trial.name.get()}")
-            self.log.append(f"Considering data: {trial.toConsider.get()}")
+            self.log.append(f"Considering data: {trial.pump_to_score.get()}")
             readings = trial.getReadings()
             self.log.append(f"Total readings: {len(readings)}")
             intPSI = sum(readings) + (
@@ -333,9 +333,9 @@ class EvaluationFrame(BaseFrame):
 
     def to_log(self: BaseFrame, log: list[str]) -> None:
         """Adds the passed log message to the Text widget in the Calculations frame."""
-        self.logText.configure(state="normal")
-        self.logText.delete(1.0, "end")
+        self.log_text.configure(state="normal")
+        self.log_text.delete(1.0, "end")
         for i in log:
-            self.logText.insert("end", i)
-            self.logText.insert("end", "\n")
-        self.logText.configure(state="disabled")
+            self.log_text.insert("end", i)
+            self.log_text.insert("end", "\n")
+        self.log_text.configure(state="disabled")

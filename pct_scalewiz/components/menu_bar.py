@@ -50,13 +50,13 @@ class MenuBar(tk.Frame):
 
     def request_project_edit(self) -> None:
         """Requests to open an editor window for the currently selected Project."""
-        currentTab = self.parent.tabControl.select()
+        currentTab = self.parent.tab_control.select()
         widget = self.parent.nametowidget(currentTab)
         self.modProj(widget.handler)
 
     def request_eval_window(self) -> None:
         """Requests to open an evalutaion window for the currently selected Project."""
-        currentTab = self.parent.tabControl.select()
+        currentTab = self.parent.tab_control.select()
         widget = self.parent.nametowidget(currentTab)
         if not os.path.isfile(widget.handler.project.path.get()):
             messagebox.showwarning(
@@ -68,14 +68,14 @@ class MenuBar(tk.Frame):
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
-        currentTab = self.parent.tabControl.select()
+        currentTab = self.parent.tab_control.select()
         widget = self.parent.nametowidget(currentTab)
         widget.handler.load_project()
         widget.build()
 
     def showRinse(self) -> None:
         """Shows a RinseFrame in a new Toplevel."""
-        currentTab = self.parent.tabControl.select()
+        currentTab = self.parent.tab_control.select()
         widget = self.parent.nametowidget(currentTab)
 
         window = tk.Toplevel()
@@ -114,5 +114,7 @@ class MenuBar(tk.Frame):
         editor = EvaluationFrame(window, handler)
         editor.grid()
         logger.info(
-            f"{handler.name}: Opened an evaluation window for {handler.project.name.get()}"
+            "%s: Opened an evaluation window for %s",
+            handler.name,
+            handler.project.name.get(),
         )

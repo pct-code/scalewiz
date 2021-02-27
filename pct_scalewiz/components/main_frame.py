@@ -26,31 +26,31 @@ class MainFrame(BaseFrame):
     def build(self) -> None:
         MenuBar(self)  # this will apply itself to the current Toplevel
 
-        self.tabControl = ttk.Notebook(self)
-        self.tabControl.grid(sticky="nsew")
+        self.tab_control = ttk.Notebook(self)
+        self.tab_control.grid(sticky="nsew")
         self.addTestHandler()
 
     def addTestHandler(self):
         # make a new handler 🤠
-        system_name = f"  System {len(self.tabControl.tabs()) + 1}  "
+        system_name = f"  System {len(self.tab_control.tabs()) + 1}  "
         name = (
             system_name.strip()
         )  # todo perhaps we could pass this as arg to TestHandler init
         handler = TestHandler(name)
         # plug it in 🔌
-        view = TestHandlerView(self.tabControl, handler)
+        view = TestHandlerView(self.tab_control, handler)
         # todo why this assignment? the handler's 'parent' isn't a view. this can't be right, there must be a better way
         handler.parent = view  # 😬
         # add it to the tab control then rename
-        self.tabControl.add(view, sticky="nsew")
-        self.tabControl.tab(view, text=system_name)
+        self.tab_control.add(view, sticky="nsew")
+        self.tab_control.tab(view, text=system_name)
         logger.info("Added %s to main window", handler.name)
 
     def close(self):
-        for tab in self.tabControl.tabs():
+        for tab in self.tab_control.tabs():
             widget = self.nametowidget(tab)
             if widget.handler.is_running.get():
-                if not widget.handler.isDone.get():
+                if not widget.handler.is_done.get():
                     logger.warning(
                         "Attempted to close while a test was running on %s",
                         widget.handler.name,

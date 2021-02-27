@@ -15,7 +15,7 @@ def show_help() -> None:
     """Displays the documentation in a web browser."""
     logger.info("Opening the help file")
     mdfile = get_resource(r"../../doc/index.md")
-    htmlfile = get_resource(r"../../doc/index.html")
+    htmlfile = mdfile[:-2] + "html"
     markdownFromFile(
         input=mdfile,
         output=htmlfile,

@@ -39,7 +39,7 @@ class LivePlot(ttk.Frame):
         """Animates the live plot."""
 
         # we can just skip this if the test isn't running
-        if self.handler.isDone.get() or not self.handler.is_running.get():
+        if self.handler.is_done.get() or not self.handler.is_running.get():
             return
 
         # data access here 😳

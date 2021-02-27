@@ -16,40 +16,41 @@ class Test:
         self.name = tk.StringVar()
         self.chemical = tk.StringVar()
         self.rate = tk.IntVar()
-        self.report_as = tk.StringVar()
+        self.label = tk.StringVar()
         self.clarity = tk.StringVar()
         self.notes = tk.StringVar()
-        self.toConsider = tk.StringVar()
+        self.pump_to_score = tk.StringVar()
         self.result = tk.DoubleVar()
-        self.includeOnRep = tk.BooleanVar()
+        self.include_on_report = tk.BooleanVar()
         self.readings = []
-        self.maxPSI = tk.IntVar()
-        self.obsBaseline = tk.IntVar()
+        self.max_psi = tk.IntVar()
+        self.observed_baseline = tk.IntVar()
 
-        self.chemical.trace("w", self.makeName)
-        self.rate.trace("w", self.makeName)
-        self.name.trace("w", self.makeRepAs)
-        self.toConsider.trace("w", self.getObsPSI)
+        self.chemical.trace("w", self.make_name)
+        self.rate.trace("w", self.make_name)
+        self.name.trace("w", self.make_label)
+        self.pump_to_score.trace("w", self.set_observed_baseline)
 
         # todo abstract this out to some TOML
-        self.toConsider.set("pump 1")
+        self.pump_to_score.set("pump 1")
         self.is_blank.set(True)
 
-    def makeName(self, *args) -> None:
+    def make_name(self, *args) -> None:
+        """Makes a name by concatenating the chemical name and rate."""
         if not (self.chemical.get() == "" or self.rate.get() == 0):
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
 
-    def makeRepAs(self, *args) -> None:
-        self.report_as.set(self.name.get())
+    def make_label(self, *args) -> None:
+        """Sets the label to the current name as a default value."""
+        self.label.set(self.name.get())
 
-    def getObsPSI(self, *args) -> None:
-        pressures = [
-            self.readings[i][self.toConsider.get()] for i in range(len(self.readings))
-        ]
-        if not len(pressures) == 0:
-            self.maxPSI.set(max(pressures))
+    def set_observed_baseline(self, *args) -> None:
+        """Sets the observed baseline psi."""
+        pressures = [reading[self.pump_to_score.get()] for reading in self.readings]
+        if len(pressures) > 0:
+            self.max_psi.set(max(pressures))
             baselines = pressures[0:4]
-            self.obsBaseline.set(round(sum(baselines) / 5))
+            self.observed_baseline.set(round(sum(baselines) / 4))
 
     def dump_json(self) -> dict:
         return {
@@ -57,32 +58,31 @@ class Test:
             "isBlank": self.is_blank.get(),
             "chemical": self.chemical.get(),
             "rate": self.rate.get(),
-            "reportAs": self.report_as.get(),
+            "reportAs": self.label.get(),
             "clarity": self.clarity.get(),
             "notes": self.notes.get(),
-            "toConsider": self.toConsider.get(),
-            "includeOnRep": self.includeOnRep.get(),
+            "toConsider": self.pump_to_score.get(),
+            "includeOnRep": self.include_on_report.get(),
             "result": self.result.get(),
-            "obsBaseline": self.obsBaseline.get(),
+            "obsBaseline": self.observed_baseline.get(),
             "readings": self.readings,
         }
 
     def load_json(self, obj: dict) -> None:
-        self.name.set(obj["name"])
-        self.is_blank.set(obj["isBlank"])
-        self.chemical.set(obj["chemical"])
-        self.rate.set(obj["rate"])
-        self.report_as.set(obj["reportAs"])
-        self.clarity.set(obj["clarity"])
-        self.notes.set(obj["notes"])
-        self.toConsider.set(obj["toConsider"])
-        self.includeOnRep.set(obj["includeOnRep"])
-        self.result.set(obj["result"])
-        self.readings = obj["readings"]
-        self.getObsPSI()
+        """Load a Test with values from a JSON object."""
+        self.name.set(obj.get("name"))
+        self.is_blank.set(obj.get("isBlank"))
+        self.chemical.set(obj.get("chemical"))
+        self.rate.set(obj.get("rate"))
+        self.label.set(obj.get("reportAs"))
+        self.clarity.set(obj.get("clarity"))
+        self.notes.set(obj.get("notes"))
+        self.pump_to_score.set(obj.get("toConsider"))
+        self.include_on_report.set(obj.get("includeOnRep"))
+        self.result.set(obj.get("result"))
+        self.readings = obj.get("readings")
+        self.set_observed_baseline()
 
     def getReadings(self) -> list[int]:
-        result = []
-        for reading in self.readings:
-            result.append(reading[self.toConsider.get()])
-        return result
+        """Returns a list of the pump_to_score's pressure readings."""
+        return [reading[self.pump_to_score.get()] for reading in self.readings]
