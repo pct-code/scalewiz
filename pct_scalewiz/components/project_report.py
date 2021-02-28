@@ -3,11 +3,11 @@
 import tkinter as tk
 from tkinter import filedialog, ttk
 
-import tkcalendar as tkcal
-
 
 class ProjectReport(ttk.Frame):
-    def __init__(self, parent):
+    """Editor for Project reporting settings."""
+
+    def __init__(self, parent: ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.grid_columnconfigure(1, weight=1)
         self.parent = parent
@@ -31,15 +31,3 @@ class ProjectReport(ttk.Frame):
         # legendLbl = ttk.Label(self, text="Legend location:")
         # legendEnt = ttk.Combobox(self)
         # parent.render(legendLbl, legendEnt, 2)
-
-    # support for excel exports was un-implemented in favor of a more general approach
-
-    # def loadTemplate(self, *args):
-    #     path = filedialog.askopenfilename(
-    #         initialdir='C:"',
-    #         title="Select report template:",
-    #         filetypes=[("Excel files", "*.xlsx")],
-    #     )
-
-    # if not (path != ""):
-    #     self.parent.editorProject.template.set(path)

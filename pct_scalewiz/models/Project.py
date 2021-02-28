@@ -13,6 +13,7 @@ logger = logging.getLogger("scalewiz")
 
 class Project:
     """Model object for a project. Provides a JSON/tkVar mapping."""
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
         # serializable test info

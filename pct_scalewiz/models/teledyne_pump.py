@@ -29,8 +29,10 @@ class TeledynePump:
                 self.logger.exception(error)
             return -1
 
-    def close(self):
+    def close(self) -> None:
+        """Close the serial port associated with the pump."""
         self.port.close()
 
-    def open(self):
+    def open(self) -> None:
+        """Open the serial port associated with the pump."""
         self.port.open()

@@ -27,6 +27,12 @@ rope = "^0.18.0"
 [tool.black]
 line-length = 88
 
+[tool.pylint.message_control]
+disable = "unnecessary-lambda"
+
+[tool.pylint.design]
+max-parents = 10
+
 [tool.pylint.reports]
 output-format = "colorized"
 

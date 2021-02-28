@@ -45,6 +45,7 @@ class TestHandler:
 
     # todo stop doing this method pls
     def can_run(self) -> bool:
+        """Returns a bool indicating whether or not the test can run."""
         value = (
             (
                 self.max_psi_1 <= self.project.limit_psi.get()
@@ -57,12 +58,14 @@ class TestHandler:
 
     # todo why is this a method ????
     def max_readings(self) -> int:
+        """Returns the maximum number of readings to take."""
         return (
             round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
             + 1
         )
 
     def load_project(self, path: str = None) -> None:
+        """Opens a file dialog then loads the selected Project file."""
         if path is None:
             path = filedialog.askopenfilename(
                 initialdir='C:"',
@@ -76,6 +79,7 @@ class TestHandler:
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
     def start_test(self) -> None:
+        """Perform a series of checks to make sure the test can run, then start it."""
         if self.is_running.get():
             return
 
@@ -131,16 +135,16 @@ class TestHandler:
         self.progress.set(0)
         # make a new log file
         log_path = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
-        dirName = os.path.dirname(self.project.path.get())
-        logs_dir = os.path.join(dirName, "logs")
+        parent_dir = os.path.dirname(self.project.path.get())
+        logs_dir = os.path.join(parent_dir, "logs")
         if not os.path.isdir(logs_dir):
             os.mkdir(logs_dir)
-        logFile = os.path.join(logs_dir, log_path)
+        log_file = os.path.join(logs_dir, log_path)
 
         # update the file handler
         if hasattr(self, "logFileHandler"):
             logger.removeHandler(self.logFileHandler)
-        self.logFileHandler = logging.FileHandler(logFile)
+        self.logFileHandler = logging.FileHandler(log_file)
         formatter = logging.Formatter(
             "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
             "%Y-%m-%d %H:%M:%S",
@@ -148,11 +152,11 @@ class TestHandler:
         self.logFileHandler.setFormatter(formatter)
         self.logFileHandler.setLevel(logging.DEBUG)
         logger.addHandler(self.logFileHandler)
-        logger.info(f"{self.name} set up a log file at {logFile}")
+        logger.info(f"{self.name} set up a log file at {log_file}")
         logger.info(f"{self.name} is starting a test for {self.project.name.get()}")
-        self.pool.submit(self.takeReadings)
+        self.pool.submit(self.take_readings)
 
-    def takeReadings(self) -> None:
+    def take_readings(self) -> None:
         # set default values for this instance of the test loop
         self.queue = []
         self.max_psi_1 = self.max_psi_2 = 0
@@ -166,13 +170,13 @@ class TestHandler:
                 self.progress.set(round(i / uptake * 100))
                 time.sleep(1)
             else:
-                self.stopTest()
+                self.stop_test()
                 break
 
         self.to_log("")
         interval = self.project.interval.get()
         snooze = round(interval * 0.9, 2)
-       
+
         test_start_time = time.time()
         reading_start = test_start_time - interval
 
@@ -233,8 +237,8 @@ class TestHandler:
                 f"{self.name} - {minutes_elapsed} was really {actual_elapsed} ({len(self.queue)}/{self.max_readings()})"
             )
 
-        self.stopTest()
-        self.saveTestToProject()
+        self.stop_test()
+        self.save_test()
 
     # because the readings loop is blocking, it is handled on a separate thread
     # beacuse of this, we have to interact with it in a somewhat backhanded way
@@ -248,7 +252,7 @@ class TestHandler:
             self.stop_requested = True
             logger.info(f"{self.name}: Received a stop request")
 
-    def stopTest(self) -> None:
+    def stop_test(self) -> None:
         if self.pump1.port.isOpen():
             self.pump1.stop()
             self.pump1.close()
@@ -268,7 +272,7 @@ class TestHandler:
         self.elapsed.set("")
         logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
 
-    def saveTestToProject(self) -> None:
+    def save_test(self) -> None:
         for reading in self.queue:
             self.test.readings.append(reading)
         self.queue.clear()
@@ -282,6 +286,7 @@ class TestHandler:
         self.close_editors()
 
     def setupPumps(self) -> None:
+        """Set up the pumps with some default values."""
         # the timeout values are an alternative to using TextIOWrapper
         # the values chosen were suggested by the pump's documentation
         try:
@@ -298,6 +303,7 @@ class TestHandler:
 
     # methods that affect UI
     def new_test(self) -> None:
+        """Initialize a new test."""
         logger.info(f"{self.name}: Initialized a new test")
         self.test = Test()
         self.is_running.set(False)
@@ -308,12 +314,14 @@ class TestHandler:
 
     # todo give this a better name
     def close_editors(self) -> None:
+        """Close all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
             self.editors.remove(window)
             window.destroy()
         logger.info(f"{self.name} has closed all editor windows")
 
     def to_log(self, msg) -> None:
+        """Pass a message to the log."""
         self.log_text.configure(state="normal")
         self.log_text.insert("end", msg + "\n")
         self.log_text.configure(state="disabled")

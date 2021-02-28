@@ -3,7 +3,6 @@
 # util
 import logging
 import sys
-import tkinter as tk
 from tkinter import ttk
 
 from pct_scalewiz.components.base_frame import BaseFrame
@@ -28,9 +27,9 @@ class MainFrame(BaseFrame):
 
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(sticky="nsew")
-        self.addTestHandler()
+        self.add_handler()
 
-    def addTestHandler(self):
+    def add_handler(self):
         # make a new handler 🤠
         system_name = f"  System {len(self.tab_control.tabs()) + 1}  "
         name = (

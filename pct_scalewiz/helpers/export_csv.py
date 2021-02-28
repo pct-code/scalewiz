@@ -72,8 +72,8 @@ def export_csv(project: Project) -> None:
 
     with open(out, "w") as output:
         if project.output_format.get() == "CSV":
-            df = DataFrame.from_dict(output_dict)
-            df.to_csv(out, encoding="utf-8")
+            data = DataFrame.from_dict(output_dict)
+            data.to_csv(out, encoding="utf-8")
         elif project.output_format.get() == "JSON":
             json.dump(output_dict, output, indent=4)
 

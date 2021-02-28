@@ -24,15 +24,15 @@ class RinseFrame(BaseFrame):
 
         self.winfo_toplevel().title(self.handler.name)
 
-        self.t = tk.IntVar()
-        self.t.set(3)
+        self.rinse_minutes = tk.IntVar()
+        self.rinse_minutes.set(5)
         self.txt = tk.StringVar()
         self.txt.set("Rinse")
 
         # build
         lbl = ttk.Label(window, text="Rinse duration (min).:")
         lbl.grid(row=0, column=0)
-        ent = ttk.Spinbox(window, textvariable=self.t, from_=3, to=60)
+        ent = ttk.Spinbox(window, textvariable=self.rinse_minutes, from_=3, to=60)
         ent.grid(row=0, column=1)
 
         self.button = ttk.Button(
@@ -41,6 +41,7 @@ class RinseFrame(BaseFrame):
         self.button.grid(row=2, column=0, columnspan=2)
 
     def request_rinse(self):
+        """Try to start a rinse cycle if a test isn't running."""
         if not self.handler.is_running.get() or self.handler.is_done.get():
             self.pool.submit(self.rinse)
 
@@ -54,7 +55,7 @@ class RinseFrame(BaseFrame):
         self.handler.pump2.run()
 
         self.button.configure(state="disabled")
-        duration = self.t.get() * 60
+        duration = self.rinse_minutes.get() * 60
         for i in range(duration):
             if not self.stop:
                 self.txt.set(f"{i+1}/{duration} s")

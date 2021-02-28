@@ -46,17 +46,14 @@ class EvaluationFrame(BaseFrame):
     def __init__(self: BaseFrame, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
-        # self.project = Project.load_json(handler.project.path.get())
-        # self.editorProject = self.project
         # todo #8 refactor this. need to rename across all the ProjectX classes
         self.project = handler.project
-        self.editorProject = self.project
         parent.winfo_toplevel().title(self.project.name.get())
         self.build()
 
     def trace(self: BaseFrame) -> None:
         """Applies a tkVar trace to properties on every test object."""
-        for test in self.editorProject.tests:
+        for test in self.project.tests:
             test.label.trace("w", self.score)
             test.pump_to_score.trace("w", self.score)
             test.include_on_report.trace("w", self.score)
@@ -178,7 +175,7 @@ class EvaluationFrame(BaseFrame):
                         elapsed.append(blank.readings[i]["elapsedMin"])
                     self.axis.plot(
                         elapsed,
-                        blank.getReadings(),
+                        blank.get_readings(),
                         label=blank.label.get(),
                         linestyle=("-."),
                     )
@@ -189,7 +186,7 @@ class EvaluationFrame(BaseFrame):
                     for i, reading in enumerate(trial.readings):
                         elapsed.append(trial.readings[i]["elapsedMin"])
                     self.axis.plot(
-                        elapsed, trial.getReadings(), label=trial.label.get()
+                        elapsed, trial.get_readings(), label=trial.label.get()
                     )
 
             self.axis.set_xlabel("Time (min)")
@@ -220,9 +217,7 @@ class EvaluationFrame(BaseFrame):
             file.write(log)
 
         Project.dump_json(self.project, self.project.path.get())
-        self.handler.project = Project.load_json(self.project.path.get())
-        self.project = self.handler.project
-        self.editorProject = self.project
+        self.handler.project = self.project = Project.load_json(self.project.path.get())
 
         # how about a call to build instead?
         self.build()
@@ -260,7 +255,7 @@ class EvaluationFrame(BaseFrame):
         for blank in blanks:
             self.log.append(f"Evaluating {blank.name.get()}")
             self.log.append(f"Considering data: {blank.pump_to_score.get()}")
-            readings = blank.getReadings()
+            readings = blank.get_readings()
             self.log.append(f"Total readings: {len(readings)}")
             intPSI = sum(readings)
             self.log.append("Integral PSI: sum of all pressure readings")
@@ -298,7 +293,7 @@ class EvaluationFrame(BaseFrame):
         for trial in trials:
             self.log.append(f"Evaluating {trial.name.get()}")
             self.log.append(f"Considering data: {trial.pump_to_score.get()}")
-            readings = trial.getReadings()
+            readings = trial.get_readings()
             self.log.append(f"Total readings: {len(readings)}")
             intPSI = sum(readings) + (
                 (max_readings - len(readings)) * self.project.limit_psi.get()

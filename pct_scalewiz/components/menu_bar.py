@@ -1,12 +1,14 @@
 """MenuBar for the MainWindow."""
 
+from __future__ import annotations
+
 # util
 import logging
 import os
 import tempfile
 import tkinter as tk
+import typing
 from tkinter import messagebox, ttk
-
 
 # internal
 from pct_scalewiz.components.evaluation_frame import EvaluationFrame
@@ -14,19 +16,24 @@ from pct_scalewiz.components.project_editor import ProjectEditor
 from pct_scalewiz.components.rinse_frame import RinseFrame
 from pct_scalewiz.helpers.show_help import show_help
 
+if typing.TYPE_CHECKING:
+    from pct_scalewiz.models.test_handler import TestHandler
+
 # todo #9 port over the old chlorides / ppm calculators
 
 logger = logging.getLogger("scalewiz")
 
 
 class MenuBar(tk.Frame):
+    """Menu bar to be displayed on the Main Frame."""
+
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         # expecting parent to be the toplevel parent of the main frame
         self.parent = parent
 
         menubar = tk.Menu()
-        menubar.add_command(label="Add System", command=lambda: parent.addTestHandler())
+        menubar.add_command(label="Add System", command=lambda: parent.add_handler())
 
         projMenu = tk.Menu(tearoff=0)
         projMenu.add_command(
@@ -85,7 +92,8 @@ class MenuBar(tk.Frame):
 
     # todo move close editors method off of testhandler
 
-    def modProj(self, handler):
+    def modProj(self, handler: TestHandler) -> None:
+        """Opens an editor to modify the current Project."""
         if len(handler.editors) > 0:
             messagebox.showwarning(
                 "Project is locked", "Can't modify a Project while it is being accessed"

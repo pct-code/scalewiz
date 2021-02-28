@@ -73,13 +73,13 @@ class TestResultRow(ttk.Frame):
         )
 
         self.parent.grid_columnconfigure(7, weight=1)
-        for i in range(len(cols)):
+        for i, col in enumerate(cols):
             if i == 0:
-                cols[i].grid(row=self.row, column=i, padx=1, pady=1, sticky="w")
+                col.grid(row=self.row, column=i, padx=1, pady=1, sticky="w")
             if i == 7:
-                cols[i].grid(row=self.row, column=i, padx=1, pady=1, sticky="ew")
+                col.grid(row=self.row, column=i, padx=1, pady=1, sticky="ew")
             else:
-                cols[i].grid(
+                col.grid(
                     row=self.row,
                     column=i,
                     padx=1,

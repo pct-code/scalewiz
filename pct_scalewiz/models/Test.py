@@ -5,10 +5,9 @@ import tkinter as tk
 
 
 class Test:
-    """
-    Object for holding all the data associated with a Test.
-    Basically a dict of tkVars.
-    """
+    """Object for holding all the data associated with a Test."""
+
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
         # serializable props
@@ -53,6 +52,7 @@ class Test:
             self.observed_baseline.set(round(sum(baselines) / 4))
 
     def dump_json(self) -> dict:
+        """Returns a dict represendation of a Test."""
         return {
             "name": self.name.get(),
             "isBlank": self.is_blank.get(),
@@ -83,6 +83,6 @@ class Test:
         self.readings = obj.get("readings")
         self.set_observed_baseline()
 
-    def getReadings(self) -> list[int]:
+    def get_readings(self) -> list[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         return [reading[self.pump_to_score.get()] for reading in self.readings]

@@ -147,8 +147,9 @@ class TestHandlerView(ttk.Frame):
         stopBtn.grid(row=0, column=1)
         plotBtn.grid(row=0, column=2)
 
-        progressBar = ttk.Progressbar(frame, variable=self.handler.progress)
-        progressBar.grid(row=1, columnspan=3, sticky="new")
+        ttk.Progressbar(frame, variable=self.handler.progress).grid(
+            row=1, columnspan=3, sticky="new"
+        )
         self.elapsed = ttk.Label(frame, textvariable=self.handler.elapsed)
         self.elapsed.grid(row=1, column=1)
         frame.grid(row=1, column=0, padx=1, pady=1, sticky="n")
@@ -214,12 +215,12 @@ class TestHandlerView(ttk.Frame):
             self.trialLblFrm.grid_remove()
             self.trialEntFrm.grid_remove()
             self.render(self.blankLbl, self.blankEnt, 3)
-            logger.info(f"{self.handler.name}: changed to Blank mode")
+            logger.info("%s: changed to Blank mode", this.handler.name)
         else:
             self.blankLbl.grid_remove()
             self.blankEnt.grid_remove()
             self.render(self.trialLblFrm, self.trialEntFrm, 3)
-            logger.info(f"{self.handler.name}: changed to Trial mode")
+            logger.info("%s: changed to Trial mode", this.handler.name)
 
     def update_PlotVisible(self):
         isVisible = bool()
@@ -230,10 +231,10 @@ class TestHandlerView(ttk.Frame):
         for tab in self.parent.tabs():
             this = self.parent.nametowidget(tab)
             if not isVisible:
-                logger.info(f"{this.handler.name}: Showing details view")
+                logger.info("%s: Showing details view", this.handler.name)
                 this.pltFrm.grid(row=0, column=1, rowspan=3)
                 this.logFrm.grid(row=2, column=0, sticky="ew")
             else:
-                logger.info(f"{this.handler.name}: Hiding details view")
+                logger.info("%s: Hiding details view", this.handler.name)
                 this.pltFrm.grid_remove()
                 this.logFrm.grid_remove()
