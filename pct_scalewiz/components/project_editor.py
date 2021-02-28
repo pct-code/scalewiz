@@ -39,9 +39,9 @@ class ProjectEditor(BaseFrame):
         ttk.Button(btnFrm, text="Save", width=7, command=lambda: self.save()).grid(
             row=0, column=0, padx=5
         )
-        ttk.Button(btnFrm, text="Save as", width=7, command=lambda: self.saveAs()).grid(
-            row=0, column=1, padx=10
-        )
+        ttk.Button(
+            btnFrm, text="Save as", width=7, command=lambda: self.save_as()
+        ).grid(row=0, column=1, padx=10)
         ttk.Button(btnFrm, text="New", width=7, command=lambda: self.new()).grid(
             row=0, column=2, padx=5
         )
@@ -58,24 +58,24 @@ class ProjectEditor(BaseFrame):
 
     def save(self):
         if self.editorProject.path.get() == "":
-            self.saveAs()
+            self.save_as()
         else:
             Project.dump_json(self.editorProject, self.editorProject.path.get())
             self.handler.project = Project.load_json(self.editorProject.path.get())
             # todo how about a call to build instead?
             self.handler.parent.build()
 
-    def saveAs(self):
-        file = filedialog.asksaveasfilename(
+    def save_as(self):
+        file_path = filedialog.asksaveasfilename(
             title="Save Project As:",
             filetypes=[("JSON files", "*.json")],
             initialfile=f"{self.editorProject.name.get()}.json",
         )
 
-        if not file == "":
+        if file_path != "":
             # make sure it is JSON extension
-            ext = file[-5:]
+            ext = file_path[-5:]
             if not ext in (".json", ".JSON"):
-                file = f"{file}.json"
-            self.editorProject.path.set(file)
+                file_path = f"{file_path}.json"
+            self.editorProject.path.set(file_path)
             self.save()

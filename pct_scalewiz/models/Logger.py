@@ -1,3 +1,5 @@
+"""A logger class for the program."""
+
 import logging
 import queue
 from logging.handlers import QueueHandler
@@ -11,7 +13,7 @@ class Logger:
     Use from anywhere by calling logging.getLogger('scalewiz')
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """The LogWindow depends on access to the .loq_queue attribute."""
         self.log_queue = queue.Queue()
         # set default logging behavior. could be moved to json. see dictConfig ?

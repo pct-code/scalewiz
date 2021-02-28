@@ -29,20 +29,15 @@ class MainFrame(BaseFrame):
         self.tab_control.grid(sticky="nsew")
         self.add_handler()
 
-    def add_handler(self):
-        # make a new handler 🤠
+    def add_handler(self) -> None:
+        """Adds a new tab with an associated test handler."""
         system_name = f"  System {len(self.tab_control.tabs()) + 1}  "
-        name = (
-            system_name.strip()
-        )  # todo perhaps we could pass this as arg to TestHandler init
-        handler = TestHandler(name)
+        handler = TestHandler(name=system_name.strip())
         # plug it in 🔌
-        view = TestHandlerView(self.tab_control, handler)
         # todo why this assignment? the handler's 'parent' isn't a view. this can't be right, there must be a better way
-        handler.parent = view  # 😬
-        # add it to the tab control then rename
-        self.tab_control.add(view, sticky="nsew")
-        self.tab_control.tab(view, text=system_name)
+        handler.parent = TestHandlerView(self.tab_control, handler)
+        self.tab_control.add(handler.parent, sticky="nsew")
+        self.tab_control.tab(handler.parent, text=system_name)
         logger.info("Added %s to main window", handler.name)
 
     def close(self):

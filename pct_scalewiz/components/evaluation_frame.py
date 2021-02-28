@@ -219,7 +219,6 @@ class EvaluationFrame(BaseFrame):
         Project.dump_json(self.project, self.project.path.get())
         self.handler.project = self.project = Project.load_json(self.project.path.get())
 
-        # how about a call to build instead?
         self.build()
 
     def score(self: BaseFrame, *args) -> None:
@@ -313,17 +312,15 @@ class EvaluationFrame(BaseFrame):
 
         self.plot()
         self.log.append("-" * 80)
-        t = round(time.time() - startTime, 3)
-
+        
         self._log = self.log
         self.log = []
         self.log.append(f"Evaluating results for {self.project.name.get()}...")
         self.log.append("")
-        self.log.append(f"Finished in {t} s")
+        self.log.append(f"Finished in {round(time.time() - startTime, 3)} s")
         self.log.append("-" * 80)
         self.log.append("")
-        for msg in self._log:
-            self.log.append(msg)
+        self.log = self.log + self._log
         self.to_log(self.log)
 
     def to_log(self: BaseFrame, log: list[str]) -> None:

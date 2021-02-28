@@ -1,10 +1,8 @@
-# A Toplevel with a ScrolledText. Displays messages from a Logger.
+"""A Toplevel with a ScrolledText. Displays messages from a Logger."""
 
 # util
 import queue
 import tkinter as tk
-from logging.handlers import QueueHandler
-from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
 # internal
@@ -15,6 +13,8 @@ from pct_scalewiz.models.logger import Logger
 
 
 class LogFrame(BaseFrame):
+    """A Toplevel with a ScrolledText. Displays messages from a Logger."""
+
     # expects parent to be a toplevel window
     def __init__(self: BaseFrame, parent: tk.Toplevel, logger: Logger):
         BaseFrame.__init__(self, parent)

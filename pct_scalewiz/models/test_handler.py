@@ -157,6 +157,7 @@ class TestHandler:
         self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:
+        """Get ready to take readings, then start doing it on a second thread."""
         # set default values for this instance of the test loop
         self.queue = []
         self.max_psi_1 = self.max_psi_2 = 0

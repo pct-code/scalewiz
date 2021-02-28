@@ -1,3 +1,5 @@
+"""A function for exporting a representation of a Project as CSV."""
+
 import json
 import logging
 import os
@@ -13,36 +15,36 @@ logger = logging.getLogger("scalewiz")
 def export_csv(project: Project) -> None:
     """Generates a report for the passed Project in a flattened CSV format (or ugly JSON)."""
     start_time = time.time()
-    logger.info(f"Beginning export of {project.name.get()}")
+    logger.info("Beginning export of %s", project.name.get())
 
     output_dict = {
         "customer": project.customer.get(),
-        "submitted by": project.submitted_by.get(),
-        "prod. co": project.client.get(),
+        "submitteBy": project.submitted_by.get(),
+        "productionCompany": project.client.get(),
         "field": project.field.get(),
-        "sample point": project.sample.get(),
-        "analysis nos.": project.numbers.get(),
-        "date sampled": project.sample_date.get(),
-        "date received": project.received_date.get(),
-        "date completed": project.completed_date.get(),
-        "test temp F": project.temperature.get(),
-        "baseline psi": project.baseline.get(),
+        "samplePoint": project.sample.get(),
+        "analysisNumbers": project.numbers.get(),
+        "dateSampled": project.sample_date.get(),
+        "dateReceived": project.received_date.get(),
+        "dateCompleted": project.completed_date.get(),
+        "testTempF": project.temperature.get(),
+        "baselinePsi": project.baseline.get(),
         "bicarbs": project.bicarbs.get(),
-        "bicarbs increase": project.bicarbs_increased.get(),
+        "bicarbsIncreased": project.bicarbs_increased.get(),
         "chlorides": project.chlorides.get(),
-        "time limit min": project.limit_minutes.get(),
-        "limit psi": project.limit_psi.get(),
+        "timeLimitMin": project.limit_minutes.get(),
+        "limitPsi": project.limit_psi.get(),
         "name": [],
-        "is_blank": [],
+        "isBlank": [],
         "chemical": [],
         "rate": [],
         "duration": [],
-        "max psi": [],
+        "maxPsi": [],
         "result": [],
         "clarity": [],
-        "plot_path": project.plot.get(),
+        "plotPath": project.plot.get(),
     }
-
+    # filter the blanks and trials to sort them
     blanks = [
         test
         for test in project.tests
@@ -56,13 +58,13 @@ def export_csv(project: Project) -> None:
     tests = blanks + trials
 
     output_dict["name"] = [test.name.get() for test in tests]
-    output_dict["is_blank"] = [test.is_blank.get() for test in tests]
+    output_dict["isBlank"] = [test.is_blank.get() for test in tests]
     output_dict["chemical"] = [test.chemical.get() for test in tests]
     output_dict["rate"] = [test.rate.get() for test in tests]
     output_dict["duration"] = [
         round(len(test.readings) * project.interval.get() / 60, 2) for test in tests
     ]
-    output_dict["max psi"] = [test.max_psi.get() for test in tests]
+    output_dict["maxPsi"] = [test.max_psi.get() for test in tests]
     output_dict["result"] = [test.result.get() for test in tests]
     output_dict["clarity"] = [test.clarity.get() for test in tests]
 
@@ -78,5 +80,8 @@ def export_csv(project: Project) -> None:
             json.dump(output_dict, output, indent=4)
 
     logger.info(
-        f"Finished export of {project.name.get()} as {project.output_format.get()} in {round(time.time() - start_time, 3)} s"
+        "Finished export of %s as %s in %s s",
+        project.name.get(),
+        project.output_format.get(),
+        round(time.time() - start_time, 3),
     )
