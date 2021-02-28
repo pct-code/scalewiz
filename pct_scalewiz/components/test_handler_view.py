@@ -215,12 +215,12 @@ class TestHandlerView(ttk.Frame):
             self.trialLblFrm.grid_remove()
             self.trialEntFrm.grid_remove()
             self.render(self.blankLbl, self.blankEnt, 3)
-            logger.info("%s: changed to Blank mode", this.handler.name)
+            logger.info("%s: changed to Blank mode", self.handler.name)
         else:
             self.blankLbl.grid_remove()
             self.blankEnt.grid_remove()
             self.render(self.trialLblFrm, self.trialEntFrm, 3)
-            logger.info("%s: changed to Trial mode", this.handler.name)
+            logger.info("%s: changed to Trial mode", self.handler.name)
 
     def update_PlotVisible(self):
         isVisible = bool()

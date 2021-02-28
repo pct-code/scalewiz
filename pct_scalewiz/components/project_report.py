@@ -1,6 +1,5 @@
 """Editor for Project reporting settings."""
 
-import tkinter as tk
 from tkinter import filedialog, ttk
 
 

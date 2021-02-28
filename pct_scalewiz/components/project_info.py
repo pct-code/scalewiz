@@ -1,7 +1,5 @@
 """Editor for Project metadata."""
 
-import tkinter as tk
-from datetime import datetime
 from tkinter import ttk
 
 import tkcalendar as tkcal

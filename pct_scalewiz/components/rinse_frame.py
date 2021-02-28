@@ -48,7 +48,7 @@ class RinseFrame(BaseFrame):
     def rinse(self):
         """Run the pumps and disable the button for the duration of a timer."""
         try:
-            self.handler.setupPumps()
+            self.handler.setup_pumps()
         except Exception:
             return
         self.handler.pump1.run()

@@ -23,6 +23,7 @@ class MainFrame(BaseFrame):
         self.build()
 
     def build(self) -> None:
+        """Build the UI."""
         MenuBar(self)  # this will apply itself to the current Toplevel
 
         self.tab_control = ttk.Notebook(self)
@@ -40,7 +41,8 @@ class MainFrame(BaseFrame):
         self.tab_control.tab(handler.parent, text=system_name)
         logger.info("Added %s to main window", handler.name)
 
-    def close(self):
+    def close(self) -> None:
+        """Closes the program if no tests are running."""
         for tab in self.tab_control.tabs():
             widget = self.nametowidget(tab)
             if widget.handler.is_running.get():

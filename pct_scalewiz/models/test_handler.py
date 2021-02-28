@@ -115,7 +115,7 @@ class TestHandler:
             messagebox.showwarning("Missing Water Clarity", msg)
             return
 
-        self.setupPumps()
+        self.setup_pumps()
 
         if not self.pump1.port.isOpen():
             msg = f"Couldn't connect to {self.pump1.port.name}"
@@ -143,15 +143,15 @@ class TestHandler:
 
         # update the file handler
         if hasattr(self, "logFileHandler"):
-            logger.removeHandler(self.logFileHandler)
-        self.logFileHandler = logging.FileHandler(log_file)
+            logger.removeHandler(self.log_handler)
+        self.log_handler = logging.FileHandler(log_file)
         formatter = logging.Formatter(
             "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
             "%Y-%m-%d %H:%M:%S",
         )
-        self.logFileHandler.setFormatter(formatter)
-        self.logFileHandler.setLevel(logging.DEBUG)
-        logger.addHandler(self.logFileHandler)
+        self.log_handler.setFormatter(formatter)
+        self.log_handler.setLevel(logging.DEBUG)
+        logger.addHandler(self.log_handler)
         logger.info(f"{self.name} set up a log file at {log_file}")
         logger.info(f"{self.name} is starting a test for {self.project.name.get()}")
         self.pool.submit(self.take_readings)
@@ -286,7 +286,7 @@ class TestHandler:
         # todo ask them to rebuild instead
         self.close_editors()
 
-    def setupPumps(self) -> None:
+    def setup_pumps(self) -> None:
         """Set up the pumps with some default values."""
         # the timeout values are an alternative to using TextIOWrapper
         # the values chosen were suggested by the pump's documentation
@@ -298,9 +298,9 @@ class TestHandler:
             port2 = Serial(self.dev2.get(), timeout=0.05)
             self.pump2 = TeledynePump(port2, logger=logger)
             logger.info(f"{self.name}: established a connection to {port2.port}")
-        except SerialException as e:
-            logger.exception(e)  # todo add more args ?
-            messagebox.showwarning("Serial Exception", e)
+        except SerialException as error:
+            logger.exception(error)  # todo add more args ?
+            messagebox.showwarning("Serial Exception", error)
 
     # methods that affect UI
     def new_test(self) -> None:

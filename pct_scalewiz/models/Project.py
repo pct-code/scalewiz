@@ -1,12 +1,19 @@
 """Model object for a project. Provides a JSON/Tk mapping."""
+
+from __future__ import annotations
+
 import json
 import logging
 import os
 import tkinter as tk
+import typing
 
 from pct_scalewiz.helpers.get_resource import get_resource
 from pct_scalewiz.helpers.sort_nicely import sort_nicely
 from pct_scalewiz.models.test import Test
+
+if typing.TYPE_CHECKING:
+    from pct_scalewiz.models.project import Project
 
 logger = logging.getLogger("scalewiz")
 
@@ -81,6 +88,7 @@ class Project:
 
     @staticmethod
     def dump_json(project, path: str) -> None:
+        """Dump a JSON representation of a Project at the passed path."""
         for test in project.tests:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())
@@ -156,7 +164,8 @@ class Project:
         logger.info("Saved %s to %s", project.name.get(), project.path.get())
 
     @staticmethod
-    def load_json(path: str) -> "Project":
+    def load_json(path: str) -> Project:
+        """Return a Project from a passed path to a JSON dump."""
         logger.info(f"Loading from {path}")
         with open(path, "r") as file:
             obj = json.load(file)

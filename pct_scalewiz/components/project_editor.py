@@ -16,7 +16,7 @@ from pct_scalewiz.components.project_report import ProjectReport
 class ProjectEditor(BaseFrame):
     """Form for mutating Project objects."""
 
-    def __init__(self, parent, handler):
+    def __init__(self, parent, handler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
         self.grid_columnconfigure(0, weight=1)
@@ -27,36 +27,39 @@ class ProjectEditor(BaseFrame):
             self.editorProject = Project()
         self.build()
 
-    def build(self):
-        tabControl = ttk.Notebook(self)
-        tabControl.grid(row=0, column=0)
+    def build(self) -> None:
+        """Render the UI."""
+        tab_control = ttk.Notebook(self)
+        tab_control.grid(row=0, column=0)
 
-        tabControl.add(ProjectInfo(self), text="Project info")
-        tabControl.add(ProjectParams(self), text="Experiment parameters")
-        tabControl.add(ProjectReport(self), text="Report settings")
+        tab_control.add(ProjectInfo(self), text="Project info")
+        tab_control.add(ProjectParams(self), text="Experiment parameters")
+        tab_control.add(ProjectReport(self), text="Report settings")
 
-        btnFrm = ttk.Frame(self)
-        ttk.Button(btnFrm, text="Save", width=7, command=lambda: self.save()).grid(
+        button_frame = ttk.Frame(self)
+        ttk.Button(button_frame, text="Save", width=7, command=lambda: self.save()).grid(
             row=0, column=0, padx=5
         )
         ttk.Button(
-            btnFrm, text="Save as", width=7, command=lambda: self.save_as()
+            button_frame, text="Save as", width=7, command=lambda: self.save_as()
         ).grid(row=0, column=1, padx=10)
-        ttk.Button(btnFrm, text="New", width=7, command=lambda: self.new()).grid(
+        ttk.Button(button_frame, text="New", width=7, command=lambda: self.new()).grid(
             row=0, column=2, padx=5
         )
-        btnFrm.grid(row=1, column=0)
+        button_frame.grid(row=1, column=0)
 
-    def render(self, label, entry, row):
+    def render(self, label, entry, row) -> None:
         """Render the passed label and entry on the passed row."""
         label.grid(row=row, column=0, sticky=tk.E)
         entry.grid(row=row, column=1, sticky=tk.E + tk.W, pady=1)
 
-    def new(self):
+    def new(self) -> None:
+        """Resets the form by connecting to a new Project."""
         self.editorProject = Project()
         self.build()
 
-    def save(self):
+    def save(self) -> None:
+        """Save the current Project to file as JSON."""
         if self.editorProject.path.get() == "":
             self.save_as()
         else:
@@ -65,7 +68,8 @@ class ProjectEditor(BaseFrame):
             # todo how about a call to build instead?
             self.handler.parent.build()
 
-    def save_as(self):
+    def save_as(self) -> None:
+        """Saves the Project to JSON using a Save As dialog."""
         file_path = filedialog.asksaveasfilename(
             title="Save Project As:",
             filetypes=[("JSON files", "*.json")],

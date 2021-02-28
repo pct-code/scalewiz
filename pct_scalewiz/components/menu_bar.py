@@ -7,8 +7,8 @@ import logging
 import os
 import tempfile
 import tkinter as tk
-import typing
 from tkinter import messagebox, ttk
+import typing
 
 # internal
 from pct_scalewiz.components.evaluation_frame import EvaluationFrame
@@ -17,6 +17,7 @@ from pct_scalewiz.components.rinse_frame import RinseFrame
 from pct_scalewiz.helpers.show_help import show_help
 
 if typing.TYPE_CHECKING:
+    from pct_scalewiz.components.base_frame import BaseFrame
     from pct_scalewiz.models.test_handler import TestHandler
 
 # todo #9 port over the old chlorides / ppm calculators
@@ -27,63 +28,63 @@ logger = logging.getLogger("scalewiz")
 class MenuBar(tk.Frame):
     """Menu bar to be displayed on the Main Frame."""
 
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         tk.Frame.__init__(self, parent)
         # expecting parent to be the toplevel parent of the main frame
         self.parent = parent
 
-        menubar = tk.Menu()
-        menubar.add_command(label="Add System", command=lambda: parent.add_handler())
+        menu_bar = tk.Menu()
+        menu_bar.add_command(label="Add System", command=lambda: parent.add_handler())
 
-        projMenu = tk.Menu(tearoff=0)
-        projMenu.add_command(
+        project_menu = tk.Menu(tearoff=0)
+        project_menu.add_command(
             label="New/Edit", command=lambda: self.request_project_edit()
         )
-        projMenu.add_command(
+        project_menu.add_command(
             label="Load existing", command=lambda: self.request_project_load()
         )
 
-        menubar.add_cascade(label="Project", menu=projMenu)
-        menubar.add_command(
+        menu_bar.add_cascade(label="Project", menu=project_menu)
+        menu_bar.add_command(
             label="Evaluation", command=lambda: self.request_eval_window()
         )
-        menubar.add_command(
+        menu_bar.add_command(
             label="Log", command=lambda: self.parent.parent.log_window.deiconify()
         )
-        menubar.add_command(label="Rinse", command=lambda: self.showRinse())
-        menubar.add_command(label="Help", command=lambda: show_help())
+        menu_bar.add_command(label="Rinse", command=lambda: self.show_rinse())
+        menu_bar.add_command(label="Help", command=lambda: show_help())
 
-        parent.winfo_toplevel().config(menu=menubar)
+        parent.winfo_toplevel().config(menu=menu_bar)
 
     def request_project_edit(self) -> None:
         """Requests to open an editor window for the currently selected Project."""
-        currentTab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(currentTab)
-        self.modProj(widget.handler)
+        current_tab = self.parent.tab_control.select()
+        widget = self.parent.nametowidget(current_tab)
+        self.modify_project(widget.handler)
 
     def request_eval_window(self) -> None:
         """Requests to open an evalutaion window for the currently selected Project."""
-        currentTab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(currentTab)
+        current_tab = self.parent.tab_control.select()
+        widget = self.parent.nametowidget(current_tab)
         if not os.path.isfile(widget.handler.project.path.get()):
             messagebox.showwarning(
                 "No Project File",
                 "The requested Project file has not yet been saved, or is missing",
             )
         else:
-            self.evalProj(widget.handler)
+            self.evaluate_project(widget.handler)
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
-        currentTab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(currentTab)
+        current_tab = self.parent.tab_control.select()
+        widget = self.parent.nametowidget(current_tab)
         widget.handler.load_project()
         widget.build()
 
-    def showRinse(self) -> None:
+    def show_rinse(self) -> None:
         """Shows a RinseFrame in a new Toplevel."""
-        currentTab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(currentTab)
+        current_tab = self.parent.tab_control.select()
+        widget = self.parent.nametowidget(current_tab)
 
         window = tk.Toplevel()
         rinse = RinseFrame(widget.handler, window)
@@ -92,8 +93,8 @@ class MenuBar(tk.Frame):
 
     # todo move close editors method off of testhandler
 
-    def modProj(self, handler: TestHandler) -> None:
-        """Opens an editor to modify the current Project."""
+    def modify_project(self, handler: TestHandler) -> None:
+        """Opens a ProjectEditor to modify the current Project."""
         if len(handler.editors) > 0:
             messagebox.showwarning(
                 "Project is locked", "Can't modify a Project while it is being accessed"
@@ -109,7 +110,8 @@ class MenuBar(tk.Frame):
             f"{handler.name}: Opened an editor window for {handler.project.name.get()}"
         )
 
-    def evalProj(self, handler):
+    def evaluate_project(self, handler: TestHandler):
+        """Opens a Toplevel with an Evaluation Frame for current Project."""
         if len(handler.editors) > 0:
             messagebox.showwarning(
                 "Project is locked", "Can't modify a Project while it is being accessed"

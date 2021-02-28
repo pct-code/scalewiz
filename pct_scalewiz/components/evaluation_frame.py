@@ -128,22 +128,25 @@ class EvaluationFrame(BaseFrame):
         self.plot()
 
         # evaluation stuff ----------------------------------------------------
-        logFrm = ttk.Frame(self)
-        logFrm.grid_columnconfigure(0, weight=1)
+        log_frame = ttk.Frame(self)
+        log_frame.grid_columnconfigure(0, weight=1)
         self.log_text = tk.scrolledtext.ScrolledText(
-            logFrm, background="white", state="disabled"
+            log_frame, background="white", state="disabled"
         )
         self.log_text.grid(sticky="ew")
-        self.tab_control.add(logFrm, text="   Calculations   ")
+        self.tab_control.add(log_frame, text="   Calculations   ")
 
-        btnFrm = ttk.Frame(self)
-        ttk.Button(btnFrm, text="Save", command=lambda: self.save(), width=10).grid(
-            row=0, column=0, padx=5
-        )
+        button_frame = ttk.Frame(self)
         ttk.Button(
-            btnFrm, text="Export", command=lambda: export_csv(self.project), width=10
+            button_frame, text="Save", command=lambda: self.save(), width=10
+        ).grid(row=0, column=0, padx=5)
+        ttk.Button(
+            button_frame,
+            text="Export",
+            command=lambda: export_csv(self.project),
+            width=10,
         ).grid(row=0, column=1, padx=5)
-        btnFrm.grid(row=1, column=0, pady=5)
+        button_frame.grid(row=1, column=0, pady=5)
         # update results
         self.score()
 
@@ -152,14 +155,14 @@ class EvaluationFrame(BaseFrame):
         # close all pyplots to prevent memory leak
         plt.close("all")
         # get rid of our old plot tab if we have one
-        if hasattr(self, "pltFrm"):
-            self.pltFrm.destroy()
+        if hasattr(self, "plot_frame"):
+            self.plot_frame.destroy()
 
-        self.pltFrm = ttk.Frame(self.tab_control)
+        self.plot_frame = ttk.Frame(self.tab_control)
         self.fig, self.axis = plt.subplots(figsize=(7.5, 4), dpi=100)
         self.fig.patch.set_facecolor("#FAFAFA")
         plt.subplots_adjust(wspace=0, hspace=0)
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.pltFrm)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
         with plt.style.context("bmh"):
             mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLORS)
@@ -199,8 +202,8 @@ class EvaluationFrame(BaseFrame):
             plt.tight_layout()
 
         # finally, add to parent control
-        self.tab_control.add(self.pltFrm, text="   Plot   ")
-        self.tab_control.insert(1, self.pltFrm)
+        self.tab_control.add(self.plot_frame, text="   Plot   ")
+        self.tab_control.insert(1, self.plot_frame)
 
     def save(self: BaseFrame) -> None:
         """Saves the project to file, as well as the most recent plot and calculations log."""
@@ -312,7 +315,7 @@ class EvaluationFrame(BaseFrame):
 
         self.plot()
         self.log.append("-" * 80)
-        
+
         self._log = self.log
         self.log = []
         self.log.append(f"Evaluating results for {self.project.name.get()}...")

@@ -16,7 +16,7 @@ class LogFrame(BaseFrame):
     """A Toplevel with a ScrolledText. Displays messages from a Logger."""
 
     # expects parent to be a toplevel window
-    def __init__(self: BaseFrame, parent: tk.Toplevel, logger: Logger):
+    def __init__(self: BaseFrame, parent: tk.Toplevel, logger: Logger) -> None:
         BaseFrame.__init__(self, parent)
         self.winfo_toplevel().title("Log Window")
         # replace the window closing behavior with withdrawing instead 🐱‍👤
@@ -26,7 +26,8 @@ class LogFrame(BaseFrame):
         self.log_queue = logger.log_queue
         self.build()
 
-    def build(self):
+    def build(self) -> None:
+        """Builds the UI."""
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.scrolled_text = ScrolledText(self, state="disabled", width=80)
@@ -40,7 +41,8 @@ class LogFrame(BaseFrame):
         # start polling messages from the queue 📩
         self.after(100, self.poll_log_queue)
 
-    def display(self, record):
+    def display(self, record) -> None:
+        """Displays a message in the log."""
         msg = record.getMessage()
         self.scrolled_text.configure(state="normal")
         self.scrolled_text.insert(
@@ -49,8 +51,8 @@ class LogFrame(BaseFrame):
         self.scrolled_text.configure(state="disabled")
         self.scrolled_text.yview(tk.END)  # scroll to bottom
 
-    def poll_log_queue(self):
-        # check every 100ms if there is a new message in the queue to display
+    def poll_log_queue(self) -> None:
+        """Checks every 100ms if there is a new message in the queue to display."""
         while True:
             try:
                 record = self.log_queue.get(block=False)
