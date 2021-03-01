@@ -5,9 +5,8 @@ from __future__ import annotations
 # util
 import logging
 import os
-import tempfile
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox
 import typing
 
 # internal
@@ -28,7 +27,7 @@ logger = logging.getLogger("scalewiz")
 class MenuBar(tk.Frame):
     """Menu bar to be displayed on the Main Frame."""
 
-    def __init__(self, parent) -> None:
+    def __init__(self, parent: tk.Toplevel) -> None:
         tk.Frame.__init__(self, parent)
         # expecting parent to be the toplevel parent of the main frame
         self.parent = parent

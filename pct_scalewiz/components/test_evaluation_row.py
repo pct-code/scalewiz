@@ -9,11 +9,12 @@ if typing.TYPE_CHECKING:
     from pct_scalewiz.models.project import Project
 
 
-
 class TestResultRow(ttk.Frame):
     """Component for displaying a Test in a gridlike fashion."""
 
-    def __init__(self, parent: tk.Frame, test: Test, project: Project, row: int) -> None:
+    def __init__(
+        self, parent: tk.Frame, test: Test, project: Project, row: int
+    ) -> None:
         ttk.Frame.__init__(self, parent)
         self.test = test
         self.parent = parent

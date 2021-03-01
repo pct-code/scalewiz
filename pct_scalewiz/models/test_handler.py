@@ -21,6 +21,9 @@ class TestHandler:
     """Handles a Test."""
 
     def __init__(self, name: str = "Nemo") -> None:
+
+        # pylint: disable=too-many-instance-attributes
+
         # local state vars
         self.name = name
         self.project = Project()
@@ -33,6 +36,7 @@ class TestHandler:
         self.progress = tk.IntVar()
         self.elapsed = tk.StringVar()
         self.editors = []  # list of views displaying the project
+        self.max_readings = int()
 
         # todo #7 refactor needed. this can't account for rinse/uptake cycles
         # need new way to manage state
@@ -51,18 +55,10 @@ class TestHandler:
                 self.max_psi_1 <= self.project.limit_psi.get()
                 or self.max_psi_2 <= self.project.limit_psi.get()
             )
-            and len(self.queue) < self.max_readings()
+            and len(self.queue) < self.max_readings
             and not self.stop_requested
         )
         return value
-
-    # todo why is this a method ????
-    def max_readings(self) -> int:
-        """Returns the maximum number of readings to take."""
-        return (
-            round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
-            + 1
-        )
 
     def load_project(self, path: str = None) -> None:
         """Opens a file dialog then loads the selected Project file."""
@@ -78,8 +74,18 @@ class TestHandler:
             self.project = Project.load_json(path)
             logger.info(f"Loaded {self.project.name.get()} to {self.name}")
 
+        self.max_readings = (
+            round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
+            + 1
+        )
+
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
+
+        # pylint: disable=too-many-return-statements
+        # this IS too many returns, but easier than a refactor
+        # wontfix
+
         if self.is_running.get():
             return
 
@@ -189,7 +195,7 @@ class TestHandler:
                 psi1 = self.pump1.get_pressure()
                 psi2 = self.pump2.get_pressure()
                 collected = time.time() - reading_start
-                logger.debug(f"{self.name} collected both PSIs in {collected} s")
+                logger.debug("%s collected both PSIs in %s s", self.name, collected)
                 average = round(((psi1 + psi2) / 2))
 
                 reading = {
@@ -202,7 +208,7 @@ class TestHandler:
                 # make a message for the log in the test handler view
                 msg = f"@ {minutes_elapsed:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
                 self.to_log(msg)
-                logger.info(f"{self.name} - {msg}")
+                logger.info("%s - %s", self.name, msg)
 
                 # todo this is janky
                 # why do this vs adding to test directly?
@@ -210,17 +216,18 @@ class TestHandler:
                 self.queue.append(reading)
 
                 self.elapsed.set(f"{minutes_elapsed:.2f} min.")
-                self.progress.set(round(len(self.queue) / self.max_readings() * 100))
+                self.progress.set(round(len(self.queue) / self.max_readings * 100))
 
                 if psi1 > self.max_psi_1:
                     self.max_psi_1 = psi1
                 if psi2 > self.max_psi_2:
                     self.max_psi_2 = psi2
                 logger.debug(
-                    f"Finished doing everything else in {time.time() - reading_start - collected} s"
+                    "Finished doing everything else in %s s",
+                    time.time() - reading_start - collected,
                 )
                 logger.debug(
-                    f"{self.name} collected data in {time.time() - reading_start}"
+                    "%s collected data in %s", self.name, time.time() - reading_start
                 )
                 # todo try asyncio - called defer or await or s/t
                 time.sleep(snooze)
@@ -234,7 +241,11 @@ class TestHandler:
             self.to_log(f"The test says it took {minutes_elapsed} min.")
             self.to_log(f"but really it took {actual_elapsed} min. (I counted)")
             logger.warning(
-                f"{self.name} - {minutes_elapsed} was really {actual_elapsed} ({len(self.queue)}/{self.max_readings()})"
+                "%s - %s was really %s (%s)",
+                self.name,
+                minutes_elapsed,
+                actual_elapsed,
+                len(self.queue) / self.max_readings,
             )
 
         self.stop_test()
@@ -248,7 +259,7 @@ class TestHandler:
         if self.is_running.get():
             # the readings loop thread checks this flag on each iteration
             self.stop_requested = True
-            logger.info(f"{self.name}: Received a stop request")
+            logger.info("%s: Received a stop request", self.name)
 
     def stop_test(self) -> None:
         """Stops the pumps, closes their ports."""
@@ -256,19 +267,23 @@ class TestHandler:
             self.pump1.stop()
             self.pump1.close()
             logger.info(
-                f"{self.name}: Stopped and closed the device @ {self.pump1.port.port}"
+                "%s: Stopped and closed the device @ %s",
+                self.name,
+                self.pump1.port.port,
             )
 
         if self.pump2.port.isOpen():
             self.pump2.stop()
             self.pump2.close()
             logger.info(
-                f"{self.name}: Stopped and closed the device @ {self.pump1.port.port}"
+                "%s: Stopped and closed the device @ %s",
+                self.name,
+                self.pump1.port.port,
             )
 
         self.is_done.set(True)
-  
-        logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
+
+        logger.info("%s: Test for %s has been stopped", self.name, self.test.name.get())
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
@@ -278,7 +293,10 @@ class TestHandler:
         self.project.tests.append(self.test)
         Project.dump_json(self.project, self.project.path.get())
         logger.info(
-            f"{self.name}: Saved {self.project.name.get()} to {self.project.path.get()}"
+            "%s: Saved %s to %s",
+            self.name,
+            self.project.name.get(),
+            self.project.path.get(),
         )
         self.load_project(path=self.project.path.get())
         # todo ask them to rebuild instead
@@ -291,24 +309,26 @@ class TestHandler:
         try:
             port1 = Serial(self.dev1.get(), timeout=0.05)
             self.pump1 = TeledynePump(port1, logger=logger)
-            logger.info(f"{self.name}: established a connection to {port1.port}")
+            logger.info("%s: established a connection to %s", self.name, port1.port)
 
             port2 = Serial(self.dev2.get(), timeout=0.05)
             self.pump2 = TeledynePump(port2, logger=logger)
-            logger.info(f"{self.name}: established a connection to {port2.port}")
+            logger.info("%s: established a connection to %s", self.name, port2.port)
+
         except SerialException as error:
-            logger.exception(error)  # todo add more args ?
+            logger.exception(error)
             messagebox.showwarning("Serial Exception", error)
 
     # methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""
-        logger.info(f"{self.name}: Initialized a new test")
+        logger.info("%s: Initialized a new test", self.name)
         self.test = Test()
         self.is_running.set(False)
         self.is_done.set(False)
         self.elapsed.set("")
-        # todo why is this here?
+        # rebuild the TestHandlerView
+        # todo #14 don't do this. where is parent assigned??
         self.parent.build()
 
     # todo give this a better name

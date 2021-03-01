@@ -272,7 +272,9 @@ class EvaluationFrame(BaseFrame):
         # get protectable area
         avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
         self.log.append(f"Average area over blanks: {avg_blank_area}")
-        avg_protectable_area = self.project.limit_psi.get() * max_readings - avg_blank_area
+        avg_protectable_area = (
+            self.project.limit_psi.get() * max_readings - avg_blank_area
+        )
         self.log.append(
             "Average protectable area: limit_psi * max_readings - average area over blanks"
         )
