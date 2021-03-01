@@ -6,7 +6,6 @@ from __future__ import annotations
 import os
 import time
 import tkinter as tk
-import tkinter.scrolledtext
 import typing
 from tkinter import font, ttk
 
@@ -65,7 +64,6 @@ class EvaluationFrame(BaseFrame):
 
     def build(self: BaseFrame) -> None:
         """Destroys all child widgets, then builds the UI."""
-
         for child in self.winfo_children():
             child.destroy()
 

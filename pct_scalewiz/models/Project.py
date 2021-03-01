@@ -12,9 +12,6 @@ from pct_scalewiz.helpers.get_resource import get_resource
 from pct_scalewiz.helpers.sort_nicely import sort_nicely
 from pct_scalewiz.models.test import Test
 
-if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.project import Project
-
 logger = logging.getLogger("scalewiz")
 
 
@@ -41,7 +38,7 @@ class Project:
         self.notes = tk.StringVar()
         # serializable test params
         self.bicarbs = tk.IntVar()
-        self.bicarbs_increased= tk.BooleanVar()
+        self.bicarbs_increased = tk.BooleanVar()
         self.chlorides = tk.IntVar()
         self.baseline = tk.IntVar()
         self.temperature = tk.IntVar()
