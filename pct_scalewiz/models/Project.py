@@ -41,7 +41,7 @@ class Project:
         self.notes = tk.StringVar()
         # serializable test params
         self.bicarbs = tk.IntVar()
-        self.bicarbs_increasedd = tk.BooleanVar()
+        self.bicarbs_increased= tk.BooleanVar()
         self.chlorides = tk.IntVar()
         self.baseline = tk.IntVar()
         self.temperature = tk.IntVar()
@@ -144,7 +144,7 @@ class Project:
             },
             "params": {
                 "bicarbonates": project.bicarbs.get(),
-                "bicarbsIncreased": project.bicarbs_increasedd.get(),
+                "bicarbsIncreased": project.bicarbs_increased.get(),
                 "chlorides": project.chlorides.get(),
                 "baseline": project.baseline.get(),
                 "temperature": project.temperature.get(),
@@ -195,7 +195,7 @@ class Project:
 
         params = obj.get("params")
         this.bicarbs.set(params.get("bicarbonates"))
-        this.bicarbs_increasedd.set(params.get("bicarbsIncreased"))
+        this.bicarbs_increased.set(params.get("bicarbsIncreased"))
         this.chlorides.set(params.get("chlorides"))
         this.baseline.set(params.get("baseline"))
         this.temperature.set(params.get("temperature"))
