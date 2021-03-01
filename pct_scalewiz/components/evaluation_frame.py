@@ -224,7 +224,7 @@ class EvaluationFrame(BaseFrame):
 
     def score(self: BaseFrame, *args) -> None:
         """Updates the result for every Test in the Project. Accepts event args passed from the tkVar trace."""
-        startTime = time.time()
+        start_time = time.time()
         self.log = []
         # scoring props
 
@@ -233,12 +233,12 @@ class EvaluationFrame(BaseFrame):
         )
         self.log.append("Max readings: limitMin * 60 / reading interval")
         self.log.append(f"Max readings: {max_readings}")
-        baselineArea = round(self.project.baseline.get() * max_readings)
+        baseline_area = round(self.project.baseline.get() * max_readings)
         self.log.append("Baseline area: baseline PSI * max readings")
         self.log.append(
             f"Baseline area: {self.project.baseline.get()} * {max_readings}"
         )
-        self.log.append(f"Baseline area: {baselineArea}")
+        self.log.append(f"Baseline area: {baseline_area}")
         self.log.append("-" * 80)
         self.log.append("")
 
@@ -251,35 +251,35 @@ class EvaluationFrame(BaseFrame):
         if len(blanks) < 1:
             return
 
-        areasOverBlanks = []
+        areas_over_blanks = []
         for blank in blanks:
             self.log.append(f"Evaluating {blank.name.get()}")
             self.log.append(f"Considering data: {blank.pump_to_score.get()}")
             readings = blank.get_readings()
             self.log.append(f"Total readings: {len(readings)}")
-            intPSI = sum(readings)
+            int_psi = sum(readings)
             self.log.append("Integral PSI: sum of all pressure readings")
-            self.log.append(f"Integral PSI: {intPSI}")
-            area = self.project.limit_psi.get() * len(readings) - intPSI
+            self.log.append(f"Integral PSI: {int_psi}")
+            area = self.project.limit_psi.get() * len(readings) - int_psi
             self.log.append("Area over blank: limit_psi * # of readings - integral PSI")
             self.log.append(
-                f"Area over blank: {self.project.limit_psi.get()} * {len(readings)} - {intPSI}"
+                f"Area over blank: {self.project.limit_psi.get()} * {len(readings)} - {int_psi}"
             )
             self.log.append(f"Area over blank: {area}")
             self.log.append("")
-            areasOverBlanks.append(area)
+            areas_over_blanks.append(area)
 
         # get protectable area
-        avgBlankArea = round(sum(areasOverBlanks) / len(areasOverBlanks))
-        self.log.append(f"Average area over blanks: {avgBlankArea}")
-        avgProtectableArea = self.project.limit_psi.get() * max_readings - avgBlankArea
+        avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
+        self.log.append(f"Average area over blanks: {avg_blank_area}")
+        avg_protectable_area = self.project.limit_psi.get() * max_readings - avg_blank_area
         self.log.append(
             "Average protectable area: limit_psi * max_readings - average area over blanks"
         )
         self.log.append(
-            f"Average protectable area: {self.project.limit_psi.get()} * {max_readings} - {avgBlankArea}"
+            f"Average protectable area: {self.project.limit_psi.get()} * {max_readings} - {avg_blank_area}"
         )
-        self.log.append(f"Average protectable area: {avgProtectableArea}")
+        self.log.append(f"Average protectable area: {avg_protectable_area}")
         self.log.append("-" * 80)
         self.log.append("")
 
@@ -295,17 +295,17 @@ class EvaluationFrame(BaseFrame):
             self.log.append(f"Considering data: {trial.pump_to_score.get()}")
             readings = trial.get_readings()
             self.log.append(f"Total readings: {len(readings)}")
-            intPSI = sum(readings) + (
+            int_psi = sum(readings) + (
                 (max_readings - len(readings)) * self.project.limit_psi.get()
             )
             self.log.append(f"Integral PSI: sum of all pressure readings")
-            self.log.append(f"Integral PSI: {intPSI}")
-            result = round(1 - (intPSI - baselineArea) / avgProtectableArea, 3)
+            self.log.append(f"Integral PSI: {int_psi}")
+            result = round(1 - (int_psi - baseline_area) / avg_protectable_area, 3)
             self.log.append(
                 "Result: 1 - (integral PSI - baseline area) / avg protectable area"
             )
             self.log.append(
-                f"Result: 1 - ({intPSI} - {baselineArea}) / {avgProtectableArea}"
+                f"Result: 1 - ({int_psi} - {baseline_area}) / {avg_protectable_area}"
             )
             self.log.append(f"Result: {result}")
             self.log.append("")
@@ -318,7 +318,7 @@ class EvaluationFrame(BaseFrame):
         self.log = []
         self.log.append(f"Evaluating results for {self.project.name.get()}...")
         self.log.append("")
-        self.log.append(f"Finished in {round(time.time() - startTime, 3)} s")
+        self.log.append(f"Finished in {round(time.time() - start_time, 3)} s")
         self.log.append("-" * 80)
         self.log.append("")
         self.log = self.log + self._log

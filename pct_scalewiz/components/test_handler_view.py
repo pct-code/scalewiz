@@ -67,47 +67,47 @@ class TestHandlerView(ttk.Frame):
         self.render(projLbl, projBtn, 1)
 
         # row 2 ---------------------------------------------------------------
-        typeLbl = ttk.Label(self.iFrm, text="Test Type:")
-        entFrm = ttk.Frame(self.iFrm)
-        entFrm.grid_columnconfigure(0, weight=1)
-        entFrm.grid_columnconfigure(1, weight=1)
-        blankRadio = ttk.Radiobutton(
-            entFrm, text="Blank", variable=self.handler.test.is_blank, value=True
+        test_type_label = ttk.Label(self.iFrm, text="Test Type:")
+        entry_frame = ttk.Frame(self.iFrm)
+        entry_frame.grid_columnconfigure(0, weight=1)
+        entry_frame.grid_columnconfigure(1, weight=1)
+        blank_radio = ttk.Radiobutton(
+            entry_frame, text="Blank", variable=self.handler.test.is_blank, value=True
         )
-        blankRadio.grid(row=0, column=0)
-        trialRadio = ttk.Radiobutton(
-            entFrm, text="Trial", variable=self.handler.test.is_blank, value=False
+        blank_radio.grid(row=0, column=0)
+        trial_radio = ttk.Radiobutton(
+            entry_frame, text="Trial", variable=self.handler.test.is_blank, value=False
         )
-        trialRadio.grid(row=0, column=1)
-        self.inputs.append(blankRadio)
-        self.inputs.append(trialRadio)
-        self.render(typeLbl, entFrm, 2)
+        trial_radio.grid(row=0, column=1)
+        self.inputs.append(blank_radio)
+        self.inputs.append(trial_radio)
+        self.render(test_type_label, entry_frame, 2)
 
         # row 3 ---------------------------------------------------------------
         self.grid_rowconfigure(3, weight=1)
         # row 3a ---------------------------------------------------------------
-        self.trialLblFrm = ttk.Frame(self.iFrm)
-        ttk.Label(self.trialLblFrm, text="Chemical:").grid(
+        self.trial_label_frame = ttk.Frame(self.iFrm)
+        ttk.Label(self.trial_label_frame, text="Chemical:").grid(
             row=0, column=0, sticky=tk.E, pady=1
         )
-        ttk.Label(self.trialLblFrm, text="Rate (ppm):").grid(
+        ttk.Label(self.trial_label_frame, text="Rate (ppm):").grid(
             row=1, column=0, sticky=tk.E, pady=1
         )
-        ttk.Label(self.trialLblFrm, text="Clarity:").grid(
+        ttk.Label(self.trial_label_frame, text="Clarity:").grid(
             row=2, column=0, sticky=tk.E, pady=1
         )
 
-        self.trialEntFrm = ttk.Frame(self.iFrm)
-        self.trialEntFrm.grid_columnconfigure(0, weight=1)
-        chemEnt = ttk.Entry(self.trialEntFrm, textvariable=self.handler.test.chemical)
+        self.trial_entry_frame = ttk.Frame(self.iFrm)
+        self.trial_entry_frame.grid_columnconfigure(0, weight=1)
+        chemEnt = ttk.Entry(self.trial_entry_frame, textvariable=self.handler.test.chemical)
         chemEnt.grid(row=0, column=0, sticky="ew", pady=1)
         rateEnt = ttk.Spinbox(
-            self.trialEntFrm, textvariable=self.handler.test.rate, from_=0, to=999999
+            self.trial_entry_frame, textvariable=self.handler.test.rate, from_=0, to=999999
         )
         rateEnt.grid(row=1, column=0, sticky="ew", pady=1)
         clarity_options = ["Clear", "Slightly hazy", "Hazy"]
         clarityEnt = ttk.Combobox(
-            self.trialEntFrm,
+            self.trial_entry_frame,
             values=clarity_options,
             textvariable=self.handler.test.clarity,
         )
@@ -119,9 +119,9 @@ class TestHandlerView(ttk.Frame):
         self.inputs.append(clarityEnt)
 
         # row 3b ---------------------------------------------------------------
-        self.blankLbl = ttk.Label(self.iFrm, text="Name:")
-        self.blankEnt = ttk.Entry(self.iFrm, textvariable=self.handler.test.name)
-        self.inputs.append(self.blankEnt)
+        self.blank_label = ttk.Label(self.iFrm, text="Name:")
+        self.blank_entry = ttk.Entry(self.iFrm, textvariable=self.handler.test.name)
+        self.inputs.append(self.blank_entry)
 
         # row 4 ---------------------------------------------------------------
         lbl = ttk.Label(self.iFrm, text="Notes:")
@@ -133,19 +133,19 @@ class TestHandlerView(ttk.Frame):
 
         # row 1 ---------------------------------------------------------------
         frame = ttk.Frame(self)
-        self.startBtn = ttk.Button(
+        self.start_button = ttk.Button(
             frame, text="Start", command=lambda: self.handler.start_test()
         )
-        stopBtn = ttk.Button(
+        stop_button = ttk.Button(
             frame, text="Stop", command=lambda: self.handler.requestStop()
         )
-        plotBtn = ttk.Button(
+        details_button = ttk.Button(
             frame, text="Toggle Details", command=lambda: self.update_plot_visible()
         )
 
-        self.startBtn.grid(row=0, column=0)
-        stopBtn.grid(row=0, column=1)
-        plotBtn.grid(row=0, column=2)
+        self.start_button.grid(row=0, column=0)
+        stop_button.grid(row=0, column=1)
+        details_button.grid(row=0, column=2)
 
         ttk.Progressbar(frame, variable=self.handler.progress).grid(
             row=1, columnspan=3, sticky="new"
@@ -160,7 +160,7 @@ class TestHandlerView(ttk.Frame):
         # rows 0-1 -------------------------------------------------------------
         # close all pyplots to prevent memory leak
         plt.close("all")
-        self.pltFrm = LivePlot(self, self.handler)
+        self.plot_frame = LivePlot(self, self.handler)
         self.grid_columnconfigure(1, weight=1)  # let it grow
         self.grid_rowconfigure(1, weight=1)
 
@@ -194,46 +194,49 @@ class TestHandlerView(ttk.Frame):
         if not "None found" in self.devices_list:
             logger.info("%s found devices: %s", self.handler.name, self.devices_list)
 
-    def update_input_frame(self, *args):
+    def update_input_frame(self, *args) -> None:
+        """Disables widgets in the input frame if a Test is running."""
         for child in self.inputs:
             if self.handler.is_running.get():
                 child.configure(state="disabled")
             else:
                 child.configure(state="normal")
 
-    def update_init_btn(self, *args):
+    def update_init_btn(self, *args) -> None:
+        """Changes the "Start" button to a "New" button when the Test finishes."""
         if self.handler.is_done.get():
-            self.startBtn.grid_remove()
+            self.start_button.grid_remove()
             self.initBtn.grid(row=0, column=0)
         else:
             self.initBtn.grid_remove()
-            self.startBtn.grid(row=0, column=0)
+            self.start_button.grid(row=0, column=0)
 
     def update_test_type(self, *args):
         if self.handler.test.is_blank.get():
-            self.trialLblFrm.grid_remove()
-            self.trialEntFrm.grid_remove()
-            self.render(self.blankLbl, self.blankEnt, 3)
+            self.trial_label_frame.grid_remove()
+            self.trial_entry_frame.grid_remove()
+            self.render(self.blank_label, self.blank_entry, 3)
             logger.info("%s: changed to Blank mode", self.handler.name)
         else:
-            self.blankLbl.grid_remove()
-            self.blankEnt.grid_remove()
-            self.render(self.trialLblFrm, self.trialEntFrm, 3)
+            self.blank_label.grid_remove()
+            self.blank_entry.grid_remove()
+            self.render(self.trial_label_frame, self.trial_entry_frame, 3)
             logger.info("%s: changed to Trial mode", self.handler.name)
 
-    def update_plot_visible(self):
-        isVisible = bool()
+    def update_plot_visible(self) -> None:
+        """Updates whether or not the details view is displayed across all TestHandlerViews."""
+        is_visible = bool()
         # check if the plot is gridded
-        if not self.pltFrm.grid_info() == {}:
-            isVisible = True
+        if self.plot_frame.grid_info() != {}:
+            is_visible = True
 
         for tab in self.parent.tabs():
             this = self.parent.nametowidget(tab)
-            if not isVisible:
+            if not is_visible: # show the details view
                 logger.info("%s: Showing details view", this.handler.name)
                 this.pltFrm.grid(row=0, column=1, rowspan=3)
                 this.logFrm.grid(row=2, column=0, sticky="ew")
-            else:
+            else: # hide the details view
                 logger.info("%s: Hiding details view", this.handler.name)
                 this.pltFrm.grid_remove()
                 this.logFrm.grid_remove()

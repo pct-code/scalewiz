@@ -20,7 +20,7 @@ logger = logging.getLogger("scalewiz")
 class TestHandler:
     """Handles a Test."""
 
-    def __init__(self, name="Nemo") -> None:
+    def __init__(self, name: str = "Nemo") -> None:
         # local state vars
         self.name = name
         self.project = Project()
@@ -80,6 +80,7 @@ class TestHandler:
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
+
         if self.is_running.get():
             return
 
@@ -108,9 +109,7 @@ class TestHandler:
             messagebox.showwarning("Invalid Experiment Name", msg)
             return
 
-        if self.test.clarity.get() == "":
-            if self.test.is_blank.get():
-                return
+        if self.test.clarity.get() == "" and not self.test.is_blank.get():
             msg = "Water clarity cannot be blank"
             messagebox.showwarning("Missing Water Clarity", msg)
             return
@@ -274,6 +273,7 @@ class TestHandler:
         logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
 
     def save_test(self) -> None:
+        """Saves the test to the Project file in JSON format."""
         for reading in self.queue:
             self.test.readings.append(reading)
         self.queue.clear()
