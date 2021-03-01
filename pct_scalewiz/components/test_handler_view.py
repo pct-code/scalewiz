@@ -1,4 +1,5 @@
 """A Tkinter widget for handling tests."""
+from __future__ import annotations
 
 import logging
 import tkinter as tk
@@ -30,7 +31,7 @@ class TestHandlerView(BaseFrame):
         self.devices_list = []
         self.build()
 
-    def setBindings(self) -> None:
+    def set_bindings(self) -> None:
         """Sets tkVar bindings for attributes on the current TestHandler."""
         self.handler.test.is_blank.trace(
             "w", self.update_test_type
@@ -45,7 +46,7 @@ class TestHandlerView(BaseFrame):
         for child in self.winfo_children():
             child.destroy()
 
-        self.setBindings()
+        self.set_bindings()
         self.inputs = []
         self.inputs_frame = ttk.Frame(self)
         self.inputs_frame.grid(row=0, column=0, sticky="new")
@@ -54,43 +55,43 @@ class TestHandlerView(BaseFrame):
         devices_label.bind("<Button-1>", lambda _: self.update_devices_list())
 
         # put the boxes in a frame to make life easier
-        frame = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
-        self.dev1Ent = ttk.Combobox(
-            frame, width=15, textvariable=self.handler.dev1, values=self.devices_list
+        frm = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
+        self.device1_entry = ttk.Combobox(
+            frm, width=15, textvariable=self.handler.dev1, values=self.devices_list
         )
-        self.dev2Ent = ttk.Combobox(
-            frame, width=15, textvariable=self.handler.dev2, values=self.devices_list
+        self.device2_entry = ttk.Combobox(
+            frm, width=15, textvariable=self.handler.dev2, values=self.devices_list
         )
-        self.dev1Ent.grid(row=0, column=0, sticky=tk.W)
-        self.dev2Ent.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
-        self.inputs.append(self.dev1Ent)
-        self.inputs.append(self.dev2Ent)
-        self.render(devices_label, frame, 0)
+        self.device1_entry.grid(row=0, column=0, sticky=tk.W)
+        self.device2_entry.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
+        self.inputs.append(self.device1_entry)
+        self.inputs.append(self.device2_entry)
+        self.render(devices_label, frm, 0)
 
         # row 1 ---------------------------------------------------------------
-        project_label = ttk.Label(self.inputs_frame, text="Project:")
-        project_button = ttk.Label(
+        lbl = ttk.Label(self.inputs_frame, text="Project:")
+        btn = ttk.Label(
             self.inputs_frame, textvariable=self.handler.project.name, anchor="center"
         )
-        self.inputs.append(project_button)
-        self.render(project_label, project_button, 1)
+        self.inputs.append(btn)
+        self.render(lbl, btn, 1)
 
         # row 2 ---------------------------------------------------------------
-        test_type_label = ttk.Label(self.inputs_frame, text="Test Type:")
-        entry_frame = ttk.Frame(self.inputs_frame)
-        entry_frame.grid_columnconfigure(0, weight=1)
-        entry_frame.grid_columnconfigure(1, weight=1)
+        lbl = ttk.Label(self.inputs_frame, text="Test Type:")
+        frm = ttk.Frame(self.inputs_frame)
+        frm.grid_columnconfigure(0, weight=1)
+        frm.grid_columnconfigure(1, weight=1)
         blank_radio = ttk.Radiobutton(
-            entry_frame, text="Blank", variable=self.handler.test.is_blank, value=True
+            frm, text="Blank", variable=self.handler.test.is_blank, value=True
         )
         blank_radio.grid(row=0, column=0)
         trial_radio = ttk.Radiobutton(
-            entry_frame, text="Trial", variable=self.handler.test.is_blank, value=False
+            frm, text="Trial", variable=self.handler.test.is_blank, value=False
         )
         trial_radio.grid(row=0, column=1)
         self.inputs.append(blank_radio)
         self.inputs.append(trial_radio)
-        self.render(test_type_label, entry_frame, 2)
+        self.render(lbl, frm, 2)
 
         # row 3 ---------------------------------------------------------------
         self.grid_rowconfigure(3, weight=1)
@@ -108,29 +109,29 @@ class TestHandlerView(BaseFrame):
 
         self.trial_entry_frame = ttk.Frame(self.inputs_frame)
         self.trial_entry_frame.grid_columnconfigure(0, weight=1)
-        chemEnt = ttk.Entry(
+        chemical_entry = ttk.Entry(
             self.trial_entry_frame, textvariable=self.handler.test.chemical
         )
-        chemEnt.grid(row=0, column=0, sticky="ew", pady=1)
-        rateEnt = ttk.Spinbox(
+        chemical_entry.grid(row=0, column=0, sticky="ew", pady=1)
+        rate_entry = ttk.Spinbox(
             self.trial_entry_frame,
             textvariable=self.handler.test.rate,
             from_=0,
             to=999999,
         )
-        rateEnt.grid(row=1, column=0, sticky="ew", pady=1)
+        rate_entry.grid(row=1, column=0, sticky="ew", pady=1)
         clarity_options = ["Clear", "Slightly hazy", "Hazy"]
-        clarityEnt = ttk.Combobox(
+        clarity_entry = ttk.Combobox(
             self.trial_entry_frame,
             values=clarity_options,
             textvariable=self.handler.test.clarity,
         )
-        clarityEnt.grid(row=2, column=0, sticky="ew", pady=1)
-        clarityEnt.current(0)
+        clarity_entry.grid(row=2, column=0, sticky="ew", pady=1)
+        clarity_entry.current(0)
 
-        self.inputs.append(chemEnt)
-        self.inputs.append(rateEnt)
-        self.inputs.append(clarityEnt)
+        self.inputs.append(chemical_entry)
+        self.inputs.append(rate_entry)
+        self.inputs.append(clarity_entry)
 
         # row 3b ---------------------------------------------------------------
         self.blank_label = ttk.Label(self.inputs_frame, text="Name:")
@@ -146,29 +147,29 @@ class TestHandlerView(BaseFrame):
         # iFrm end ------------------------------------------------------------
 
         # row 1 ---------------------------------------------------------------
-        frame = ttk.Frame(self)
+        frm = ttk.Frame(self)
         self.start_button = ttk.Button(
-            frame, text="Start", command=lambda: self.handler.start_test()
+            frm, text="Start", command=lambda: self.handler.start_test()
         )
         stop_button = ttk.Button(
-            frame, text="Stop", command=lambda: self.handler.request_stop()
+            frm, text="Stop", command=lambda: self.handler.request_stop()
         )
         details_button = ttk.Button(
-            frame, text="Toggle Details", command=lambda: self.update_plot_visible()
+            frm, text="Toggle Details", command=lambda: self.update_plot_visible()
         )
 
         self.start_button.grid(row=0, column=0)
         stop_button.grid(row=0, column=1)
         details_button.grid(row=0, column=2)
 
-        ttk.Progressbar(frame, variable=self.handler.progress).grid(
-            row=1, columnspan=3, sticky="new"
+        ttk.Progressbar(frm, variable=self.handler.progress).grid(
+            row=1, columnspan=3, sticky="nwe"
         )
-        self.elapsed = ttk.Label(frame, textvariable=self.handler.elapsed)
-        self.elapsed.grid(row=1, column=1)
-        frame.grid(row=1, column=0, padx=1, pady=1, sticky="n")
+        self.elapsed_label = ttk.Label(frm, textvariable=self.handler.elapsed)
+        self.elapsed_label.grid(row=1, column=1)
+        frm.grid(row=1, column=0, padx=1, pady=1, sticky="n")
         self.new_button = ttk.Button(
-            frame, text="New", command=lambda: self.handler.new_test()
+            frm, text="New", command=lambda: self.handler.new_test()
         )
 
         # rows 0-1 -------------------------------------------------------------
@@ -204,8 +205,8 @@ class TestHandlerView(BaseFrame):
         self.devices_list = sorted([i.device for i in list_ports.comports()])
         if len(self.devices_list) < 1:
             self.devices_list = ["None found"]
-        self.dev1Ent.configure(values=self.devices_list)
-        self.dev2Ent.configure(values=self.devices_list)
+        self.device1_entry.configure(values=self.devices_list)
+        self.device2_entry.configure(values=self.devices_list)
         if not "None found" in self.devices_list:
             logger.info("%s found devices: %s", self.handler.name, self.devices_list)
 
