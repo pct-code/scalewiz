@@ -39,7 +39,7 @@ class LivePlot(ttk.Frame):
         """Animates the live plot if a test isn't running."""
 
         # we can just skip this if the test isn't running
-        if self.handler.is_done.get() or self.handler.is_running.get():
+        if self.handler.is_running.get():
             # data access here 😳
             start = time.time()
             logger.debug(f"{self.handler.name}: Drawing a new plot ...")
