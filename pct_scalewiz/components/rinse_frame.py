@@ -14,7 +14,7 @@ logger = logging.getLogger("pct-scalewiz")
 class RinseFrame(BaseFrame):
     """Simple frame that starts and stops the pumps on a timer."""
 
-    def __init__(self, handler, window):
+    def __init__(self, handler, window) -> None:
         BaseFrame.__init__(self, window)
         window.protocol("WM_DELETE_WINDOW", self.close)
         self.window = window
@@ -47,10 +47,7 @@ class RinseFrame(BaseFrame):
 
     def rinse(self):
         """Run the pumps and disable the button for the duration of a timer."""
-        try:
-            self.handler.setup_pumps()
-        except Exception:
-            return
+        self.handler.setup_pumps()
         self.handler.pump1.run()
         self.handler.pump2.run()
 
@@ -87,6 +84,6 @@ class RinseFrame(BaseFrame):
             )
 
     def close(self) -> None:
-        """Stops the rinse cycle and closes the rine Toplevel."""
+        """Stops the rinse cycle and closes the rinse Toplevel."""
         self.stop = True
         self.window.destroy()

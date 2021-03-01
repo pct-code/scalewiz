@@ -20,17 +20,17 @@ class TestHandlerView(ttk.Frame):
         self.parent = parent
         self.handler = handler
         self.handler.parent = self
-        self.devList = []
+        self.devices_list = []
         self.build()
 
     def setBindings(self):
         self.handler.test.is_blank.trace(
-            "w", self.update_TestType
+            "w", self.update_test_type
         )  # might have to retrace on new test
-        self.handler.is_running.trace("w", self.update_InputFrame)
-        self.handler.is_done.trace("w", self.update_InitBtn)
-        self.handler.dev1.trace("w", self.update_DevList)
-        self.handler.dev2.trace("w", self.update_DevList)
+        self.handler.is_running.trace("w", self.update_input_frame)
+        self.handler.is_done.trace("w", self.update_init_btn)
+        self.handler.dev1.trace("w", self.update_devices_list)
+        self.handler.dev2.trace("w", self.update_devices_list)
 
     def build(self):
         for child in self.winfo_children():
@@ -42,15 +42,15 @@ class TestHandlerView(ttk.Frame):
         self.iFrm.grid(row=0, column=0, sticky="new")
         # row 0 ---------------------------------------------------------------
         devLbl = ttk.Label(self.iFrm, text="      Devices:")
-        devLbl.bind("<Button-1>", lambda _: self.update_DevList())
+        devLbl.bind("<Button-1>", lambda _: self.update_devices_list())
 
         # put the boxes in a frame to make life easier
         frame = ttk.Frame(self.iFrm)  # this frame will set the width for the col
         self.dev1Ent = ttk.Combobox(
-            frame, width=15, textvariable=self.handler.dev1, values=self.devList
+            frame, width=15, textvariable=self.handler.dev1, values=self.devices_list
         )
         self.dev2Ent = ttk.Combobox(
-            frame, width=15, textvariable=self.handler.dev2, values=self.devList
+            frame, width=15, textvariable=self.handler.dev2, values=self.devices_list
         )
         self.dev1Ent.grid(row=0, column=0, sticky=tk.W)
         self.dev2Ent.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
@@ -140,7 +140,7 @@ class TestHandlerView(ttk.Frame):
             frame, text="Stop", command=lambda: self.handler.requestStop()
         )
         plotBtn = ttk.Button(
-            frame, text="Toggle Details", command=lambda: self.update_PlotVisible()
+            frame, text="Toggle Details", command=lambda: self.update_plot_visible()
         )
 
         self.startBtn.grid(row=0, column=0)
@@ -173,36 +173,35 @@ class TestHandlerView(ttk.Frame):
         self.handler.log_text = self.log_text  # this is bad ?
         self.log_text.grid(sticky="ew")
 
-        self.update_TestType()
-        self.update_InitBtn()
-        self.update_DevList()
+        self.update_test_type()
+        self.update_init_btn()
+        self.update_devices_list()
 
     # methods to update local state
 
-    def render(self, label, entry, row):
+    def render(self, label, entry, row) -> None:
+        """Renders a row on the UI. As method for convenience."""
         label.grid(row=row, column=0, sticky=tk.N + tk.E)
         entry.grid(row=row, column=1, sticky=tk.N + tk.E + tk.W, pady=1, padx=1)
 
     # todo shouldn't this be held by the test handler?
-    def update_DevList(self, *args):
-        old = self.devList.copy()
-        self.devList = sorted([i.device for i in list_ports.comports()])
-        if len(self.devList) < 1:
-            self.devList.append("None found")
-        self.dev1Ent.configure(values=self.devList)
-        self.dev2Ent.configure(values=self.devList)
-        for i in self.devList:
-            if not i in old and not i == "None found":
-                logger.info(f"{self.handler.name} found device: {i}")
+    def update_devices_list(self, *args):
+        self.devices_list = sorted([i.device for i in list_ports.comports()])
+        if len(self.devices_list) < 1:
+            self.devices_list = ["None found"]
+        self.dev1Ent.configure(values=self.devices_list)
+        self.dev2Ent.configure(values=self.devices_list)
+        if not "None found" in self.devices_list:
+            logger.info("%s found devices: %s", self.handler.name, self.devices_list)
 
-    def update_InputFrame(self, *args):
+    def update_input_frame(self, *args):
         for child in self.inputs:
             if self.handler.is_running.get():
                 child.configure(state="disabled")
             else:
                 child.configure(state="normal")
 
-    def update_InitBtn(self, *args):
+    def update_init_btn(self, *args):
         if self.handler.is_done.get():
             self.startBtn.grid_remove()
             self.initBtn.grid(row=0, column=0)
@@ -210,7 +209,7 @@ class TestHandlerView(ttk.Frame):
             self.initBtn.grid_remove()
             self.startBtn.grid(row=0, column=0)
 
-    def update_TestType(self, *args):
+    def update_test_type(self, *args):
         if self.handler.test.is_blank.get():
             self.trialLblFrm.grid_remove()
             self.trialEntFrm.grid_remove()
@@ -222,7 +221,7 @@ class TestHandlerView(ttk.Frame):
             self.render(self.trialLblFrm, self.trialEntFrm, 3)
             logger.info("%s: changed to Trial mode", self.handler.name)
 
-    def update_PlotVisible(self):
+    def update_plot_visible(self):
         isVisible = bool()
         # check if the plot is gridded
         if not self.pltFrm.grid_info() == {}:
