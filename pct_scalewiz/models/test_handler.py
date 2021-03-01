@@ -80,7 +80,6 @@ class TestHandler:
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
-
         if self.is_running.get():
             return
 
@@ -132,6 +131,7 @@ class TestHandler:
         self.is_done.set(False)
         self.is_running.set(True)
         self.progress.set(0)
+        self.elapsed.set("")
         # make a new log file
         log_path = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
         parent_dir = os.path.dirname(self.project.path.get())
@@ -243,16 +243,15 @@ class TestHandler:
     # because the readings loop is blocking, it is handled on a separate thread
     # beacuse of this, we have to interact with it in a somewhat backhanded way
     # this method is intended to be called from the test handler view module on a UI button click
-    def requestStop(self) -> None:
-        if not self.is_running.get():
-            return
-
+    def request_stop(self) -> None:
+        """Requests that the Test stop."""
         if self.is_running.get():
             # the readings loop thread checks this flag on each iteration
             self.stop_requested = True
             logger.info(f"{self.name}: Received a stop request")
 
     def stop_test(self) -> None:
+        """Stops the pumps, closes their ports."""
         if self.pump1.port.isOpen():
             self.pump1.stop()
             self.pump1.close()
@@ -268,8 +267,7 @@ class TestHandler:
             )
 
         self.is_done.set(True)
-        self.progress.set(0)
-        self.elapsed.set("")
+  
         logger.info(f"{self.name}: Test for {self.test.name.get()} has been stopped")
 
     def save_test(self) -> None:

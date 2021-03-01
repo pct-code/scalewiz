@@ -21,7 +21,7 @@ class Test:
         self.pump_to_score = tk.StringVar()
         self.result = tk.DoubleVar()
         self.include_on_report = tk.BooleanVar()
-        self.readings = []
+        self.readings: list[dict] = []
         self.max_psi = tk.IntVar()
         self.observed_baseline = tk.IntVar()
 

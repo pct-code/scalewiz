@@ -1,12 +1,19 @@
 """Component for displaying a Test in a gridlike fashion."""
 
+import tkinter as tk
 from tkinter import messagebox, ttk
+import typing
+
+if typing.TYPE_CHECKING:
+    from pct_scalewiz.models.test import Test
+    from pct_scalewiz.models.project import Project
+
 
 
 class TestResultRow(ttk.Frame):
     """Component for displaying a Test in a gridlike fashion."""
 
-    def __init__(self, parent, test, project, row) -> None:
+    def __init__(self, parent: tk.Frame, test: Test, project: Project, row: int) -> None:
         ttk.Frame.__init__(self, parent)
         self.test = test
         self.parent = parent
@@ -16,7 +23,7 @@ class TestResultRow(ttk.Frame):
 
     def build(self) -> None:
         """Make the UI."""
-        cols = []
+        cols: list[tk.Widget] = []
         # col 0 - name
         cols.append(ttk.Label(self.parent, textvariable=self.test.name))
         # col 1 - report as

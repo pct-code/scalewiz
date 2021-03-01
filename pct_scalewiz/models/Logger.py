@@ -1,8 +1,8 @@
 """A logger class for the program."""
 
 import logging
-import queue
 from logging.handlers import QueueHandler
+from queue import Queue
 
 
 class Logger:
@@ -15,7 +15,7 @@ class Logger:
 
     def __init__(self) -> None:
         """The LogWindow depends on access to the .loq_queue attribute."""
-        self.log_queue = queue.Queue()
+        self.log_queue = Queue()
         # set default logging behavior. could be moved to json. see dictConfig ?
         logging.basicConfig(level=logging.DEBUG)
         queue_handler = QueueHandler(self.log_queue)

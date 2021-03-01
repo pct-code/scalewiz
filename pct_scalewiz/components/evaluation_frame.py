@@ -42,7 +42,7 @@ COLORS = [
 class EvaluationFrame(BaseFrame):
     """Frame for analyzing data."""
 
-    def __init__(self: BaseFrame, parent: tk.Toplevel, handler: TestHandler) -> None:
+    def __init__(self, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
         # todo #8 refactor this. need to rename across all the ProjectX classes
@@ -50,19 +50,19 @@ class EvaluationFrame(BaseFrame):
         parent.winfo_toplevel().title(self.project.name.get())
         self.build()
 
-    def trace(self: BaseFrame) -> None:
+    def trace(self) -> None:
         """Applies a tkVar trace to properties on every test object."""
         for test in self.project.tests:
             test.label.trace("w", self.score)
             test.pump_to_score.trace("w", self.score)
             test.include_on_report.trace("w", self.score)
 
-    def render(self: BaseFrame, label: ttk.Label, entry: ttk.Entry, row: int) -> None:
+    def render(self, label: ttk.Label, entry: ttk.Entry, row: int) -> None:
         """Renders a given label and entry on the passed row."""
         label.grid(row=row, column=0, sticky="e")
         entry.grid(row=row, column=1, sticky="new", padx=(5, 550), pady=2)
 
-    def build(self: BaseFrame) -> None:
+    def build(self) -> None:
         """Destroys all child widgets, then builds the UI."""
         for child in self.winfo_children():
             child.destroy()
@@ -148,7 +148,7 @@ class EvaluationFrame(BaseFrame):
         # update results
         self.score()
 
-    def plot(self: BaseFrame) -> None:
+    def plot(self) -> None:
         """Destroys the old plot frame if it exists, then makes a new one."""
         # close all pyplots to prevent memory leak
         plt.close("all")
@@ -172,8 +172,8 @@ class EvaluationFrame(BaseFrame):
             for blank in self.blanks:
                 if blank.include_on_report.get():
                     elapsed = []
-                    for i, reading in enumerate(blank.readings):
-                        elapsed.append(blank.readings[i]["elapsedMin"])
+                    for reading in blank.readings:
+                        elapsed.append(reading["elapsedMin"])
                     self.axis.plot(
                         elapsed,
                         blank.get_readings(),
@@ -203,7 +203,7 @@ class EvaluationFrame(BaseFrame):
         self.tab_control.add(self.plot_frame, text="   Plot   ")
         self.tab_control.insert(1, self.plot_frame)
 
-    def save(self: BaseFrame) -> None:
+    def save(self) -> None:
         """Saves the project to file, as well as the most recent plot and calculations log."""
         # update image
         out = f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} Scale Block Analysis (Graph).png"
@@ -222,7 +222,7 @@ class EvaluationFrame(BaseFrame):
 
         self.build()
 
-    def score(self: BaseFrame, *args) -> None:
+    def score(self, *args) -> None:
         """Updates the result for every Test in the Project. Accepts event args passed from the tkVar trace."""
         start_time = time.time()
         self.log = []
@@ -298,7 +298,7 @@ class EvaluationFrame(BaseFrame):
             int_psi = sum(readings) + (
                 (max_readings - len(readings)) * self.project.limit_psi.get()
             )
-            self.log.append(f"Integral PSI: sum of all pressure readings")
+            self.log.append("Integral PSI: sum of all pressure readings")
             self.log.append(f"Integral PSI: {int_psi}")
             result = round(1 - (int_psi - baseline_area) / avg_protectable_area, 3)
             self.log.append(
@@ -324,7 +324,7 @@ class EvaluationFrame(BaseFrame):
         self.log = self.log + self._log
         self.to_log(self.log)
 
-    def to_log(self: BaseFrame, log: list[str]) -> None:
+    def to_log(self, log: list[str]) -> None:
         """Adds the passed log message to the Text widget in the Calculations frame."""
         self.log_text.configure(state="normal")
         self.log_text.delete(1.0, "end")

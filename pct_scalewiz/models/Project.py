@@ -50,8 +50,7 @@ class Project:
         self.output_format = tk.StringVar()
         self.plot = tk.StringVar()
 
-        # list of JSON objects
-        self.tests = []
+        self.tests: list[dict] = []
 
         # maintain live fields
         self.customer.trace("w", self.make_name)

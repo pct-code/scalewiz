@@ -16,7 +16,7 @@ class LogFrame(BaseFrame):
     """A Toplevel with a ScrolledText. Displays messages from a Logger."""
 
     # expects parent to be a toplevel window
-    def __init__(self: BaseFrame, parent: tk.Toplevel, logger: Logger) -> None:
+    def __init__(self, parent: tk.Toplevel, logger: Logger) -> None:
         BaseFrame.__init__(self, parent)
         self.winfo_toplevel().title("Log Window")
         # replace the window closing behavior with withdrawing instead 🐱‍👤

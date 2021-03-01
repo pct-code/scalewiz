@@ -137,7 +137,7 @@ class TestHandlerView(ttk.Frame):
             frame, text="Start", command=lambda: self.handler.start_test()
         )
         stop_button = ttk.Button(
-            frame, text="Stop", command=lambda: self.handler.requestStop()
+            frame, text="Stop", command=lambda: self.handler.request_stop()
         )
         details_button = ttk.Button(
             frame, text="Toggle Details", command=lambda: self.update_plot_visible()
