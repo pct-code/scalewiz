@@ -326,6 +326,7 @@ class TestHandler:
         self.test = Test()
         self.is_running.set(False)
         self.is_done.set(False)
+        self.progress.set(0)
         self.elapsed.set("")
         # rebuild the TestHandlerView
         # todo #14 don't do this. where is parent assigned??
