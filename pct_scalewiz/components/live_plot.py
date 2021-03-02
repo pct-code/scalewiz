@@ -40,7 +40,7 @@ class LivePlot(ttk.Frame):
         # the interval argument is used by matplotlib internally
 
         # we can just skip this if the test isn't running
-        if self.handler.is_running.get() or not self.handler.is_done.get():
+        if self.handler.is_running.get() and not self.handler.is_done.get():
             # data access here 😳
             start = time.time()
             logger.debug(f"{self.handler.name}: Drawing a new plot ...")
