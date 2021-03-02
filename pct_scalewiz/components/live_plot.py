@@ -37,6 +37,8 @@ class LivePlot(ttk.Frame):
 
     def animate(self, interval: float) -> None:
         """Animates the live plot if a test isn't running."""
+        # the interval argument is used by matplotlib internally
+
         # we can just skip this if the test isn't running
         if self.handler.is_running.get() or not self.handler.is_done.get():
             # data access here 😳
@@ -44,8 +46,7 @@ class LivePlot(ttk.Frame):
             logger.debug(f"{self.handler.name}: Drawing a new plot ...")
             with plt.style.context("bmh"):
                 self.axis.clear()
-                # self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-                plt.grid(color="darkgrey", alpha=0.65, linestyle="-")
+                self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
                 self.axis.set_facecolor("w")
                 self.axis.set_xlabel("Time (min)")
                 self.axis.set_ylabel("Pressure (psi)")
@@ -55,7 +56,7 @@ class LivePlot(ttk.Frame):
                 self.axis.margins(0)
                 pump1 = []
                 pump2 = []
-                elapsed = [] # we will share this series as an axis
+                elapsed = []  # we will share this series as an axis
                 points = len(self.handler.queue)
                 # todo there's a smarter way to enumerate over these
                 for i in range(points):

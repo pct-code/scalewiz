@@ -207,6 +207,7 @@ class TestHandlerView(BaseFrame):
     # todo shouldn't this be held by the test handler?
     def update_devices_list(self, *args) -> None:
         """Updates the devices list held by the TestHandler."""
+        # extra unused args are passed in by tkinter
         self.devices_list = sorted([i.device for i in list_ports.comports()])
         if len(self.devices_list) < 1:
             self.devices_list = ["None found"]
@@ -223,6 +224,7 @@ class TestHandlerView(BaseFrame):
 
     def update_input_frame(self, *args) -> None:
         """Disables widgets in the input frame if a Test is running."""
+        # extra unused args are passed in by tkinter
         if self.handler.is_running.get():
             for widget in self.inputs:
                 widget.configure(state="disabled")
@@ -232,6 +234,7 @@ class TestHandlerView(BaseFrame):
 
     def update_start_button(self, *args) -> None:
         """Changes the "Start" button to a "New" button when the Test finishes."""
+        # extra unused args are passed in by tkinter
         if self.handler.is_done.get():
             self.start_button.configure(
                 text="New", command=lambda: self.handler.new_test()
@@ -243,6 +246,7 @@ class TestHandlerView(BaseFrame):
 
     def update_test_type(self, *args):
         """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""
+        # extra unused args are passed in by tkinter
         if self.handler.test.is_blank.get():
             self.trial_label_frame.grid_remove()
             self.trial_entry_frame.grid_remove()

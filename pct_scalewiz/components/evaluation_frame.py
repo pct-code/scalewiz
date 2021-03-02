@@ -208,15 +208,19 @@ class EvaluationFrame(BaseFrame):
             f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} "
             "Scale Block Analysis (Graph).png"
         )
-        output_path = os.path.join(os.path.dirname(self.project.path.get()), output_path)
+        output_path = os.path.join(
+            os.path.dirname(self.project.path.get()), output_path
+        )
         self.fig.savefig(output_path)
-        self.project.plot.set(output_path) # store this path so we can find it later
+        self.project.plot.set(output_path)  # store this path so we can find it later
         # update log
         output_path = (
             f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} "
             "Scale Block Analysis (Log).txt"
-            )
-        output_path = os.path.join(os.path.dirname(self.project.path.get()), output_path)
+        )
+        output_path = os.path.join(
+            os.path.dirname(self.project.path.get()), output_path
+        )
         with open(output_path, "w") as file:
             file.write(self.log_text.get("1.0", "end-1c"))
 
@@ -227,6 +231,7 @@ class EvaluationFrame(BaseFrame):
 
     def score(self, *args) -> None:
         """Updates the result for every Test in the Project. Accepts event args passed from the tkVar trace."""
+        # extra unused args are passed in by tkinter
         start_time = time.time()
         self.log = []
         # scoring props

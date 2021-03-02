@@ -1,6 +1,6 @@
 """Editor for Project reporting settings."""
 
-from tkinter import filedialog, ttk
+from tkinter import ttk
 
 
 class ProjectReport(ttk.Frame):

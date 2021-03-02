@@ -29,7 +29,7 @@ mypy = "^0.812"
 line-length = 88
 
 [tool.pylint.message_control]
-disable = "unnecessary-lambda"
+disable = "unnecessary-lambda, unused-argument"
 
 [tool.pylint.design]
 max-parents = 10

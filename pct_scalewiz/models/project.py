@@ -71,6 +71,7 @@ class Project:
 
     def make_name(self, *args) -> None:
         """Constructs a default name for the Project."""
+        # extra unused args are passed in by tkinter
         name = ""
         if self.client.get() != "":
             name = self.client.get().strip()
@@ -83,7 +84,7 @@ class Project:
         self.name.set(name)
 
     @staticmethod
-    def dump_json(project, path: str) -> None:
+    def dump_json(project: Project) -> None:
         """Dump a JSON representation of a Project at the passed path."""
         for test in project.tests:
             if test.chemical.get().strip() != test.chemical.get():
