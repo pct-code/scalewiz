@@ -1,4 +1,5 @@
 """Component for displaying a Test in a gridlike fashion."""
+from __future__ import annotations
 
 import tkinter as tk
 from tkinter import messagebox, ttk
@@ -80,13 +81,13 @@ class TestResultRow(ttk.Frame):
             )
         )
 
-        self.parent.grid_columnconfigure(7, weight=1)
         for i, col in enumerate(cols):
-            if i == 0:
+            if i == 0:  # left align the name col
                 col.grid(row=self.row, column=i, padx=1, pady=1, sticky="w")
-            if i == 7:
+            if i == 7:  # make the notes col stretch
+                self.parent.grid_columnconfigure(7, weight=1)
                 col.grid(row=self.row, column=i, padx=1, pady=1, sticky="ew")
-            else:
+            else:  # defaults for the rest
                 col.grid(
                     row=self.row,
                     column=i,
@@ -96,8 +97,11 @@ class TestResultRow(ttk.Frame):
 
     def remove_from_project(self) -> None:
         """Removes a Test from the parent Project, then tries to rebuild the UI."""
-        msg = f"You are about to delete {self.test.name.get()} from {self.project.name.get()}."
-        msg += "\nThis will become permanent once you save the project. \nDo you wish to continue?"
+        msg = (
+            "You are about to delete {} from {}.\n"
+            "This will become permanent once you save the project.\n"
+            "Do you wish to continue?"
+        ).format(self.test.name.get(), self.project.name.get())
         remove = messagebox.askyesno("Delete test", msg)
         if remove and self.test in self.project.tests:
             self.project.tests.remove(self.test)

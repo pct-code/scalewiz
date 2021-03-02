@@ -162,12 +162,12 @@ class Project:
     @staticmethod
     def load_json(path: str) -> Project:
         """Return a Project from a passed path to a JSON dump."""
-        logger.info(f"Loading from {path}")
+        logger.info("Loading from %s", path)
         with open(path, "r") as file:
             obj = json.load(file)
 
-        json_path = obj.get("info").get("path")
-        if path != json_path:
+        # we expect the data files to be shared over Dropbox, etc.
+        if path != obj.get("info").get("path"):
             logger.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )

@@ -13,6 +13,8 @@ class Logger:
     Use from anywhere by calling logging.getLogger('scalewiz')
     """
 
+    # pylint: disable=too-few-public-methods
+
     def __init__(self) -> None:
         """The LogWindow depends on access to the .loq_queue attribute."""
         self.log_queue = Queue()

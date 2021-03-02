@@ -35,7 +35,8 @@ class MainFrame(BaseFrame):
         system_name = f"  System {len(self.tab_control.tabs()) + 1}  "
         handler = TestHandler(name=system_name.strip())
         # plug it in 🔌
-        # todo why this assignment? the handler's 'parent' isn't a view. this can't be right, there must be a better way
+        # todo why this assignment? the handler's 'parent' isn't a view.
+        # this can't be right, there must be a better way
         handler.parent = TestHandlerView(self.tab_control, handler)
         self.tab_control.add(handler.parent, sticky="nsew")
         self.tab_control.tab(handler.parent, text=system_name)

@@ -2,21 +2,18 @@
 
 from __future__ import annotations
 
-# stdlib
 import os
 import time
 import tkinter as tk
 import typing
 from tkinter import font, ttk
 
-# 3rd party
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
-# internal
 from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.test_evaluation_row import TestResultRow
 from pct_scalewiz.helpers.export_csv import export_csv
@@ -57,8 +54,9 @@ class EvaluationFrame(BaseFrame):
             test.pump_to_score.trace("w", self.score)
             test.include_on_report.trace("w", self.score)
 
-    def render(self, label: ttk.Label, entry: ttk.Entry, row: int) -> None:
+    def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Renders a given label and entry on the passed row."""
+        # pylint: disable=no-self-use
         label.grid(row=row, column=0, sticky="e")
         entry.grid(row=row, column=1, sticky="new", padx=(5, 550), pady=2)
 
@@ -69,7 +67,6 @@ class EvaluationFrame(BaseFrame):
 
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(row=0, column=0)
-        # col config this too?
 
         tests_frame = ttk.Frame(self)
 
@@ -115,10 +112,11 @@ class EvaluationFrame(BaseFrame):
             TestResultRow(tests_frame, blank, self.project, i + 2).grid(
                 row=i + 1, column=0, sticky="w", padx=3, pady=1
             )
+        count = len(self.blanks)
         for i, trial in enumerate(self.trials):
-            TestResultRow(
-                tests_frame, trial, self.project, i + len(self.blanks) + 3
-            ).grid(row=i + len(self.blanks) + 3, column=0, sticky="w", padx=3, pady=1)
+            TestResultRow(tests_frame, trial, self.project, i + count + 3).grid(
+                row=i + count + 3, column=0, sticky="w", padx=3, pady=1
+            )
 
         self.tab_control.add(tests_frame, text="   Data   ")
 

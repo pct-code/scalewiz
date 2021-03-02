@@ -42,11 +42,9 @@ class ScaleWiz(BaseFrame):
         ttk.Style().configure("TNotebook", background="#FAFAFA")
         ttk.Style().configure("TNotebook.Tab", font=bold_font)
 
-        # make log window, immediately hide it
         # todo this seems inelegant
-        # holding a ref for the menubar to find...
+        # holding a ref to the toplevel for the menubar to find
         self.log_window = tk.Toplevel(self)
-        self.log_window.parent = self  # tacky ?
         LogFrame(self.log_window, Logger()).grid()
         logging.getLogger("scalewiz").info("Starting in %s", os.getcwd())
         self.log_window.withdraw()  # 🏌️‍♀️👋

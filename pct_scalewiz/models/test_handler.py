@@ -206,13 +206,13 @@ class TestHandler:
                 }
 
                 # make a message for the log in the test handler view
-                msg = f"@ {minutes_elapsed:.2f} min; pump1: {psi1}, pump2: {psi2}, avg: {average}"
+                msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
+                    minutes_elapsed, psi1, psi2, average
+                )
                 self.to_log(msg)
                 logger.info("%s - %s", self.name, msg)
 
                 # todo this is janky
-                # why do this vs adding to test directly?
-                # -> trying to not access same obj across threads
                 self.queue.append(reading)
 
                 self.elapsed.set(f"{minutes_elapsed:.2f} min.")
@@ -253,7 +253,7 @@ class TestHandler:
 
     # because the readings loop is blocking, it is handled on a separate thread
     # beacuse of this, we have to interact with it in a somewhat backhanded way
-    # this method is intended to be called from the test handler view module on a UI button click
+    # this method is intended to be called from the test handler view
     def request_stop(self) -> None:
         """Requests that the Test stop."""
         if self.is_running.get():

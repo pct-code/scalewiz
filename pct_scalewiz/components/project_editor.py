@@ -1,22 +1,28 @@
 """Form for mutating Project objects."""
+from __future__ import annotations
 
-# util
 import os.path
 import tkinter as tk
+import typing
 from tkinter import filedialog, ttk
 
-# internal
-from pct_scalewiz.models.project import Project
 from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.project_info import ProjectInfo
 from pct_scalewiz.components.project_params import ProjectParams
 from pct_scalewiz.components.project_report import ProjectReport
+from pct_scalewiz.models.project import Project
+
+if typing.TYPE_CHECKING:
+    from pct_scalewiz.models.test_handler import TestHandler
 
 
 class ProjectEditor(BaseFrame):
-    """Form for mutating Project objects."""
+    """Form for mutating Project objects.
 
-    def __init__(self, parent, handler) -> None:
+    Has a tab control widget for separating the sub-forms.
+    """
+
+    def __init__(self, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
         self.grid_columnconfigure(0, weight=1)
@@ -29,6 +35,9 @@ class ProjectEditor(BaseFrame):
 
     def build(self) -> None:
         """Render the UI."""
+        for child in self.winfo_children():
+            child.destroy()
+
         tab_control = ttk.Notebook(self)
         tab_control.grid(row=0, column=0)
 
@@ -48,8 +57,9 @@ class ProjectEditor(BaseFrame):
         )
         button_frame.grid(row=1, column=0)
 
-    def render(self, label, entry, row) -> None:
+    def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Render the passed label and entry on the passed row."""
+        # pylint: disable=no-self-use
         label.grid(row=row, column=0, sticky=tk.E)
         entry.grid(row=row, column=1, sticky=tk.E + tk.W, pady=1)
 
@@ -65,7 +75,6 @@ class ProjectEditor(BaseFrame):
         else:
             Project.dump_json(self.editorProject, self.editorProject.path.get())
             self.handler.project = Project.load_json(self.editorProject.path.get())
-            # todo how about a call to build instead?
             self.handler.parent.build()
 
     def save_as(self) -> None:

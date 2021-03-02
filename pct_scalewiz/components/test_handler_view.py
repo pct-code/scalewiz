@@ -33,11 +33,9 @@ class TestHandlerView(BaseFrame):
 
     def set_bindings(self) -> None:
         """Sets tkVar bindings for attributes on the current TestHandler."""
-        self.handler.test.is_blank.trace(
-            "w", self.update_test_type
-        )  # might have to retrace on new test
+        self.handler.test.is_blank.trace("w", self.update_test_type)
         self.handler.is_running.trace("w", self.update_input_frame)
-        self.handler.is_done.trace("w", self.update_init_btn)
+        self.handler.is_done.trace("w", self.update_start_button)
         self.handler.dev1.trace("w", self.update_devices_list)
         self.handler.dev2.trace("w", self.update_devices_list)
 
@@ -47,26 +45,28 @@ class TestHandlerView(BaseFrame):
             child.destroy()
 
         self.set_bindings()
+        # use this list to hold refs so we can easily disable later
         self.inputs = []
         self.inputs_frame = ttk.Frame(self)
         self.inputs_frame.grid(row=0, column=0, sticky="new")
+
         # row 0 ---------------------------------------------------------------
-        devices_label = ttk.Label(self.inputs_frame, text="      Devices:")
-        devices_label.bind("<Button-1>", lambda _: self.update_devices_list())
+        lbl = ttk.Label(self.inputs_frame, text="      Devices:")
+        lbl.bind("<Button-1>", lambda _: self.update_devices_list())
 
         # put the boxes in a frame to make life easier
-        frm = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
+        ent = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
         self.device1_entry = ttk.Combobox(
-            frm, width=15, textvariable=self.handler.dev1, values=self.devices_list
+            ent, width=15, textvariable=self.handler.dev1, values=self.devices_list
         )
         self.device2_entry = ttk.Combobox(
-            frm, width=15, textvariable=self.handler.dev2, values=self.devices_list
+            ent, width=15, textvariable=self.handler.dev2, values=self.devices_list
         )
         self.device1_entry.grid(row=0, column=0, sticky=tk.W)
         self.device2_entry.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
         self.inputs.append(self.device1_entry)
         self.inputs.append(self.device2_entry)
-        self.render(devices_label, frm, 0)
+        self.render(lbl, ent, 0)
 
         # row 1 ---------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="Project:")
@@ -78,25 +78,27 @@ class TestHandlerView(BaseFrame):
 
         # row 2 ---------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="Test Type:")
-        frm = ttk.Frame(self.inputs_frame)
-        frm.grid_columnconfigure(0, weight=1)
-        frm.grid_columnconfigure(1, weight=1)
+        ent = ttk.Frame(self.inputs_frame)
+        ent.grid_columnconfigure(0, weight=1)
+        ent.grid_columnconfigure(1, weight=1)
         blank_radio = ttk.Radiobutton(
-            frm, text="Blank", variable=self.handler.test.is_blank, value=True
+            ent, text="Blank", variable=self.handler.test.is_blank, value=True
+        )
+        trial_radio = ttk.Radiobutton(
+            ent, text="Trial", variable=self.handler.test.is_blank, value=False
         )
         blank_radio.grid(row=0, column=0)
-        trial_radio = ttk.Radiobutton(
-            frm, text="Trial", variable=self.handler.test.is_blank, value=False
-        )
         trial_radio.grid(row=0, column=1)
         self.inputs.append(blank_radio)
         self.inputs.append(trial_radio)
-        self.render(lbl, frm, 2)
+        self.render(lbl, ent, 2)
 
         # row 3 ---------------------------------------------------------------
         self.grid_rowconfigure(3, weight=1)
-        # row 3a ---------------------------------------------------------------
+        # row 3a is used when the TestHandlerView is in "Blank" mode
+        # row 3a --------------------------------------------------------------
         self.trial_label_frame = ttk.Frame(self.inputs_frame)
+
         ttk.Label(self.trial_label_frame, text="Chemical:").grid(
             row=0, column=0, sticky=tk.E, pady=1
         )
@@ -120,10 +122,9 @@ class TestHandlerView(BaseFrame):
             to=999999,
         )
         rate_entry.grid(row=1, column=0, sticky="ew", pady=1)
-        clarity_options = ["Clear", "Slightly hazy", "Hazy"]
         clarity_entry = ttk.Combobox(
             self.trial_entry_frame,
-            values=clarity_options,
+            values=["Clear", "Slightly hazy", "Hazy"],
             textvariable=self.handler.test.clarity,
         )
         clarity_entry.grid(row=2, column=0, sticky="ew", pady=1)
@@ -133,9 +134,12 @@ class TestHandlerView(BaseFrame):
         self.inputs.append(rate_entry)
         self.inputs.append(clarity_entry)
 
-        # row 3b ---------------------------------------------------------------
+        # row 3b is used when the TestHandlerView is in "Trial" mode
+        # row 3b --------------------------------------------------------------
         self.blank_label = ttk.Label(self.inputs_frame, text="Name:")
-        self.blank_entry = ttk.Entry(self.inputs_frame, textvariable=self.handler.test.name)
+        self.blank_entry = ttk.Entry(
+            self.inputs_frame, textvariable=self.handler.test.name
+        )
         self.inputs.append(self.blank_entry)
 
         # row 4 ---------------------------------------------------------------
@@ -144,32 +148,32 @@ class TestHandlerView(BaseFrame):
         self.inputs.append(ent)
         self.render(lbl, ent, 4)
 
-        # iFrm end ------------------------------------------------------------
+        # inputs_frame end ----------------------------------------------------
 
         # row 1 ---------------------------------------------------------------
-        frm = ttk.Frame(self)
+        ent = ttk.Frame(self)
         self.start_button = ttk.Button(
-            frm, text="Start", command=lambda: self.handler.start_test()
+            ent, text="Start", command=lambda: self.handler.start_test()
         )
         stop_button = ttk.Button(
-            frm, text="Stop", command=lambda: self.handler.request_stop()
+            ent, text="Stop", command=lambda: self.handler.request_stop()
         )
         details_button = ttk.Button(
-            frm, text="Toggle Details", command=lambda: self.update_plot_visible()
+            ent, text="Toggle Details", command=lambda: self.update_plot_visible()
         )
 
         self.start_button.grid(row=0, column=0)
         stop_button.grid(row=0, column=1)
         details_button.grid(row=0, column=2)
 
-        ttk.Progressbar(frm, variable=self.handler.progress).grid(
+        ttk.Progressbar(ent, variable=self.handler.progress).grid(
             row=1, columnspan=3, sticky="nwe"
         )
-        self.elapsed_label = ttk.Label(frm, textvariable=self.handler.elapsed)
+        self.elapsed_label = ttk.Label(ent, textvariable=self.handler.elapsed)
         self.elapsed_label.grid(row=1, column=1)
-        frm.grid(row=1, column=0, padx=1, pady=1, sticky="n")
+        ent.grid(row=1, column=0, padx=1, pady=1, sticky="n")
         self.new_button = ttk.Button(
-            frm, text="New", command=lambda: self.handler.new_test()
+            ent, text="New", command=lambda: self.handler.new_test()
         )
 
         # rows 0-1 -------------------------------------------------------------
@@ -189,13 +193,14 @@ class TestHandlerView(BaseFrame):
         self.log_text.grid(sticky="ew")
 
         self.update_test_type()
-        self.update_init_btn()
+        self.update_start_button()
         self.update_devices_list()
 
     # methods to update local state
 
-    def render(self, label, entry, row) -> None:
+    def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Renders a row on the UI. As method for convenience."""
+        # pylint: disable=no-self-use
         label.grid(row=row, column=0, sticky=tk.N + tk.E)
         entry.grid(row=row, column=1, sticky=tk.N + tk.E + tk.W, pady=1, padx=1)
 
@@ -205,27 +210,36 @@ class TestHandlerView(BaseFrame):
         self.devices_list = sorted([i.device for i in list_ports.comports()])
         if len(self.devices_list) < 1:
             self.devices_list = ["None found"]
+
         self.device1_entry.configure(values=self.devices_list)
         self.device2_entry.configure(values=self.devices_list)
+
+        if len(self.devices_list) > 1:
+            self.device1_entry.current(0)
+            self.device2_entry.current(1)
+
         if not "None found" in self.devices_list:
-            logger.info("%s found devices: %s", self.handler.name, self.devices_list)
+            logger.debug("%s found devices: %s", self.handler.name, self.devices_list)
 
     def update_input_frame(self, *args) -> None:
         """Disables widgets in the input frame if a Test is running."""
-        for child in self.inputs:
-            if self.handler.is_running.get():
-                child.configure(state="disabled")
-            else:
-                child.configure(state="normal")
+        if self.handler.is_running.get():
+            for widget in self.inputs:
+                widget.configure(state="disabled")
+        else:
+            for widget in self.inputs:
+                widget.configure(state="normal")
 
-    def update_init_btn(self, *args) -> None:
+    def update_start_button(self, *args) -> None:
         """Changes the "Start" button to a "New" button when the Test finishes."""
         if self.handler.is_done.get():
-            self.start_button.grid_remove()
-            self.new_button.grid(row=0, column=0)
+            self.start_button.configure(
+                text="New", command=lambda: self.handler.new_test()
+            )
         else:
-            self.new_button.grid_remove()
-            self.start_button.grid(row=0, column=0)
+            self.start_button.configure(
+                text="Start", command=lambda: self.handler.start_test()
+            )
 
     def update_test_type(self, *args):
         """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""
@@ -241,7 +255,7 @@ class TestHandlerView(BaseFrame):
             logger.info("%s: changed to Trial mode", self.handler.name)
 
     def update_plot_visible(self) -> None:
-        """Updates whether or not the details view is displayed across all TestHandlerViews."""
+        """Updates the details view across all TestHandlerViews."""
         is_visible = bool()
         # check if the plot is gridded
         if self.plot_frame.grid_info() != {}:
@@ -251,9 +265,9 @@ class TestHandlerView(BaseFrame):
             this = self.parent.nametowidget(tab)
             if not is_visible:  # show the details view
                 logger.info("%s: Showing details view", this.handler.name)
-                this.pltFrm.grid(row=0, column=1, rowspan=3)
-                this.logFrm.grid(row=2, column=0, sticky="ew")
+                this.plot_frame.grid(row=0, column=1, rowspan=3)
+                this.log_frame.grid(row=2, column=0, sticky="ew")
             else:  # hide the details view
                 logger.info("%s: Hiding details view", this.handler.name)
-                this.pltFrm.grid_remove()
-                this.logFrm.grid_remove()
+                this.plot_frame.grid_remove()
+                this.log_frame.grid_remove()

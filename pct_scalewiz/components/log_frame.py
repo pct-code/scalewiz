@@ -1,13 +1,16 @@
 """A Toplevel with a ScrolledText. Displays messages from a Logger."""
+from __future__ import annotations
 
-# util
 import queue
 import tkinter as tk
+import typing
 from tkinter.scrolledtext import ScrolledText
 
-# internal
 from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.models.logger import Logger
+
+if typing.TYPE_CHECKING:
+    from logging import LogRecord
 
 # thanks https://github.com/beenje/tkinter-logging-text-widget
 
@@ -15,7 +18,6 @@ from pct_scalewiz.models.logger import Logger
 class LogFrame(BaseFrame):
     """A Toplevel with a ScrolledText. Displays messages from a Logger."""
 
-    # expects parent to be a toplevel window
     def __init__(self, parent: tk.Toplevel, logger: Logger) -> None:
         BaseFrame.__init__(self, parent)
         self.winfo_toplevel().title("Log Window")
@@ -41,7 +43,7 @@ class LogFrame(BaseFrame):
         # start polling messages from the queue 📩
         self.after(100, self.poll_log_queue)
 
-    def display(self, record) -> None:
+    def display(self, record: LogRecord) -> None:
         """Displays a message in the log."""
         msg = record.getMessage()
         self.scrolled_text.configure(state="normal")

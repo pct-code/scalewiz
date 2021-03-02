@@ -24,16 +24,17 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger("scalewiz")
 
 
-class MenuBar(tk.Frame):
+class MenuBar:
     """Menu bar to be displayed on the Main Frame."""
 
-    def __init__(self, parent: tk.Toplevel) -> None:
-        tk.Frame.__init__(self, parent)
+    def __init__(self, parent: BaseFrame) -> None:
         # expecting parent to be the toplevel parent of the main frame
-        self.parent = parent
+        self.main_frame = parent
 
         menu_bar = tk.Menu()
-        menu_bar.add_command(label="Add System", command=lambda: parent.add_handler())
+        menu_bar.add_command(
+            label="Add System", command=lambda: self.main_frame.add_handler()
+        )
 
         project_menu = tk.Menu(tearoff=0)
         project_menu.add_command(
@@ -48,23 +49,23 @@ class MenuBar(tk.Frame):
             label="Evaluation", command=lambda: self.request_eval_window()
         )
         menu_bar.add_command(
-            label="Log", command=lambda: self.parent.parent.log_window.deiconify()
+            label="Log", command=lambda: self.main_frame.parent.log_window.deiconify()
         )
         menu_bar.add_command(label="Rinse", command=lambda: self.show_rinse())
         menu_bar.add_command(label="Help", command=lambda: show_help())
 
-        parent.winfo_toplevel().config(menu=menu_bar)
+        self.main_frame.winfo_toplevel().config(menu=menu_bar)
 
     def request_project_edit(self) -> None:
         """Requests to open an editor window for the currently selected Project."""
-        current_tab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(current_tab)
+        current_tab = self.main_frame.tab_control.select()
+        widget = self.main_frame.nametowidget(current_tab)
         self.modify_project(widget.handler)
 
     def request_eval_window(self) -> None:
         """Requests to open an evalutaion window for the currently selected Project."""
-        current_tab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(current_tab)
+        current_tab = self.main_frame.tab_control.select()
+        widget = self.main_frame.nametowidget(current_tab)
         if not os.path.isfile(widget.handler.project.path.get()):
             messagebox.showwarning(
                 "No Project File",
@@ -75,15 +76,15 @@ class MenuBar(tk.Frame):
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
-        current_tab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(current_tab)
+        current_tab = self.main_frame.tab_control.select()
+        widget = self.main_frame.nametowidget(current_tab)
         widget.handler.load_project()
         widget.build()
 
     def show_rinse(self) -> None:
         """Shows a RinseFrame in a new Toplevel."""
-        current_tab = self.parent.tab_control.select()
-        widget = self.parent.nametowidget(current_tab)
+        current_tab = self.main_frame.tab_control.select()
+        widget = self.main_frame.nametowidget(current_tab)
 
         window = tk.Toplevel()
         rinse = RinseFrame(widget.handler, window)
@@ -119,6 +120,7 @@ class MenuBar(tk.Frame):
         window = tk.Toplevel()
         window.protocol("WM_DELETE_WINDOW", lambda: handler.close_editors())
         window.resizable(0, 0)
+        # todo #16 try passing in the editor itself. then can rebuild it or winfo_toplevel.destroy()
         handler.editors.append(window)
         editor = EvaluationFrame(window, handler)
         editor.grid()

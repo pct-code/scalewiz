@@ -13,7 +13,7 @@ logger = logging.getLogger("scalewiz")
 
 
 def export_csv(project: Project) -> None:
-    """Generates a report for the passed Project in a flattened CSV format (or ugly JSON)."""
+    """Generates a report for a Project in a flattened CSV format (or ugly JSON)."""
     start_time = time.time()
     logger.info("Beginning export of %s", project.name.get())
 
