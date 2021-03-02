@@ -73,7 +73,7 @@ class ProjectEditor(BaseFrame):
         if self.editorProject.path.get() == "":
             self.save_as()
         else:
-            Project.dump_json(self.editorProject, self.editorProject.path.get())
+            Project.dump_json(self.editorProject)
             self.handler.project = Project.load_json(self.editorProject.path.get())
             self.handler.parent.build()
 

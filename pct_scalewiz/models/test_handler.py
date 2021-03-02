@@ -291,7 +291,7 @@ class TestHandler:
             self.test.readings.append(reading)
         self.queue.clear()
         self.project.tests.append(self.test)
-        Project.dump_json(self.project, self.project.path.get())
+        Project.dump_json(self.project)
         logger.info(
             "%s: Saved %s to %s",
             self.name,

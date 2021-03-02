@@ -230,7 +230,10 @@ class EvaluationFrame(BaseFrame):
         self.build()
 
     def score(self, *args) -> None:
-        """Updates the result for every Test in the Project. Accepts event args passed from the tkVar trace."""
+        """Updates the result for every Test in the Project.
+        
+        Accepts event args passed from the tkVar trace.
+        """
         # extra unused args are passed in by tkinter
         start_time = time.time()
         self.log = []
