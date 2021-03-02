@@ -202,18 +202,23 @@ class EvaluationFrame(BaseFrame):
         self.tab_control.insert(1, self.plot_frame)
 
     def save(self) -> None:
-        """Saves the project to file, as well as the most recent plot and calculations log."""
+        """Saves to file the project, most recent plot, and calculations log."""
         # update image
-        out = f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} Scale Block Analysis (Graph).png"
-        out = os.path.join(os.path.dirname(self.project.path.get()), out)
-        self.fig.savefig(out)
-        self.project.plot.set(out)
+        output_path = (
+            f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} "
+            "Scale Block Analysis (Graph).png"
+        )
+        output_path = os.path.join(os.path.dirname(self.project.path.get()), output_path)
+        self.fig.savefig(output_path)
+        self.project.plot.set(output_path) # store this path so we can find it later
         # update log
-        out = f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} Scale Block Analysis (Log).txt"
-        out = os.path.join(os.path.dirname(self.project.path.get()), out)
-        log = self.log_text.get("1.0", "end-1c")
-        with open(out, "w") as file:
-            file.write(log)
+        output_path = (
+            f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} "
+            "Scale Block Analysis (Log).txt"
+            )
+        output_path = os.path.join(os.path.dirname(self.project.path.get()), output_path)
+        with open(output_path, "w") as file:
+            file.write(self.log_text.get("1.0", "end-1c"))
 
         Project.dump_json(self.project, self.project.path.get())
         self.handler.project = self.project = Project.load_json(self.project.path.get())
@@ -269,17 +274,17 @@ class EvaluationFrame(BaseFrame):
 
         # get protectable area
         avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
-        self.log.append(f"Average area over blanks: {avg_blank_area}")
+        self.log.append(f"Avg. area over blanks: {avg_blank_area}")
         avg_protectable_area = (
             self.project.limit_psi.get() * max_readings - avg_blank_area
         )
         self.log.append(
-            "Average protectable area: limit_psi * max_readings - average area over blanks"
+            "Avg. protectable area: limit_psi * max_readings - avg. area over blanks"
         )
         self.log.append(
-            f"Average protectable area: {self.project.limit_psi.get()} * {max_readings} - {avg_blank_area}"
+            f"Avg. protectable area: {self.project.limit_psi.get()} * {max_readings} - {avg_blank_area}"
         )
-        self.log.append(f"Average protectable area: {avg_protectable_area}")
+        self.log.append(f"Avg. protectable area: {avg_protectable_area}")
         self.log.append("-" * 80)
         self.log.append("")
 
