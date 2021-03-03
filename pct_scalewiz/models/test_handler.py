@@ -1,9 +1,12 @@
 """Handles a test."""
 
+from __future__ import annotations
+
 import logging
 import os
 import time
 import tkinter as tk
+import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from tkinter import filedialog, messagebox
@@ -14,29 +17,39 @@ from pct_scalewiz.models.project import Project
 from pct_scalewiz.models.teledyne_pump import TeledynePump
 from pct_scalewiz.models.test import Test
 
+if typing.TYPE_CHECKING:
+    from tkinter.scrolledtext import ScrolledText
+
 logger = logging.getLogger("scalewiz")
 
 
 class TestHandler:
     """Handles a Test."""
 
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, name: str = "Nemo") -> None:
-
-        # pylint: disable=too-many-instance-attributes
-
-        # local state vars
         self.name = name
         self.project = Project()
         self.test = Test()
+        self.pool = ThreadPoolExecutor(max_workers=1)
+        self.queue: list[dict] = []
+        self.editors = []  # list of views displaying the project
+        self.max_readings = int()  # max # of readings to collect
+        self.max_pressures: dict[str, int] = {"pump 1": int(), "pump 2": int()}
+        # we assign a real handler later
+        self.log_handler: logging.FileHandler = None
+        # test handler view overwrites this attribute with a widget
+        self.log_text: ScrolledText = None
+
         self.dev1 = tk.StringVar()
         self.dev2 = tk.StringVar()
         self.stop_requested = False
-        self.pool = ThreadPoolExecutor(max_workers=1)
-        self.queue = []
         self.progress = tk.IntVar()
         self.elapsed = tk.StringVar()
-        self.editors = []  # list of views displaying the project
-        self.max_readings = int()
+
+        self.pump1: TeledynePump = None
+        self.pump2: TeledynePump = None
 
         # todo #7 refactor needed. this can't account for rinse/uptake cycles
         # need new way to manage state
@@ -47,18 +60,16 @@ class TestHandler:
         # logging
         # todo add handler here and set to a file in logs/ next to the project.json
 
-    # todo stop doing this method pls
     def can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
-        value = (
+        return (
             (
-                self.max_psi_1 <= self.project.limit_psi.get()
-                or self.max_psi_2 <= self.project.limit_psi.get()
+                self.max_pressures["pump 1"] <= self.project.limit_psi.get()
+                or self.max_pressures["pump 2"] <= self.project.limit_psi.get()
             )
             and len(self.queue) < self.max_readings
             and not self.stop_requested
         )
-        return value
 
     def load_project(self, path: str = None) -> None:
         """Opens a file dialog then loads the selected Project file."""
@@ -71,8 +82,8 @@ class TestHandler:
 
         if path != "":
             self.close_editors()
-            self.project = Project.load_json(path)
-            logger.info(f"Loaded {self.project.name.get()} to {self.name}")
+            self.project.load_json(path)
+            logger.info("Loaded %s to %s", self.project.name.get(), self.name)
 
         self.max_readings = (
             round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
@@ -81,11 +92,8 @@ class TestHandler:
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
-
         # pylint: disable=too-many-return-statements
         # this IS too many returns, but easier than a refactor
-        # wontfix
-
         if self.is_running.get():
             return
 
@@ -147,9 +155,16 @@ class TestHandler:
         log_file = os.path.join(logs_dir, log_path)
 
         # update the file handler
-        if hasattr(self, "logFileHandler"):
+        self.update_log_handler(log_file)
+
+        self.pool.submit(self.take_readings)
+
+    def update_log_handler(self, log_file: str) -> None:
+        """Sets up the logging FileHandler to the passed path."""
+        if self.log_handler in logger.handlers:
             logger.removeHandler(self.log_handler)
         self.log_handler = logging.FileHandler(log_file)
+
         formatter = logging.Formatter(
             "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
             "%Y-%m-%d %H:%M:%S",
@@ -157,15 +172,14 @@ class TestHandler:
         self.log_handler.setFormatter(formatter)
         self.log_handler.setLevel(logging.DEBUG)
         logger.addHandler(self.log_handler)
-        logger.info(f"{self.name} set up a log file at {log_file}")
-        logger.info(f"{self.name} is starting a test for {self.project.name.get()}")
-        self.pool.submit(self.take_readings)
+        logger.info("%s set up a log file at %s", self.name, log_file)
+        logger.info("%s is starting a test for %s", self.name, self.project.name.get())
 
     def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
         # set default values for this instance of the test loop
         self.queue = []
-        self.max_psi_1 = self.max_psi_2 = 0
+        self.max_pressures["pump 1"] = self.max_pressures["pump 2"] = 0
         # start the pumps
         self.pump1.run()
         self.pump2.run()
@@ -218,10 +232,10 @@ class TestHandler:
                 self.elapsed.set(f"{minutes_elapsed:.2f} min.")
                 self.progress.set(round(len(self.queue) / self.max_readings * 100))
 
-                if psi1 > self.max_psi_1:
-                    self.max_psi_1 = psi1
-                if psi2 > self.max_psi_2:
-                    self.max_psi_2 = psi2
+                if psi1 > self.max_pressures["pump 1"]:
+                    self.max_pressures["pump 1"] = psi1
+                if psi2 > self.max_pressures["pump 1"]:
+                    self.max_pressures["pump 1"] = psi2
                 logger.debug(
                     "Finished doing everything else in %s s",
                     time.time() - reading_start - collected,
@@ -291,13 +305,7 @@ class TestHandler:
             self.test.readings.append(reading)
         self.queue.clear()
         self.project.tests.append(self.test)
-        Project.dump_json(self.project)
-        logger.info(
-            "%s: Saved %s to %s",
-            self.name,
-            self.project.name.get(),
-            self.project.path.get(),
-        )
+        self.project.dump_json()
         self.load_project(path=self.project.path.get())
         # todo ask them to rebuild instead
         self.close_editors()
@@ -332,13 +340,12 @@ class TestHandler:
         # todo #14 don't do this. where is parent assigned??
         self.parent.build()
 
-    # todo give this a better name
     def close_editors(self) -> None:
         """Close all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
             self.editors.remove(window)
             window.destroy()
-        logger.info(f"{self.name} has closed all editor windows")
+        logger.info("%s has closed all editor windows", self.name)
 
     def to_log(self, msg) -> None:
         """Pass a message to the log."""

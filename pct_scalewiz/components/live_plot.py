@@ -43,7 +43,7 @@ class LivePlot(ttk.Frame):
         if self.handler.is_running.get() and not self.handler.is_done.get():
             # data access here 😳
             start = time.time()
-            logger.debug(f"{self.handler.name}: Drawing a new plot ...")
+            logger.debug("%s: Drawing a new plot ...", self.handler.name)
             with plt.style.context("bmh"):
                 self.axis.clear()
                 self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
@@ -57,12 +57,10 @@ class LivePlot(ttk.Frame):
                 pump1 = []
                 pump2 = []
                 elapsed = []  # we will share this series as an axis
-                points = len(self.handler.queue)
-                # todo there's a smarter way to enumerate over these
-                for i in range(points):
-                    pump1.append(self.handler.queue[i]["pump 1"])
-                    pump2.append(self.handler.queue[i]["pump 2"])
-                    elapsed.append(self.handler.queue[i]["elapsedMin"])
+                for reading in self.handler.queue:
+                    pump1.append(reading["pump 1"])
+                    pump2.append(reading["pump 2"])
+                    elapsed.append(reading["elapsedMin"])
                 self.axis.plot(elapsed, pump1, label="Pump 1")
                 self.axis.plot(elapsed, pump2, label="Pump 2")
                 self.axis.legend(loc=0)
@@ -70,6 +68,6 @@ class LivePlot(ttk.Frame):
                 logger.debug(
                     "%s: Drew a new plot for %s data points in %s s",
                     self.handler.name,
-                    points,
+                    len(self.handler.queue),
                     round(time.time() - start, 3),
                 )

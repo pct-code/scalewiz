@@ -10,7 +10,6 @@ from tkinter import font, ttk
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
@@ -42,17 +41,21 @@ class EvaluationFrame(BaseFrame):
     def __init__(self, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
-        # todo #8 refactor this. need to rename across all the ProjectX classes
-        self.project = handler.project
-        parent.winfo_toplevel().title(self.project.name.get())
+        self.editor_project = Project()
+        parent.winfo_toplevel().title(
+            f"{self.handler.name} {self.handler.project.name.get()}"
+        )
+        # matplotlib uses these later
+        self.fig, self.axis, self.canvas = None, None, None
+        self.plot_frame = tk.Frame(self)  # this gets destroyed in plot()
         self.build()
 
-    def trace(self) -> None:
+    def add_traces(self) -> None:
         """Applies a tkVar trace to properties on every test object."""
-        for test in self.project.tests:
-            test.label.trace("w", self.score)
-            test.pump_to_score.trace("w", self.score)
-            test.include_on_report.trace("w", self.score)
+        for test in self.editor_project.tests:
+            # test.label.trace_add("write", self.score)
+            test.pump_to_score.trace_add("write", self.score)
+            test.include_on_report.trace_add("write", self.score)
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Renders a given label and entry on the passed row."""
@@ -64,6 +67,8 @@ class EvaluationFrame(BaseFrame):
         """Destroys all child widgets, then builds the UI."""
         for child in self.winfo_children():
             child.destroy()
+
+        self.editor_project.load_json(self.handler.project.path.get())
 
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(row=0, column=0)
@@ -88,16 +93,16 @@ class EvaluationFrame(BaseFrame):
 
         self.grid_columnconfigure(0, weight=1)
         # add traces for scoring
-        self.trace()
+        self.add_traces()
 
         self.blanks = []
-        for test in self.project.tests:
+        for test in self.editor_project.tests:
             if test.is_blank.get():
                 self.blanks.append(test)
 
         # select the trials
         self.trials = []
-        for test in self.project.tests:
+        for test in self.editor_project.tests:
             if not test.is_blank.get():
                 self.trials.append(test)
 
@@ -109,12 +114,12 @@ class EvaluationFrame(BaseFrame):
         )
 
         for i, blank in enumerate(self.blanks):
-            TestResultRow(tests_frame, blank, self.project, i + 2).grid(
+            TestResultRow(tests_frame, blank, self.editor_project, i + 2).grid(
                 row=i + 1, column=0, sticky="w", padx=3, pady=1
             )
         count = len(self.blanks)
         for i, trial in enumerate(self.trials):
-            TestResultRow(tests_frame, trial, self.project, i + count + 3).grid(
+            TestResultRow(tests_frame, trial, self.editor_project, i + count + 3).grid(
                 row=i + count + 3, column=0, sticky="w", padx=3, pady=1
             )
 
@@ -139,7 +144,7 @@ class EvaluationFrame(BaseFrame):
         ttk.Button(
             button_frame,
             text="Export",
-            command=lambda: export_csv(self.project),
+            command=lambda: export_csv(self.editor_project),
             width=10,
         ).grid(row=0, column=1, padx=5)
         button_frame.grid(row=1, column=0, pady=5)
@@ -150,10 +155,8 @@ class EvaluationFrame(BaseFrame):
         """Destroys the old plot frame if it exists, then makes a new one."""
         # close all pyplots to prevent memory leak
         plt.close("all")
-        # get rid of our old plot tab if we have one
-        if hasattr(self, "plot_frame"):
-            self.plot_frame.destroy()
-
+        # get rid of our old plot tab
+        self.plot_frame.destroy()
         self.plot_frame = ttk.Frame(self.tab_control)
         self.fig, self.axis = plt.subplots(figsize=(7.5, 4), dpi=100)
         self.fig.patch.set_facecolor("#FAFAFA")
@@ -190,9 +193,9 @@ class EvaluationFrame(BaseFrame):
 
             self.axis.set_xlabel("Time (min)")
             self.axis.set_ylabel("Pressure (psi)")
-            self.axis.set_ylim(top=self.project.limit_psi.get())
+            self.axis.set_ylim(top=self.editor_project.limit_psi.get())
             self.axis.yaxis.set_major_locator(MultipleLocator(100))
-            self.axis.set_xlim((0, self.project.limit_minutes.get()))
+            self.axis.set_xlim((0, self.editor_project.limit_minutes.get()))
             self.axis.legend(loc=0)
             self.axis.margins(0)
             plt.tight_layout()
@@ -205,137 +208,135 @@ class EvaluationFrame(BaseFrame):
         """Saves to file the project, most recent plot, and calculations log."""
         # update image
         output_path = (
-            f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} "
+            f"{self.editor_project.numbers.get().replace(' ', '')} "
+            f"{self.editor_project.name.get()} "
             "Scale Block Analysis (Graph).png"
         )
         output_path = os.path.join(
-            os.path.dirname(self.project.path.get()), output_path
+            os.path.dirname(self.editor_project.path.get()), output_path
         )
         self.fig.savefig(output_path)
-        self.project.plot.set(output_path)  # store this path so we can find it later
+        self.editor_project.plot.set(
+            output_path
+        )  # store this path so we can find it later
         # update log
         output_path = (
-            f"{self.project.numbers.get().replace(' ', '')} {self.project.name.get()} "
+            f"{self.editor_project.numbers.get().replace(' ', '')} "
+            f"{self.editor_project.name.get()} "
             "Scale Block Analysis (Log).txt"
         )
         output_path = os.path.join(
-            os.path.dirname(self.project.path.get()), output_path
+            os.path.dirname(self.editor_project.path.get()), output_path
         )
         with open(output_path, "w") as file:
             file.write(self.log_text.get("1.0", "end-1c"))
 
-        Project.dump_json(self.project, self.project.path.get())
-        self.handler.project = self.project = Project.load_json(self.project.path.get())
+        self.editor_project.dump_json()
+        self.handler.project.load_json(self.editor_project.path.get())
 
         self.build()
 
     def score(self, *args) -> None:
         """Updates the result for every Test in the Project.
-        
+
         Accepts event args passed from the tkVar trace.
         """
         # extra unused args are passed in by tkinter
         start_time = time.time()
-        self.log = []
+        log = []
         # scoring props
-
         max_readings = round(
-            self.project.limit_minutes.get() * 60 / self.project.interval.get()
+            self.editor_project.limit_minutes.get()
+            * 60
+            / self.editor_project.interval.get()
+            + 1
         )
-        self.log.append("Max readings: limitMin * 60 / reading interval")
-        self.log.append(f"Max readings: {max_readings}")
-        baseline_area = round(self.project.baseline.get() * max_readings)
-        self.log.append("Baseline area: baseline PSI * max readings")
-        self.log.append(
-            f"Baseline area: {self.project.baseline.get()} * {max_readings}"
+        log.append("Max readings: limitMin * 60 / reading interval")
+        log.append(f"Max readings: {max_readings}")
+        baseline_area = round(self.editor_project.baseline.get() * max_readings)
+        log.append("Baseline area: baseline PSI * max readings")
+        log.append(
+            f"Baseline area: {self.editor_project.baseline.get()} * {max_readings}"
         )
-        self.log.append(f"Baseline area: {baseline_area}")
-        self.log.append("-" * 80)
-        self.log.append("")
+        log.append(f"Baseline area: {baseline_area}")
+        log.append("-" * 80)
+        log.append("")
 
         # select the blanks
         blanks = []
-        for test in self.project.tests:
+        for test in self.editor_project.tests:
             if test.is_blank.get() and test.include_on_report.get():
                 blanks.append(test)
 
-        if len(blanks) < 1:
-            return
-
         areas_over_blanks = []
         for blank in blanks:
-            self.log.append(f"Evaluating {blank.name.get()}")
-            self.log.append(f"Considering data: {blank.pump_to_score.get()}")
+            log.append(f"Evaluating {blank.name.get()}")
+            log.append(f"Considering data: {blank.pump_to_score.get()}")
             readings = blank.get_readings()
-            self.log.append(f"Total readings: {len(readings)}")
+            log.append(f"Total readings: {len(readings)}")
             int_psi = sum(readings)
-            self.log.append("Integral PSI: sum of all pressure readings")
-            self.log.append(f"Integral PSI: {int_psi}")
-            area = self.project.limit_psi.get() * len(readings) - int_psi
-            self.log.append("Area over blank: limit_psi * # of readings - integral PSI")
-            self.log.append(
-                f"Area over blank: {self.project.limit_psi.get()} * {len(readings)} - {int_psi}"
+            log.append("Integral PSI: sum of all pressure readings")
+            log.append(f"Integral PSI: {int_psi}")
+            area = self.editor_project.limit_psi.get() * len(readings) - int_psi
+            log.append("Area over blank: limit_psi * # of readings - integral PSI")
+            log.append(
+                f"Area over blank: {self.editor_project.limit_psi.get()} "
+                f"* {len(readings)} - {int_psi}"
             )
-            self.log.append(f"Area over blank: {area}")
-            self.log.append("")
+            log.append(f"Area over blank: {area}")
+            log.append("")
             areas_over_blanks.append(area)
 
         # get protectable area
         avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
-        self.log.append(f"Avg. area over blanks: {avg_blank_area}")
+        log.append(f"Avg. area over blanks: {avg_blank_area}")
         avg_protectable_area = (
-            self.project.limit_psi.get() * max_readings - avg_blank_area
+            self.editor_project.limit_psi.get() * max_readings - avg_blank_area
         )
-        self.log.append(
+        log.append(
             "Avg. protectable area: limit_psi * max_readings - avg. area over blanks"
         )
-        self.log.append(
-            f"Avg. protectable area: {self.project.limit_psi.get()} * {max_readings} - {avg_blank_area}"
+        log.append(
+            f"Avg. protectable area: {self.editor_project.limit_psi.get()} "
+            f"* {max_readings} - {avg_blank_area}"
         )
-        self.log.append(f"Avg. protectable area: {avg_protectable_area}")
-        self.log.append("-" * 80)
-        self.log.append("")
+        log.append(f"Avg. protectable area: {avg_protectable_area}")
+        log.append("-" * 80)
+        log.append("")
 
         # select trials
         trials = []
-        for test in self.project.tests:
+        for test in self.editor_project.tests:
             if not test.is_blank.get():
                 trials.append(test)
 
         # get readings
         for trial in trials:
-            self.log.append(f"Evaluating {trial.name.get()}")
-            self.log.append(f"Considering data: {trial.pump_to_score.get()}")
+            log.append(f"Evaluating {trial.name.get()}")
+            log.append(f"Considering data: {trial.pump_to_score.get()}")
             readings = trial.get_readings()
-            self.log.append(f"Total readings: {len(readings)}")
+            log.append(f"Total readings: {len(readings)}")
             int_psi = sum(readings) + (
-                (max_readings - len(readings)) * self.project.limit_psi.get()
+                (max_readings - len(readings)) * self.editor_project.limit_psi.get()
             )
-            self.log.append("Integral PSI: sum of all pressure readings")
-            self.log.append(f"Integral PSI: {int_psi}")
+            log.append("Integral PSI: sum of all pressure readings")
+            log.append(f"Integral PSI: {int_psi}")
             result = round(1 - (int_psi - baseline_area) / avg_protectable_area, 3)
-            self.log.append(
+            log.append(
                 "Result: 1 - (integral PSI - baseline area) / avg protectable area"
             )
-            self.log.append(
+            log.append(
                 f"Result: 1 - ({int_psi} - {baseline_area}) / {avg_protectable_area}"
             )
-            self.log.append(f"Result: {result}")
-            self.log.append("")
+            log.append(f"Result: {result} \n")
             trial.result.set(result)
 
         self.plot()
-        self.log.append("-" * 80)
 
-        self._log = self.log
-        self.log = []
-        self.log.append(f"Evaluating results for {self.project.name.get()}...")
-        self.log.append("")
-        self.log.append(f"Finished in {round(time.time() - start_time, 3)} s")
-        self.log.append("-" * 80)
-        self.log.append("")
-        self.log = self.log + self._log
-        self.to_log(self.log)
+        log.insert(0, f"Evaluating results for {self.editor_project.name.get()}... \n")
+        log.insert(0, f"Finished in {round(time.time() - start_time, 3)} s")
+        log.insert(0, "-" * 80 + "\n")
+        self.to_log(log)
 
     def to_log(self, log: list[str]) -> None:
         """Adds the passed log message to the Text widget in the Calculations frame."""

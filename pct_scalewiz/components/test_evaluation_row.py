@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 import tkinter as tk
-from tkinter import messagebox, ttk
 import typing
+from tkinter import messagebox, ttk
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.test import Test
     from pct_scalewiz.models.project import Project
+    from pct_scalewiz.models.test import Test
 
 
 class TestResultRow(ttk.Frame):
@@ -18,6 +18,8 @@ class TestResultRow(ttk.Frame):
     ) -> None:
         ttk.Frame.__init__(self, parent)
         self.test = test
+        # the immediate parent will be a frame "tests_frame" in the EvaluationFrame
+        # self.parent.master refers to the EvaluationFrame itself
         self.parent = parent
         self.project = project
         self.row = row
@@ -28,8 +30,16 @@ class TestResultRow(ttk.Frame):
         cols: list[tk.Widget] = []
         # col 0 - name
         cols.append(ttk.Label(self.parent, textvariable=self.test.name))
-        # col 1 - report as
-        cols.append(ttk.Entry(self.parent, textvariable=self.test.label, width=25))
+        # col 1 - label
+        cols.append(
+            ttk.Entry(
+                self.parent,
+                textvariable=self.test.label,
+                width=25,
+                validate="focusout",
+                validatecommand=self.update_score,
+            )
+        )
         # col 2 - duration
         duration = round(len(self.test.readings) * self.project.interval.get() / 60, 2)
         cols.append(
@@ -105,4 +115,10 @@ class TestResultRow(ttk.Frame):
         remove = messagebox.askyesno("Delete test", msg)
         if remove and self.test in self.project.tests:
             self.project.tests.remove(self.test)
+            print(type(self.parent.master))
             self.parent.master.build()
+
+    def update_score(self, *args) -> True:
+        """Method to call score from a validation callback. Doesn't check anything."""
+        self.parent.master.score()
+        return True

@@ -3,7 +3,7 @@
 #4 support for program settings stored in TOML or similar
 #6 entry validation in experiment params (ints/doubles)
 #7 refactor state management in the test handler
-#8 refactor that Project vs editorProject silliness 
+#8 refactor that Project vs editor_project silliness 
 #9 port over the old chlorides / ppm calculators
 
 

@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import logging
 import tkinter as tk
-from tkinter import ttk
 import typing
+from tkinter import ttk
 
 import matplotlib.pyplot as plt
 import serial.tools.list_ports as list_ports
@@ -31,20 +31,20 @@ class TestHandlerView(BaseFrame):
         self.devices_list = []
         self.build()
 
-    def set_bindings(self) -> None:
+    def add_traces(self) -> None:
         """Sets tkVar bindings for attributes on the current TestHandler."""
-        self.handler.test.is_blank.trace("w", self.update_test_type)
-        self.handler.is_running.trace("w", self.update_input_frame)
-        self.handler.is_done.trace("w", self.update_start_button)
-        self.handler.dev1.trace("w", self.update_devices_list)
-        self.handler.dev2.trace("w", self.update_devices_list)
+        self.handler.test.is_blank.trace_add("write", self.update_test_type)
+        self.handler.is_running.trace_add("write", self.update_input_frame)
+        self.handler.is_done.trace_add("write", self.update_start_button)
+        self.handler.dev1.trace_add("write", self.update_devices_list)
+        self.handler.dev2.trace_add("write", self.update_devices_list)
 
     def build(self) -> None:
         """Builds the UI, destroying any currently existing widgets."""
         for child in self.winfo_children():
             child.destroy()
 
-        self.set_bindings()
+        self.add_traces()
         # use this list to hold refs so we can easily disable later
         self.inputs = []
         self.inputs_frame = ttk.Frame(self)

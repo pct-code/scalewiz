@@ -23,6 +23,7 @@ class TeledynePump:
             response = self.port.readline().decode()
             psi = response.split(",")[1][:-1]
             return int(psi)
+        # pylint: disable=broad-except
         except Exception as error:
             if self.logger is not None:
                 self.logger.critical("Reading failed on %s", self.port.port)

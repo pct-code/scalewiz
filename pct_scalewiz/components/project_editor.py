@@ -25,12 +25,9 @@ class ProjectEditor(BaseFrame):
     def __init__(self, parent: tk.Toplevel, handler: TestHandler) -> None:
         BaseFrame.__init__(self, parent)
         self.handler = handler
-        self.grid_columnconfigure(0, weight=1)
+        self.editor_project = Project()
         if os.path.isfile(handler.project.path.get()):
-            self.editorProject = Project.load_json(handler.project.path.get())
-            self.editorProject.path.set(handler.project.path.get())
-        else:
-            self.editorProject = Project()
+            self.editor_project.load_json(handler.project.path.get())
         self.build()
 
     def build(self) -> None:
@@ -38,9 +35,9 @@ class ProjectEditor(BaseFrame):
         for child in self.winfo_children():
             child.destroy()
 
+        self.grid_columnconfigure(0, weight=1)
         tab_control = ttk.Notebook(self)
         tab_control.grid(row=0, column=0)
-
         tab_control.add(ProjectInfo(self), text="Project info")
         tab_control.add(ProjectParams(self), text="Experiment parameters")
         tab_control.add(ProjectReport(self), text="Report settings")
@@ -65,16 +62,16 @@ class ProjectEditor(BaseFrame):
 
     def new(self) -> None:
         """Resets the form by connecting to a new Project."""
-        self.editorProject = Project()
+        self.editor_project = Project()
         self.build()
 
     def save(self) -> None:
         """Save the current Project to file as JSON."""
-        if self.editorProject.path.get() == "":
+        if self.editor_project.path.get() == "":
             self.save_as()
         else:
-            Project.dump_json(self.editorProject)
-            self.handler.project = Project.load_json(self.editorProject.path.get())
+            self.editor_project.dump_json()
+            self.handler.project.load_json(self.editor_project.path.get())
             self.handler.parent.build()
 
     def save_as(self) -> None:
@@ -82,7 +79,7 @@ class ProjectEditor(BaseFrame):
         file_path = filedialog.asksaveasfilename(
             title="Save Project As:",
             filetypes=[("JSON files", "*.json")],
-            initialfile=f"{self.editorProject.name.get()}.json",
+            initialfile=f"{self.editor_project.name.get()}.json",
         )
 
         if file_path != "":
@@ -90,5 +87,5 @@ class ProjectEditor(BaseFrame):
             ext = file_path[-5:]
             if not ext in (".json", ".JSON"):
                 file_path = f"{file_path}.json"
-            self.editorProject.path.set(file_path)
+            self.editor_project.path.set(file_path)
             self.save()

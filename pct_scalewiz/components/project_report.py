@@ -15,7 +15,7 @@ class ProjectReport(ttk.Frame):
         ent = ttk.Combobox(
             self,
             values=["JSON", "CSV"],
-            textvariable=parent.editorProject.output_format,
+            textvariable=parent.editor_project.output_format,
         )
 
         parent.render(lbl, ent, 0)

@@ -1,12 +1,10 @@
 """Core object for the application."""
 
-# utils
 import logging
 import os
 import tkinter as tk
 from tkinter import font, ttk
 
-# internal
 from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.log_frame import LogFrame
 from pct_scalewiz.components.main_frame import MainFrame
@@ -42,11 +40,10 @@ class ScaleWiz(BaseFrame):
         ttk.Style().configure("TNotebook", background="#FAFAFA")
         ttk.Style().configure("TNotebook.Tab", font=bold_font)
 
-        # todo this seems inelegant
         # holding a ref to the toplevel for the menubar to find
         self.log_window = tk.Toplevel(self)
         LogFrame(self.log_window, Logger()).grid()
         logging.getLogger("scalewiz").info("Starting in %s", os.getcwd())
         self.log_window.withdraw()  # 🏌️‍♀️👋
-
-        MainFrame(self).grid()  # this will hijack the window closing protocol
+        # this will hijack the window closing protocol
+        MainFrame(self).grid()

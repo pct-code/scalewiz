@@ -2,17 +2,15 @@
 
 from __future__ import annotations
 
-# util
 import logging
 import os
 import tkinter as tk
-from tkinter import messagebox
 import typing
+from tkinter import messagebox
 
-# internal
-from pct_scalewiz.components.evaluation_frame import EvaluationFrame
-from pct_scalewiz.components.project_editor import ProjectEditor
 from pct_scalewiz.components.rinse_frame import RinseFrame
+from pct_scalewiz.helpers.evaluate_project import evaluate_project
+from pct_scalewiz.helpers.modify_project import modify_project
 from pct_scalewiz.helpers.show_help import show_help
 
 if typing.TYPE_CHECKING:
@@ -60,19 +58,19 @@ class MenuBar:
         """Requests to open an editor window for the currently selected Project."""
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        self.modify_project(widget.handler)
+        modify_project(widget.handler)
 
     def request_eval_window(self) -> None:
         """Requests to open an evalutaion window for the currently selected Project."""
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        if not os.path.isfile(widget.handler.project.path.get()):
+        if os.path.isfile(widget.handler.project.path.get()):
+            evaluate_project(widget.handler)
+        else:
             messagebox.showwarning(
                 "No Project File",
                 "The requested Project file has not yet been saved, or is missing",
             )
-        else:
-            self.evaluate_project(widget.handler)
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
@@ -92,40 +90,3 @@ class MenuBar:
         window.resizable(0, 0)
 
     # todo move close editors method off of testhandler
-
-    def modify_project(self, handler: TestHandler) -> None:
-        """Opens a ProjectEditor to modify the current Project."""
-        if len(handler.editors) > 0:
-            messagebox.showwarning(
-                "Project is locked", "Can't modify a Project while it is being accessed"
-            )
-            return
-        window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", lambda: handler.close_editors())
-        window.resizable(0, 0)
-        handler.editors.append(window)
-        editor = ProjectEditor(window, handler)
-        editor.grid()
-        logger.info(
-            f"{handler.name}: Opened an editor window for {handler.project.name.get()}"
-        )
-
-    def evaluate_project(self, handler: TestHandler):
-        """Opens a Toplevel with an Evaluation Frame for current Project."""
-        if len(handler.editors) > 0:
-            messagebox.showwarning(
-                "Project is locked", "Can't modify a Project while it is being accessed"
-            )
-            return
-        window = tk.Toplevel()
-        window.protocol("WM_DELETE_WINDOW", lambda: handler.close_editors())
-        window.resizable(0, 0)
-        # todo #16 try passing in the editor itself. then can rebuild it or winfo_toplevel.destroy()
-        handler.editors.append(window)
-        editor = EvaluationFrame(window, handler)
-        editor.grid()
-        logger.info(
-            "%s: Opened an evaluation window for %s",
-            handler.name,
-            handler.project.name.get(),
-        )

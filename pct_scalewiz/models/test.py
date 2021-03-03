@@ -10,7 +10,6 @@ class Test:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
-        # serializable props
         self.is_blank = tk.BooleanVar()
         self.name = tk.StringVar()
         self.chemical = tk.StringVar()
@@ -25,12 +24,11 @@ class Test:
         self.max_psi = tk.IntVar()
         self.observed_baseline = tk.IntVar()
 
-        self.chemical.trace("w", self.make_name)
-        self.rate.trace("w", self.make_name)
-        self.name.trace("w", self.make_label)
-        self.pump_to_score.trace("w", self.set_observed_baseline)
+        self.chemical.trace_add("write", self.make_name)
+        self.rate.trace_add("write", self.make_name)
+        self.name.trace_add("write", self.make_label)
+        self.pump_to_score.trace_add("write", self.set_observed_baseline)
 
-        # todo abstract this out to some TOML
         self.pump_to_score.set("pump 1")
         self.is_blank.set(True)
 
@@ -52,7 +50,7 @@ class Test:
             self.observed_baseline.set(round(sum(baselines) / 4))
 
     def dump_json(self) -> dict:
-        """Returns a dict represendation of a Test."""
+        """Returns a dict representation of a Test."""
         return {
             "name": self.name.get(),
             "isBlank": self.is_blank.get(),

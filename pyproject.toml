@@ -24,6 +24,7 @@ black = "^20.8b1"
 pylint = "^2.7.1"
 rope = "^0.18.0"
 mypy = "^0.812"
+isort = "^5.7.0"
 
 [tool.black]
 line-length = 88
@@ -39,6 +40,9 @@ output-format = "colorized"
 
 [tool.pylint.format]
 max-line-length = 88
+
+[tool.pylint.similarities]
+ignore-imports = "yes"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
