@@ -115,7 +115,6 @@ class TestResultRow(ttk.Frame):
         remove = messagebox.askyesno("Delete test", msg)
         if remove and self.test in self.project.tests:
             self.project.tests.remove(self.test)
-            print(type(self.parent.master))
             self.parent.master.build()
 
     def update_score(self, *args) -> True:

@@ -42,6 +42,7 @@ class EvaluationFrame(BaseFrame):
         BaseFrame.__init__(self, parent)
         self.handler = handler
         self.editor_project = Project()
+        self.editor_project.load_json(self.handler.project.path.get())
         parent.winfo_toplevel().title(
             f"{self.handler.name} {self.handler.project.name.get()}"
         )
@@ -67,8 +68,6 @@ class EvaluationFrame(BaseFrame):
         """Destroys all child widgets, then builds the UI."""
         for child in self.winfo_children():
             child.destroy()
-
-        self.editor_project.load_json(self.handler.project.path.get())
 
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(row=0, column=0)
@@ -286,6 +285,9 @@ class EvaluationFrame(BaseFrame):
             log.append(f"Area over blank: {area}")
             log.append("")
             areas_over_blanks.append(area)
+
+        if len(areas_over_blanks) == 0:
+            return
 
         # get protectable area
         avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
