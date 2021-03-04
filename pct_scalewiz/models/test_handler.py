@@ -223,7 +223,7 @@ class TestHandler:
                 self.to_log(msg)
                 logger.info("%s - %s", self.name, msg)
 
-                # todo this is janky
+                # todo use a real Queue ??
                 self.queue.append(reading)
 
                 self.elapsed.set(f"{minutes_elapsed:.2f} min.")

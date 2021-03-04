@@ -64,7 +64,6 @@ class Project:
         self.limit_minutes.set(90)
         self.interval.set(3)
         self.uptake.set(60)
-        # todo clean out this old template stuff ?
         self.output_format.set("CSV")
 
     def make_name(self, *args) -> None:

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import logging
-import os
 import tkinter as tk
-import typing
 
 from pct_scalewiz.components.evaluation_window import EvaluationWindow
 from pct_scalewiz.components.project_window import ProjectWindow

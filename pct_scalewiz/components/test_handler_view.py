@@ -188,8 +188,8 @@ class TestHandlerView(ttk.Frame):
         self.log_text = tk.scrolledtext.ScrolledText(
             self.log_frame, background="white", height=5, width=44, state="disabled"
         )
-        # todo alert alert this is not elegant
-        self.handler.log_text = self.log_text  # this is bad ?
+        # todo this is not elegant
+        self.handler.log_text = self.log_text
         self.log_text.grid(sticky="ew")
 
         self.update_test_type()
