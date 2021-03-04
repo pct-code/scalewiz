@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
-from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.test_evaluation_row import TestResultRow
 from pct_scalewiz.helpers.export_csv import export_csv
+from pct_scalewiz.helpers.set_icon import set_icon
 from pct_scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
@@ -35,17 +35,15 @@ COLORS = [
 ]
 
 
-class EvaluationFrame(BaseFrame):
+class EvaluationWindow(tk.Toplevel):
     """Frame for analyzing data."""
 
-    def __init__(self, parent: tk.Toplevel, handler: TestHandler) -> None:
-        BaseFrame.__init__(self, parent)
+    def __init__(self, handler: TestHandler) -> None:
+        tk.Toplevel.__init__(self)
         self.handler = handler
         self.editor_project = Project()
-        self.editor_project.load_json(self.handler.project.path.get())
-        parent.winfo_toplevel().title(
-            f"{self.handler.name} {self.handler.project.name.get()}"
-        )
+        if os.path.isfile(self.handler.project.path.get()):
+            self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
         self.plot_frame = tk.Frame(self)  # this gets destroyed in plot()
@@ -64,8 +62,15 @@ class EvaluationFrame(BaseFrame):
         label.grid(row=row, column=0, sticky="e")
         entry.grid(row=row, column=1, sticky="new", padx=(5, 550), pady=2)
 
-    def build(self) -> None:
+    def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
+        if reload:
+            self.editor_project = Project()
+            self.editor_project.load_json(self.handler.project.path.get())
+
+        self.title(f"{self.handler.name} {self.handler.project.name.get()}")
+        set_icon(self)
+
         for child in self.winfo_children():
             child.destroy()
 
@@ -288,7 +293,6 @@ class EvaluationFrame(BaseFrame):
 
         if len(areas_over_blanks) == 0:
             return
-
         # get protectable area
         avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
         log.append(f"Avg. area over blanks: {avg_blank_area}")

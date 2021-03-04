@@ -1,4 +1,5 @@
 """Form for mutating Project objects."""
+
 from __future__ import annotations
 
 import os.path
@@ -10,31 +11,39 @@ from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.project_info import ProjectInfo
 from pct_scalewiz.components.project_params import ProjectParams
 from pct_scalewiz.components.project_report import ProjectReport
+from pct_scalewiz.helpers.set_icon import set_icon
 from pct_scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
     from pct_scalewiz.models.test_handler import TestHandler
 
 
-class ProjectEditor(BaseFrame):
+class ProjectWindow(tk.Toplevel):
     """Form for mutating Project objects.
 
     Has a tab control widget for separating the sub-forms.
     """
 
-    def __init__(self, parent: tk.Toplevel, handler: TestHandler) -> None:
-        BaseFrame.__init__(self, parent)
+    def __init__(self, handler: TestHandler) -> None:
+        tk.Toplevel.__init__(self)
         self.handler = handler
         self.editor_project = Project()
         if os.path.isfile(handler.project.path.get()):
             self.editor_project.load_json(handler.project.path.get())
         self.build()
 
-    def build(self) -> None:
-        """Render the UI."""
+    def build(self, reload: bool = False) -> None:
+        """Destroys all child widgets, then builds the UI."""
+        if reload:
+            self.editor_project = Project()
+            self.editor_project.load_json(self.handler.project.path.get())
+
+        self.title(f"{self.handler.name} {self.handler.project.name.get()}")
+        set_icon(self)
         for child in self.winfo_children():
             child.destroy()
 
+        self.winfo_toplevel().resizable(0, 0)
         self.grid_columnconfigure(0, weight=1)
         tab_control = ttk.Notebook(self)
         tab_control.grid(row=0, column=0)
