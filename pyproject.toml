@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pct-scalewiz"
-version = "0.1.0"
+version = "0.2.0"
 description = "A graphical user interface designed to work with Teledyne SSI MX-class HPLC pumps."
 authors = ["Alex Whittington <alex@southsun.tech>"]
 packages = [

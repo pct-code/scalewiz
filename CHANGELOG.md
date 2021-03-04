@@ -8,19 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - clicking a date entry label in the 'Project info' view will clear its contents
  - report export as CSV (default)
- - report export as JSON 
+ - report export as JSON (not human readable)
+ - more descriptive window titles
 ### Changed
  - rinse windows will be titled after the system they control
  - requests for rinse cycles will be ignored if a test is already running
  - the Live Plot stops updating (clearing itself) at the end of a test
  - evaluation windows will title themselves after their test handler and project
  - minor performance improvement to evaluation window
+ - refactored project editor window / evaluation window
+ - linting
 ### Fixed
  - observed baseline pressure reporting
 ### Removed
  - dependency on openpyxl
  - dependency on PIL
- - ability to export report as .xlsx
+ - ability to export report as .xlsx directly
  - redundant tabs from EvaluationFrame
 
 ## [v0.1.0]
