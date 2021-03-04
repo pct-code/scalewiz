@@ -3,24 +3,24 @@
 import logging
 import os
 import tkinter as tk
+from importlib.metadata import version
 from tkinter import font, ttk
 
-from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.log_frame import LogFrame
 from pct_scalewiz.components.main_frame import MainFrame
 from pct_scalewiz.models.logger import Logger
 
 
-class ScaleWiz(BaseFrame):
+class ScaleWiz(ttk.Frame):
     """Core object for the application."""
 
     def __init__(self, parent):
         # expects the parent to be the root Tk object (and/or it's assoc. toplevel...?)
-        BaseFrame.__init__(self, parent)
+        ttk.Frame.__init__(self, parent)
 
         # set UI
         # icon / version
-        parent.title("")
+        parent.title(f"ScaleWiz {version('pct_scalewiz')}")
         parent.resizable(0, 0)  # apparently this is a bad practice...
 
         # font 🔠

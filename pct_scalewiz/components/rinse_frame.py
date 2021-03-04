@@ -11,11 +11,11 @@ from pct_scalewiz.components.base_frame import BaseFrame
 logger = logging.getLogger("pct-scalewiz")
 
 
-class RinseFrame(BaseFrame):
+class RinseFrame(ttk.Frame):
     """Simple frame that starts and stops the pumps on a timer."""
 
     def __init__(self, handler, window) -> None:
-        BaseFrame.__init__(self, window)
+        ttk.Frame.__init__(self, window)
         window.protocol("WM_DELETE_WINDOW", self.close)
         self.window = window
         self.handler = handler

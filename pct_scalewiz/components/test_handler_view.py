@@ -1,4 +1,5 @@
 """A Tkinter widget for handling tests."""
+
 from __future__ import annotations
 
 import logging
@@ -9,7 +10,6 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 import serial.tools.list_ports as list_ports
 
-from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.live_plot import LivePlot
 
 if typing.TYPE_CHECKING:
@@ -20,11 +20,11 @@ logger = logging.getLogger("scalewiz")
 # todo #1 these frames should probably be separated into separate classes
 
 
-class TestHandlerView(BaseFrame):
+class TestHandlerView(ttk.Frame):
     """A form for setting up / running Tests."""
 
-    def __init__(self, parent: BaseFrame, handler: TestHandler) -> None:
-        BaseFrame.__init__(self, parent)
+    def __init__(self, parent: ttk.Frame, handler: TestHandler) -> None:
+        ttk.Frame.__init__(self, parent)
         self.parent = parent
         self.handler = handler
         self.handler.parent = self

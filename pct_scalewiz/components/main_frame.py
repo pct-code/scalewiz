@@ -5,7 +5,6 @@ import logging
 import sys
 from tkinter import ttk
 
-from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.menu_bar import MenuBar
 from pct_scalewiz.components.test_handler_view import TestHandlerView
 from pct_scalewiz.models.test_handler import TestHandler
@@ -13,11 +12,11 @@ from pct_scalewiz.models.test_handler import TestHandler
 logger = logging.getLogger("scalewiz")
 
 
-class MainFrame(BaseFrame):
+class MainFrame(ttk.Frame):
     """Main Frame for the application."""
 
     def __init__(self, parent):
-        BaseFrame.__init__(self, parent)
+        ttk.Frame.__init__(self, parent)
         # hijack closing protocol
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
         self.build()

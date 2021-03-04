@@ -57,9 +57,6 @@ class TestHandler:
         self.is_running = tk.BooleanVar()
         self.is_done = tk.BooleanVar()
 
-        # logging
-        # todo add handler here and set to a file in logs/ next to the project.json
-
     def can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
         return (
@@ -81,7 +78,7 @@ class TestHandler:
             )
 
         if path != "":
-            self.close_editors()
+            self.rebuild_editors()
             self.project.load_json(path)
             logger.info("Loaded %s to %s", self.project.name.get(), self.name)
 
@@ -140,7 +137,7 @@ class TestHandler:
             return
 
         # close any open editors
-        self.close_editors()
+        self.rebuild_editors()
         self.stop_requested = False
         self.is_done.set(False)
         self.is_running.set(True)
@@ -307,8 +304,7 @@ class TestHandler:
         self.project.tests.append(self.test)
         self.project.dump_json()
         self.load_project(path=self.project.path.get())
-        # todo ask them to rebuild instead
-        self.close_editors()
+        self.rebuild_editors()
 
     def setup_pumps(self) -> None:
         """Set up the pumps with some default values."""
@@ -340,12 +336,11 @@ class TestHandler:
         # todo #14 don't do this. where is parent assigned??
         self.parent.build()
 
-    def close_editors(self) -> None:
-        """Close all open Toplevels that could overwrite the Project file."""
+    def rebuild_editors(self) -> None:
+        """Rebuild all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
-            self.editors.remove(window)
-            window.destroy()
-        logger.info("%s has closed all editor windows", self.name)
+            window.build(reload=True)
+        logger.info("%s has rebuilt all editor windows", self.name)
 
     def to_log(self, msg) -> None:
         """Pass a message to the log."""

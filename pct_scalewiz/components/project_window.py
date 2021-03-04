@@ -7,7 +7,6 @@ import tkinter as tk
 import typing
 from tkinter import filedialog, ttk
 
-from pct_scalewiz.components.base_frame import BaseFrame
 from pct_scalewiz.components.project_info import ProjectInfo
 from pct_scalewiz.components.project_params import ProjectParams
 from pct_scalewiz.components.project_report import ProjectReport
