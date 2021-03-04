@@ -234,8 +234,8 @@ class TestHandler:
 
                 if psi1 > self.max_pressures["pump 1"]:
                     self.max_pressures["pump 1"] = psi1
-                if psi2 > self.max_pressures["pump 1"]:
-                    self.max_pressures["pump 1"] = psi2
+                if psi2 > self.max_pressures["pump 2"]:
+                    self.max_pressures["pump 2"] = psi2
                 logger.debug(
                     "Finished doing everything else in %s s",
                     time.time() - reading_start - collected,
