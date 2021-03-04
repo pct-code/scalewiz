@@ -9,6 +9,7 @@ from tkinter import font, ttk
 from pct_scalewiz.components.log_frame import LogFrame
 from pct_scalewiz.components.main_frame import MainFrame
 from pct_scalewiz.models.logger import Logger
+from pct_scalewiz.helpers.set_icon import set_icon
 
 
 class ScaleWiz(ttk.Frame):
@@ -20,6 +21,7 @@ class ScaleWiz(ttk.Frame):
 
         # set UI
         # icon / version
+        set_icon(parent)
         parent.title(f"ScaleWiz {version('pct_scalewiz')}")
         parent.resizable(0, 0)  # apparently this is a bad practice...
 
