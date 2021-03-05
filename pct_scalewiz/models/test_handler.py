@@ -194,7 +194,7 @@ class TestHandler:
 
         self.to_log("")
         interval = self.project.interval.get()
-        snooze = round(interval * 0.8, 2)
+        snooze = round(interval * 0.9, 2)
 
         test_start_time = time.monotonic()
         reading_start = test_start_time - interval
