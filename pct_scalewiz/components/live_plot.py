@@ -29,6 +29,13 @@ class LivePlot(ttk.Frame):
         # matplotlib objects
         fig, self.axis = plt.subplots(figsize=(5, 3), dpi=100)
         fig.patch.set_facecolor("#FAFAFA")
+        self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
+        self.axis.set_facecolor("w")
+        # self.axis.set_ylim(top=self.handler.project.limit_psi.get())
+        # self.axis.yaxis.set_major_locator(MultipleLocator(100))
+        # self.axis.set_xlim((0, None), auto=True)
+        self.axis.margins(0)
+        plt.tight_layout()
         plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
         self.canvas = FigureCanvasTkAgg(fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
@@ -46,14 +53,8 @@ class LivePlot(ttk.Frame):
             logger.debug("%s: Drawing a new plot ...", self.handler.name)
             with plt.style.context("bmh"):
                 self.axis.clear()
-                self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-                self.axis.set_facecolor("w")
                 self.axis.set_xlabel("Time (min)")
                 self.axis.set_ylabel("Pressure (psi)")
-                self.axis.set_ylim(top=self.handler.project.limit_psi.get())
-                self.axis.yaxis.set_major_locator(MultipleLocator(100))
-                self.axis.set_xlim((0, None), auto=True)
-                self.axis.margins(0)
                 pump1 = []
                 pump2 = []
                 elapsed = []  # we will share this series as an axis
@@ -64,7 +65,6 @@ class LivePlot(ttk.Frame):
                 self.axis.plot(elapsed, pump1, label="Pump 1")
                 self.axis.plot(elapsed, pump2, label="Pump 2")
                 self.axis.legend(loc=0)
-                plt.tight_layout()
                 logger.debug(
                     "%s: Drew a new plot for %s data points in %s s",
                     self.handler.name,
