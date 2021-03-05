@@ -343,7 +343,8 @@ class TestHandler:
     def rebuild_editors(self) -> None:
         """Rebuild all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
-            window.build(reload=True)
+            if isinstance(window, tk.Toplevel)
+                window.build(reload=True)
         logger.info("%s has rebuilt all editor windows", self.name)
 
     def to_log(self, msg) -> None:
