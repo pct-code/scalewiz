@@ -194,7 +194,7 @@ class TestHandler:
 
         self.to_log("")
         interval = self.project.interval.get()
-        snooze = round(interval * 0.9, 2)
+        snooze = round(interval * 0.8, 2)
 
         test_start_time = time.monotonic()
         reading_start = test_start_time - interval
@@ -343,7 +343,7 @@ class TestHandler:
     def rebuild_editors(self) -> None:
         """Rebuild all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
-            if isinstance(window, tk.Toplevel):
+            if window.winfo_exists() == 1:
                 window.build(reload=True)
         logger.info("%s has rebuilt all editor windows", self.name)
 
