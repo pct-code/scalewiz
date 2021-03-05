@@ -144,7 +144,9 @@ class TestHandler:
         self.progress.set(0)
         self.elapsed.set("")
         # make a new log file
-        log_path = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
+        log_path = (
+            f"{round(time.monotonic())}_{self.test.name.get()}_{date.today()}.txt"
+        )
         parent_dir = os.path.dirname(self.project.path.get())
         logs_dir = os.path.join(parent_dir, "logs")
         if not os.path.isdir(logs_dir):
@@ -194,18 +196,18 @@ class TestHandler:
         interval = self.project.interval.get()
         snooze = round(interval * 0.8, 2)
 
-        test_start_time = time.time()
+        test_start_time = time.monotonic()
         reading_start = test_start_time - interval
 
         # readings loop -------------------------------------------------------
         while self.can_run():
-            if time.time() - reading_start >= interval:
-                reading_start = time.time()
-                minutes_elapsed = round((time.time() - test_start_time) / 60, 2)
+            if time.monotonic() - reading_start >= interval:
+                reading_start = time.monotonic()
+                minutes_elapsed = round((time.monotonic() - test_start_time) / 60, 2)
 
                 psi1 = self.pump1.get_pressure()
                 psi2 = self.pump2.get_pressure()
-                collected = time.time() - reading_start
+                collected = time.monotonic() - reading_start
                 logger.debug("%s collected both PSIs in %s s", self.name, collected)
                 average = round(((psi1 + psi2) / 2))
 
@@ -235,17 +237,19 @@ class TestHandler:
                     self.max_pressures["pump 2"] = psi2
                 logger.debug(
                     "Finished doing everything else in %s s",
-                    time.time() - reading_start - collected,
+                    time.monotonic() - reading_start - collected,
                 )
                 logger.debug(
-                    "%s collected data in %s", self.name, time.time() - reading_start
+                    "%s collected data in %s",
+                    self.name,
+                    time.monotonic() - reading_start,
                 )
                 # todo try asyncio - called defer or await or s/t
                 time.sleep(snooze)
         # end of readings loop ------------------------------------------------
 
         # find the actual elapsed time
-        actual_elapsed = round((time.time() - test_start_time) / 60, 2)
+        actual_elapsed = round((time.monotonic() - test_start_time) / 60, 2)
         # compare to the most recent minutes_elapsed value
         if actual_elapsed != minutes_elapsed:
             # maybe make a dialog pop up instead?
