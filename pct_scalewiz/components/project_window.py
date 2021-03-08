@@ -37,7 +37,9 @@ class ProjectWindow(tk.Toplevel):
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
-        self.winfo_toplevel().title(f"{self.handler.name} {self.handler.project.name.get()}")
+        self.winfo_toplevel().title(
+            f"{self.handler.name} {self.handler.project.name.get()}"
+        )
         set_icon(self)
         for child in self.winfo_children():
             child.destroy()

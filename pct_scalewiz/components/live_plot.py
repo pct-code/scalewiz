@@ -10,7 +10,7 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.ticker import MultipleLocator
+# from matplotlib.ticker import MultipleLocator
 
 if typing.TYPE_CHECKING:
     from pct_scalewiz.models.test_handler import TestHandler

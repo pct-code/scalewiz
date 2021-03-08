@@ -7,7 +7,7 @@ class TeledynePump:
     def __init__(self, serialport, logger=None) -> None:
         self.port = serialport
         self.logger = logger
-    
+
     def open(self) -> None:
         """Open the serial port associated with the pump."""
         self.port.open()
@@ -37,5 +37,3 @@ class TeledynePump:
     def close(self) -> None:
         """Close the serial port associated with the pump."""
         self.port.close()
-
-    
