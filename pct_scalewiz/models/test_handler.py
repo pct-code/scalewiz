@@ -145,7 +145,7 @@ class TestHandler:
         self.elapsed.set("")
         # make a new log file
         log_path = (
-            f"{round(time.monotonic())}_{self.test.name.get()}_{date.today()}.txt"
+            f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
         )
         parent_dir = os.path.dirname(self.project.path.get())
         logs_dir = os.path.join(parent_dir, "logs")

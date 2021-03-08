@@ -85,6 +85,7 @@ class Project:
         if path is None:
             path = self.path.get()
 
+        # clean up user inputs
         for test in self.tests:
             if test.chemical.get().strip() != test.chemical.get():
                 test.chemical.set(test.chemical.get().strip())

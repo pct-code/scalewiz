@@ -7,14 +7,14 @@ class TeledynePump:
     def __init__(self, serialport, logger=None) -> None:
         self.port = serialport
         self.logger = logger
+    
+    def open(self) -> None:
+        """Open the serial port associated with the pump."""
+        self.port.open()
 
     def run(self) -> None:
         """Run the pump."""
         self.port.write("ru".encode())
-
-    def stop(self) -> None:
-        """Stop the pump."""
-        self.port.write("st".encode())
 
     def get_pressure(self) -> int:
         """Get the pump's current pressure."""
@@ -30,10 +30,12 @@ class TeledynePump:
                 self.logger.exception(error)
             return -1
 
+    def stop(self) -> None:
+        """Stop the pump."""
+        self.port.write("st".encode())
+
     def close(self) -> None:
         """Close the serial port associated with the pump."""
         self.port.close()
 
-    def open(self) -> None:
-        """Open the serial port associated with the pump."""
-        self.port.open()
+    
