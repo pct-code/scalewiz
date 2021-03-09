@@ -78,8 +78,9 @@ class TestHandler:
             )
 
         if path != "":
-            self.rebuild_editors()
+            self.project = Project()
             self.project.load_json(path)
+            self.rebuild_editors()
             logger.info("Loaded %s to %s", self.project.name.get(), self.name)
 
         self.max_readings = (
@@ -109,7 +110,7 @@ class TestHandler:
             messagebox.showwarning("Missing Device Port", msg)
             return
 
-        if not os.path.isfile(self.project.path.get()):
+        if not os.path.exists(self.project.path.get()):
             msg = "Select an existing project file first"
             messagebox.showwarning("Invalid Project Selected", msg)
             return

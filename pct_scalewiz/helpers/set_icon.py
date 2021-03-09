@@ -14,5 +14,5 @@ def set_icon(widget: tk.Widget):
         r"../../assets/chem.ico"
     )  # this makes me nervous, but whatever
 
-    if os.path.isfile(icon_path):
+    if os.path.exists(icon_path):
         widget.winfo_toplevel().wm_iconbitmap(icon_path)
