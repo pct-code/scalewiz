@@ -6,6 +6,8 @@ import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
 from tkinter import ttk
 
+from pct_scalewiz.helpers.set_icon import set_icon
+
 logger = logging.getLogger("pct-scalewiz")
 
 
@@ -20,6 +22,7 @@ class RinseFrame(ttk.Frame):
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
+        set_icon(self.window)
         self.winfo_toplevel().title(self.handler.name)
 
         self.rinse_minutes = tk.IntVar()
