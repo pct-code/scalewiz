@@ -163,7 +163,7 @@ class EvaluationWindow(tk.Toplevel):
         plt.close("all")
         # get rid of our old plot tab
         self.plot_frame.destroy()
-        self.plot_frame = ttk.Frame(self.tab_control)
+        self.plot_frame = ttk.Frame(self)
         self.fig, self.axis = plt.subplots(figsize=(7.5, 4), dpi=100)
         self.fig.patch.set_facecolor("#FAFAFA")
         plt.subplots_adjust(wspace=0, hspace=0)
