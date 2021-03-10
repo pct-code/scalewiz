@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 import time
@@ -155,7 +154,6 @@ class TestHandler:
 
         # update the file handler
         self.update_log_handler(log_file)
-
         self.pool.submit(self.take_readings)
 
     def update_log_handler(self, log_file: str) -> None:
@@ -174,7 +172,7 @@ class TestHandler:
         logger.info("%s set up a log file at %s", self.name, log_file)
         logger.info("%s is starting a test for %s", self.name, self.project.name.get())
 
-    async def take_readings(self) -> None:
+    def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
         # set default values for this instance of the test loop
         self.queue = []
@@ -195,7 +193,7 @@ class TestHandler:
 
         self.to_log("")
         interval = self.project.interval.get()
-        snooze = round(interval * 0.8, 2)
+        snooze = round(interval * 0.75, 2)
 
         test_start_time = time.monotonic()
         reading_start = test_start_time - interval
@@ -245,8 +243,7 @@ class TestHandler:
                     self.name,
                     time.monotonic() - reading_start,
                 )
-                # todo try asyncio - called defer or await or s/t
-                await asyncio.sleep(snooze)
+                time.sleep(snooze)
         # end of readings loop ------------------------------------------------
 
         # find the actual elapsed time
