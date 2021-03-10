@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import time
@@ -57,7 +58,7 @@ class TestHandler:
         self.is_running = tk.BooleanVar()
         self.is_done = tk.BooleanVar()
 
-    def can_run(self) -> bool:
+    def get_can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
         return (
             (
@@ -173,7 +174,7 @@ class TestHandler:
         logger.info("%s set up a log file at %s", self.name, log_file)
         logger.info("%s is starting a test for %s", self.name, self.project.name.get())
 
-    def take_readings(self) -> None:
+    async def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
         # set default values for this instance of the test loop
         self.queue = []
@@ -181,9 +182,10 @@ class TestHandler:
         # start the pumps
         self.pump1.run()
         self.pump2.run()
+        # run the uptake cycle
         uptake = self.project.uptake.get()
         for i in range(uptake):
-            if self.can_run():
+            if self.get_can_run():
                 self.elapsed.set(f"{uptake - i} s")
                 self.progress.set(round(i / uptake * 100))
                 time.sleep(1)
@@ -199,7 +201,7 @@ class TestHandler:
         reading_start = test_start_time - interval
 
         # readings loop -------------------------------------------------------
-        while self.can_run():
+        while self.get_can_run():
             if time.monotonic() - reading_start >= interval:
                 reading_start = time.monotonic()
                 minutes_elapsed = round((time.monotonic() - test_start_time) / 60, 2)
@@ -244,7 +246,7 @@ class TestHandler:
                     time.monotonic() - reading_start,
                 )
                 # todo try asyncio - called defer or await or s/t
-                time.sleep(snooze)
+                await asyncio.sleep(snooze)
         # end of readings loop ------------------------------------------------
 
         # find the actual elapsed time
