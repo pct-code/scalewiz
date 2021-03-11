@@ -88,13 +88,11 @@ class TestHandler:
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
-        issues = []
-
         # todo disable the start button instead of this
         if self.is_running.get():
             return 
 
-        # check entries on UI
+        issues = []
         if not os.path.exists(self.project.path.get()):
             msg = "Select an existing project file first"
             issues.append(msg)
@@ -107,7 +105,7 @@ class TestHandler:
             msg = "Water clarity cannot be blank"
             issues.append(msg)
 
-        # this method will append issues msgs if any occur
+        # this method will append issue msgs if any occur
         self.setup_pumps(issues)
 
         if len(issues) > 0:
