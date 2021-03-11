@@ -19,6 +19,7 @@ from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
     from tkinter.scrolledtext import ScrolledText
+    from pct_scalewiz.components.test_handler_view import TestHandlerView
 
 logger = logging.getLogger("scalewiz")
 
@@ -30,8 +31,9 @@ class TestHandler:
 
     def __init__(self, name: str = "Nemo") -> None:
         self.name = name
+        self.parent: TestHandlerView = None
         self.project = Project()
-        self.test = Test()
+        self.test: Test = None
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.queue: list[dict] = []
         self.editors = []  # list of views displaying the project
@@ -56,6 +58,7 @@ class TestHandler:
         # UI concerns
         self.is_running = tk.BooleanVar()
         self.is_done = tk.BooleanVar()
+        self.new_test()
 
     def get_can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
@@ -82,8 +85,6 @@ class TestHandler:
             self.project.load_json(path)
             self.rebuild_editors()
             logger.info("Loaded %s to %s", self.project.name.get(), self.name)
-
-        
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
@@ -113,7 +114,6 @@ class TestHandler:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
             return
 
-        self.new_test()
         self.stop_requested = False
         self.is_done.set(False)
         self.is_running.set(True)
@@ -335,7 +335,8 @@ class TestHandler:
         )
         # rebuild the TestHandlerView
         # todo #14 don't do this. where is parent assigned??
-        self.parent.build()
+        if self.parent is not None:
+            self.parent.build()
 
     def rebuild_editors(self) -> None:
         """Rebuild all open Toplevels that could overwrite the Project file."""
