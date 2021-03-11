@@ -83,84 +83,55 @@ class TestHandler:
             self.rebuild_editors()
             logger.info("Loaded %s to %s", self.project.name.get(), self.name)
 
-        self.max_readings = (
-            round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
-            + 1
-        )
+        
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
-        # pylint: disable=too-many-return-statements
-        # this IS too many returns, but easier than a refactor
+        issues = []
+
+        # todo disable the start button instead of this
         if self.is_running.get():
-            return
+            return 
 
-        if self.dev1.get() == "" or self.dev1.get() == "None found":
-            msg = "Select a port for pump 1"
-            messagebox.showwarning("Missing Device Port", msg)
-            return
-
-        if self.dev2.get() == "" or self.dev2.get() == "None found":
-            msg = "Select a port for pump 1"
-            messagebox.showwarning("Missing Device Port", msg)
-            return
-
-        if self.dev1.get() == self.dev2.get():
-            msg = "Select two unique ports"
-            messagebox.showwarning("Missing Device Port", msg)
-            return
-
+        # check entries on UI
         if not os.path.exists(self.project.path.get()):
             msg = "Select an existing project file first"
-            messagebox.showwarning("Invalid Project Selected", msg)
-            return
+            issues.append(msg)
 
         if self.test.name.get() == "":
             msg = "Name the experiment before starting"
-            messagebox.showwarning("Invalid Experiment Name", msg)
-            return
+            issues.append(msg)
 
         if self.test.clarity.get() == "" and not self.test.is_blank.get():
             msg = "Water clarity cannot be blank"
-            messagebox.showwarning("Missing Water Clarity", msg)
+            issues.append(msg)
+
+        # this method will append issues msgs if any occur
+        self.setup_pumps(issues)
+
+        if len(issues) > 0:
+            messagebox.showwarning("Couldn't start the test", "\n".join(issues))
             return
 
-        self.setup_pumps()
-
-        if not self.pump1.port.isOpen():
-            msg = f"Couldn't connect to {self.pump1.port.name}"
-            messagebox.showwarning("Serial Exception", msg)
-            return
-
-        if not self.pump2.port.isOpen():
-            msg = f"Couldn't connect to {self.pump2.port.name}"
-            messagebox.showwarning("Serial Exception", msg)
-            return
-
-        # close any open editors
-        self.rebuild_editors()
+        self.new_test()
         self.stop_requested = False
         self.is_done.set(False)
         self.is_running.set(True)
-        self.progress.set(0)
-        self.elapsed.set("")
-        # make a new log file
-        log_path = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
+        self.update_log_handler()
+        self.pool.submit(self.take_readings)
+
+    def update_log_handler(self) -> None:
+        """Sets up the logging FileHandler to the passed path."""
+        log_file = f"{round(time.time())}_{self.test.name.get()}_{date.today()}.txt"
         parent_dir = os.path.dirname(self.project.path.get())
         logs_dir = os.path.join(parent_dir, "logs")
         if not os.path.isdir(logs_dir):
             os.mkdir(logs_dir)
-        log_file = os.path.join(logs_dir, log_path)
-
-        # update the file handler
-        self.update_log_handler(log_file)
-        self.pool.submit(self.take_readings)
-
-    def update_log_handler(self, log_file: str) -> None:
-        """Sets up the logging FileHandler to the passed path."""
+        log_path= os.path.join(logs_dir, log_file)
+        
         if self.log_handler in logger.handlers:
             logger.removeHandler(self.log_handler)
-        self.log_handler = logging.FileHandler(log_file)
+        self.log_handler = logging.FileHandler(log_path)
 
         formatter = logging.Formatter(
             "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
@@ -302,38 +273,65 @@ class TestHandler:
         """Saves the test to the Project file in JSON format."""
         for reading in self.queue:
             self.test.readings.append(reading)
-        self.queue.clear()
         self.project.tests.append(self.test)
         self.project.dump_json()
         self.load_project(path=self.project.path.get())
         self.rebuild_editors()
 
-    def setup_pumps(self) -> None:
+    def setup_pumps(self, issues: [str]) -> None:
         """Set up the pumps with some default values."""
         # the timeout values are an alternative to using TextIOWrapper
         # the values chosen were suggested by the pump's documentation
+        if self.dev1.get() == "" or self.dev1.get() == "None found":
+            msg = "Select a port for pump 1"
+            issues.append(msg)
+
+        if self.dev2.get() == "" or self.dev2.get() == "None found":
+            msg = "Select a port for pump 2"
+            issues.append(msg)
+
+        if self.dev1.get() == self.dev2.get():
+            msg = "Select two unique ports"
+            issues.append(msg)
+            return
+
         try:
             port1 = Serial(self.dev1.get(), timeout=0.05)
             self.pump1 = TeledynePump(port1, logger=logger)
             logger.info("%s: established a connection to %s", self.name, port1.port)
-
+        except SerialException as error:
+            logger.exception(error)
+       
+        try:
             port2 = Serial(self.dev2.get(), timeout=0.05)
             self.pump2 = TeledynePump(port2, logger=logger)
             logger.info("%s: established a connection to %s", self.name, port2.port)
-
         except SerialException as error:
             logger.exception(error)
-            messagebox.showwarning("Serial Exception", error)
 
+        if not None in (self.pump1, self.pump2):
+            if not self.pump1.port.isOpen():
+                msg = f"Couldn't connect to {self.pump1.port.name}"
+                issues.append(msg)
+
+            if not self.pump2.port.isOpen():
+                msg = f"Couldn't connect to {self.pump2.port.name}"
+                issues.append(msg)
+        
     # methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""
         logger.info("%s: Initialized a new test", self.name)
         self.test = Test()
+        self.queue.clear()
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)
         self.elapsed.set("")
+        self.max_readings = (
+            round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
+            + 1
+        )
         # rebuild the TestHandlerView
         # todo #14 don't do this. where is parent assigned??
         self.parent.build()
