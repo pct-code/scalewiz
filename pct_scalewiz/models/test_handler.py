@@ -278,10 +278,10 @@ class TestHandler:
         self.load_project(path=self.project.path.get())
         self.rebuild_editors()
 
-    def setup_pumps(self, issues: [str]) -> None:
+    def setup_pumps(self, issues: [str] = None) -> None:
         """Set up the pumps with some default values."""
-        # the timeout values are an alternative to using TextIOWrapper
-        # the values chosen were suggested by the pump's documentation
+        if issues is None:
+            issues = []
         if self.dev1.get() == "" or self.dev1.get() == "None found":
             msg = "Select a port for pump 1"
             issues.append(msg)
@@ -294,7 +294,8 @@ class TestHandler:
             msg = "Select two unique ports"
             issues.append(msg)
             return
-
+        # the timeout values are an alternative to using TextIOWrapper
+        # the values chosen were suggested by the pump's documentation
         try:
             port1 = Serial(self.dev1.get(), timeout=0.05)
             self.pump1 = TeledynePump(port1, logger=logger)
