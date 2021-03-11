@@ -28,7 +28,7 @@ class TestHandlerView(ttk.Frame):
         self.parent = parent
         self.handler = handler
         self.handler.parent = self
-        self.devices_list = []
+        self.devices_list: [str] = []
         self.build()
 
     def add_traces(self) -> None:

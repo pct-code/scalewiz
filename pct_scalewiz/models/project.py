@@ -162,6 +162,7 @@ class Project:
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
+        path = os.path.abspath(path)
         logger.info("Loading from %s", path)
         with open(path, "r") as file:
             obj = json.load(file)
@@ -172,6 +173,7 @@ class Project:
                 "Opened a Project whose actual path didn't match its path property"
             )
             obj["info"]["path"] = path
+
 
         info = obj.get("info")
         self.customer.set(info.get("customer"))
