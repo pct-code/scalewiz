@@ -82,7 +82,7 @@ class ProjectWindow(tk.Toplevel):
         else:
             self.editor_project.dump_json()
             self.handler.project.load_json(self.editor_project.path.get())
-            self.handler.parent.build()
+            self.handler.view.build()
 
     def save_as(self) -> None:
         """Saves the Project to JSON using a Save As dialog."""

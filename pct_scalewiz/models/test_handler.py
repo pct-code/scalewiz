@@ -19,6 +19,7 @@ from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
     from tkinter.scrolledtext import ScrolledText
+    from tkinter import ttk
 
 logger = logging.getLogger("scalewiz")
 
@@ -339,6 +340,7 @@ class TestHandler:
         """Rebuild all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
             if window.winfo_exists() == 1:
+                print(window)
                 window.build(reload=True)
         logger.info("%s has rebuilt all editor windows", self.name)
 
@@ -348,3 +350,7 @@ class TestHandler:
         self.log_text.insert("end", msg + "\n")
         self.log_text.configure(state="disabled")
         self.log_text.see("end")
+
+    def set_view(self, view: ttk.Frame) -> None:
+        """Stores a ref to the view displaying the handler."""
+        self.view = view
