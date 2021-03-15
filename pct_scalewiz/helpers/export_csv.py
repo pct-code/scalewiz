@@ -70,7 +70,7 @@ def export_csv(project: Project) -> None:
 
     pre = f"{project.numbers.get().replace(' ', '')} {project.name.get()}"
     out = f"{pre} - CaCO3 Scale Block Analysis.{project.output_format.get()}"
-    out = os.path.join(os.path.dirname(project.path.get()), out)
+    out = os.path.join(os.path.dirname(project.path.get()), out.strip())
 
     with open(out, "w") as output:
         if project.output_format.get() == "CSV":

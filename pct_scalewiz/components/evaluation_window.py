@@ -219,7 +219,7 @@ class EvaluationWindow(tk.Toplevel):
             "Scale Block Analysis (Graph).png"
         )
         output_path = os.path.join(
-            os.path.dirname(self.editor_project.path.get()), output_path
+            os.path.dirname(self.editor_project.path.get()), output_path.strip()
         )
         self.fig.savefig(output_path)
         self.editor_project.plot.set(
@@ -232,7 +232,7 @@ class EvaluationWindow(tk.Toplevel):
             "Scale Block Analysis (Log).txt"
         )
         output_path = os.path.join(
-            os.path.dirname(self.editor_project.path.get()), output_path
+            os.path.dirname(self.editor_project.path.get()), output_path.strip()
         )
         with open(output_path, "w") as file:
             file.write(self.log_text.get("1.0", "end-1c"))

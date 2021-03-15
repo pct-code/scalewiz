@@ -18,6 +18,7 @@ class MainFrame(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
         # hijack closing protocol
+        self.parent = parent
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
         self.build()
 
