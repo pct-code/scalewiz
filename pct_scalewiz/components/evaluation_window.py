@@ -279,6 +279,7 @@ class EvaluationWindow(tk.Toplevel):
             log.append(f"Considering data: {blank.pump_to_score.get()}")
             readings = blank.get_readings()
             log.append(f"Total readings: {len(readings)}")
+            log.append(f"Observed baseline: {blank.observed_baseline.get()} psi")
             int_psi = sum(readings)
             log.append("Integral PSI: sum of all pressure readings")
             log.append(f"Integral PSI: {int_psi}")
@@ -323,6 +324,7 @@ class EvaluationWindow(tk.Toplevel):
             log.append(f"Considering data: {trial.pump_to_score.get()}")
             readings = trial.get_readings()
             log.append(f"Total readings: {len(readings)}")
+            log.append(f"Observed baseline: {trial.observed_baseline.get()} psi")
             int_psi = sum(readings) + (
                 (max_readings - len(readings)) * self.editor_project.limit_psi.get()
             )
@@ -340,9 +342,8 @@ class EvaluationWindow(tk.Toplevel):
 
         self.plot()
 
-        log.insert(0, f"Evaluating results for {self.editor_project.name.get()}... \n")
-        log.insert(0, f"Finished in {round(time.time() - start_time, 3)} s")
-        log.insert(0, "-" * 80 + "\n")
+        log.insert(0, f"Evaluating results for {self.editor_project.name.get()}...")
+        log.insert(1, f"Finished in {round(time.time() - start_time, 3)} s \n")
         self.to_log(log)
 
     def to_log(self, log: list[str]) -> None:
