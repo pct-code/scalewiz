@@ -6,7 +6,11 @@
 A graphical user interface designed to work with Teledyne SSI MX-class HPLC pumps for the purpose of calcite scale inhibitor chemical performance testing.
 
 # Installation
-
+```
+poetry install
+```
 
 # Usage
-
+```
+poetry run scalewiz
+```
