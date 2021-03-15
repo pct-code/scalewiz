@@ -22,8 +22,8 @@ class MenuBar:
         # expecting parent to be the toplevel parent of the main frame
         self.main_frame = parent
 
-        menu_bar = tk.Menu()
-        menu_bar.add_command(
+        menubar = tk.Menu()
+        menubar.add_command(
             label="Add System", command=lambda: self.main_frame.add_handler()
         )
 
@@ -33,15 +33,18 @@ class MenuBar:
             label="Load existing", command=lambda: self.request_project_load()
         )
 
-        menu_bar.add_cascade(label="Project", menu=project_menu)
-        menu_bar.add_command(label="Evaluation", command=lambda: self.spawn_evaluator())
-        menu_bar.add_command(
+        menubar.add_cascade(label="Project", menu=project_menu)
+        menubar.add_command(label="Evaluation", command=lambda: self.spawn_evaluator())
+        menubar.add_command(
             label="Log", command=lambda: self.main_frame.parent.log_window.deiconify()
         )
-        menu_bar.add_command(label="Rinse", command=lambda: self.spawn_rinse())
-        menu_bar.add_command(label="Help", command=lambda: show_help())
+        menubar.add_command(label="Rinse", command=lambda: self.spawn_rinse())
+        menubar.add_command(label="Help", command=lambda: show_help())
 
-        self.main_frame.winfo_toplevel().configure(menu=menu_bar)
+        # debug
+        menubar.add_command(label="Debug", command= lambda: self.debug())
+
+        self.main_frame.winfo_toplevel().configure(menu=menubar)
 
     def spawn_editor(self) -> None:
         """Spawn a Toplevel for editing Projects."""
@@ -70,3 +73,9 @@ class MenuBar:
         widget = self.main_frame.nametowidget(current_tab)
         window = RinseWindow(widget.handler)
         widget.handler.editors.append(window)
+
+    def debug(self) -> None:
+        """used for debugging"""
+        current_tab = self.main_frame.tab_control.select()
+        widget = self.main_frame.nametowidget(current_tab)
+        widget.handler.rebuild_editors()
