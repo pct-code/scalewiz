@@ -36,10 +36,13 @@ class Test:
         """Makes a name by concatenating the chemical name and rate."""
         if not (self.chemical.get() == "" or self.rate.get() == 0):
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
+        
+        if self.chemical.get().strip() != self.chemical.get():
+            self.chemical.set(self.chemical.get().strip())
 
     def make_label(self, *args) -> None:
         """Sets the label to the current name as a default value."""
-        self.label.set(self.name.get())
+        self.label.set(self.name.get().strip())
 
     def set_observed_baseline(self, *args) -> None:
         """Sets the observed baseline psi."""

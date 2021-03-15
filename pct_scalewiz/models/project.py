@@ -85,14 +85,6 @@ class Project:
         if path is None:
             path = self.path.get()
 
-        # clean up user inputs
-        for test in self.tests:
-            if test.chemical.get().strip() != test.chemical.get():
-                test.chemical.set(test.chemical.get().strip())
-
-            if test.label.get().strip() != test.label.get():
-                test.label.set(test.label.get().strip())
-
         # filter the data alphanumerically by label
         _blanks = {}  # put in dicts to allow for popping later
         _trials = {}
@@ -115,7 +107,6 @@ class Project:
         )
         blanks = [_blanks.pop(name) for name in blank_labels]
 
-        # instead, sort by label then by conc magnitude
         trial_labels = sort_nicely(
             [trial.label.get().lower() for trial in list(_trials.values())]
         )
