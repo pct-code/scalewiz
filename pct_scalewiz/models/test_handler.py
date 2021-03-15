@@ -20,6 +20,7 @@ from pct_scalewiz.models.test import Test
 if typing.TYPE_CHECKING:
     from tkinter.scrolledtext import ScrolledText
     from tkinter import ttk
+    from pct_scalewiz.components.test_handler_view import TestHandlerView
 
 logger = logging.getLogger("scalewiz")
 

@@ -11,5 +11,5 @@ def get_resource(name: str) -> str:
     path_to_dat = path.abspath(path.join(bundle_dir, name))
     if path.exists(path_to_dat):
         return path_to_dat
-    else:
-        raise FileNotFoundError(f"Could not find a file at {path_to_dat}")
+    
+    raise FileNotFoundError(f"Could not find a file at {path_to_dat}")
