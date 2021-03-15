@@ -11,18 +11,17 @@ from pct_scalewiz.helpers.set_icon import set_icon
 logger = logging.getLogger("pct-scalewiz")
 
 
-class RinseFrame(ttk.Frame):
-    """Simple frame that starts and stops the pumps on a timer."""
+class RinseWindow(tk.Toplevel):
+    """Toplevel control that starts and stops the pumps on a timer."""
 
-    def __init__(self, handler, window) -> None:
-        ttk.Frame.__init__(self, window)
-        window.protocol("WM_DELETE_WINDOW", self.close)
-        self.window = window
+    def __init__(self, handler) -> None:
+        tk.Toplevel.__init__(self)
+        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
         self.handler = handler
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
-        set_icon(self.window)
+        set_icon(self)
         self.winfo_toplevel().title(self.handler.name)
 
         self.rinse_minutes = tk.IntVar()
@@ -31,13 +30,13 @@ class RinseFrame(ttk.Frame):
         self.txt.set("Rinse")
 
         # build
-        lbl = ttk.Label(window, text="Rinse duration (min).:")
+        lbl = ttk.Label(self, text="Rinse duration (min).:")
         lbl.grid(row=0, column=0)
-        ent = ttk.Spinbox(window, textvariable=self.rinse_minutes, from_=3, to=60)
+        ent = ttk.Spinbox(self, textvariable=self.rinse_minutes, from_=3, to=60)
         ent.grid(row=0, column=1)
 
         self.button = ttk.Button(
-            window, textvariable=self.txt, command=lambda: self.request_rinse()
+            self, textvariable=self.txt, command=lambda: self.request_rinse()
         )
         self.button.grid(row=2, column=0, columnspan=2)
 
@@ -87,4 +86,4 @@ class RinseFrame(ttk.Frame):
     def close(self) -> None:
         """Stops the rinse cycle and closes the rinse Toplevel."""
         self.stop = True
-        self.window.destroy()
+        self.destroy()
