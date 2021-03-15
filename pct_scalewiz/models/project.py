@@ -165,7 +165,6 @@ class Project:
             )
             obj["info"]["path"] = path
 
-
         info = obj.get("info")
         self.customer.set(info.get("customer"))
         self.submitted_by.set(info.get("submittedBy"))

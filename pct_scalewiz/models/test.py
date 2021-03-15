@@ -36,7 +36,7 @@ class Test:
         """Makes a name by concatenating the chemical name and rate."""
         if not (self.chemical.get() == "" or self.rate.get() == 0):
             self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
-        
+
         if self.chemical.get().strip() != self.chemical.get():
             self.chemical.set(self.chemical.get().strip())
 

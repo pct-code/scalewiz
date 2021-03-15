@@ -91,7 +91,7 @@ class TestHandler:
         """Perform a series of checks to make sure the test can run, then start it."""
         # todo disable the start button instead of this
         if self.is_running.get():
-            return 
+            return
 
         issues = []
         if not os.path.exists(self.project.path.get()):
@@ -126,8 +126,8 @@ class TestHandler:
         logs_dir = os.path.join(parent_dir, "logs")
         if not os.path.isdir(logs_dir):
             os.mkdir(logs_dir)
-        log_path= os.path.join(logs_dir, log_file)
-        
+        log_path = os.path.join(logs_dir, log_file)
+
         if self.log_handler in logger.handlers:
             logger.removeHandler(self.log_handler)
         self.log_handler = logging.FileHandler(log_path)
@@ -301,7 +301,7 @@ class TestHandler:
             logger.info("%s: established a connection to %s", self.name, port1.port)
         except SerialException as error:
             logger.exception(error)
-       
+
         try:
             port2 = Serial(self.dev2.get(), timeout=0.05)
             self.pump2 = TeledynePump(port2, logger=logger)
@@ -317,7 +317,7 @@ class TestHandler:
             if not self.pump2.port.isOpen():
                 msg = f"Couldn't connect to {self.pump2.port.name}"
                 issues.append(msg)
-        
+
     # methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""

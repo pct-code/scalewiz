@@ -35,10 +35,8 @@ class MainFrame(ttk.Frame):
         system_name = f"  System {len(self.tab_control.tabs()) + 1}  "
         handler = TestHandler(name=system_name.strip())
         # plug it in 🔌
-        # todo why this assignment? the handler's 'parent' isn't a view.
-        # this can't be right, there must be a better way
         view = TestHandlerView(self.tab_control, handler)
-        handler.set_view(view) # we want to be able to rebuild it later
+        handler.set_view(view)  # we want to be able to rebuild it later
         self.tab_control.add(view, sticky="nsew")
         self.tab_control.tab(view, text=system_name)
         logger.info("Added %s to main window", handler.name)

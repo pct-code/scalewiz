@@ -42,7 +42,7 @@ class MenuBar:
         menubar.add_command(label="Help", command=lambda: show_help())
 
         # debug
-        menubar.add_command(label="Debug", command= lambda: self.debug())
+        menubar.add_command(label="Debug", command=lambda: self.debug())
 
         self.main_frame.winfo_toplevel().configure(menu=menubar)
 
