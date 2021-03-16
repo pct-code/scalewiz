@@ -4,9 +4,6 @@ from tkinter import ttk
 
 import tkcalendar as tkcal
 
-# todo #2 implement some form of entry validation
-# targeting disallowed chars for a filepath
-
 # todo give these project sub frames a regular build pattern
 
 

@@ -32,7 +32,7 @@ class TestHandler:
 
     def __init__(self, name: str = "Nemo") -> None:
         self.name = name
-        self.parent: TestHandlerView = None
+        self.view: TestHandlerView = None
         self.project = Project()
         self.test: Test = None
         self.pool = ThreadPoolExecutor(max_workers=1)
@@ -40,9 +40,9 @@ class TestHandler:
         self.editors = []  # list of views displaying the project
         self.max_readings = int()  # max # of readings to collect
         self.max_pressures: dict[str, int] = {"pump 1": int(), "pump 2": int()}
-        # we assign a real handler later
         self.log_handler: logging.FileHandler = None
-        # test handler view overwrites this attribute with a widget
+
+        # test handler view overwrites this attribute in the view's build()
         self.log_text: ScrolledText = None
 
         self.dev1 = tk.StringVar()
@@ -54,8 +54,6 @@ class TestHandler:
         self.pump1: TeledynePump = None
         self.pump2: TeledynePump = None
 
-        # todo #7 refactor needed. this can't account for rinse/uptake cycles
-        # need new way to manage state
         # UI concerns
         self.is_running = tk.BooleanVar()
         self.is_done = tk.BooleanVar()
@@ -107,7 +105,7 @@ class TestHandler:
             issues.append(msg)
 
         # this method will append issue msgs if any occur
-        self.setup_pumps(issues)
+        self.setup_pumps(issues)  # hooray for pointers
 
         if len(issues) > 0:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
@@ -145,7 +143,7 @@ class TestHandler:
     def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
         # set default values for this instance of the test loop
-        self.queue = []
+        self.queue.clear()
         self.max_pressures["pump 1"] = self.max_pressures["pump 2"] = 0
         # start the pumps
         self.pump1.run()
@@ -194,7 +192,6 @@ class TestHandler:
                 self.to_log(msg)
                 logger.info("%s - %s", self.name, msg)
 
-                # todo use a real Queue ??
                 self.queue.append(reading)
 
                 self.elapsed.set(f"{minutes_elapsed:.2f} min.")
@@ -333,9 +330,8 @@ class TestHandler:
             + 1
         )
         # rebuild the TestHandlerView
-        # todo #14 don't do this. where is parent assigned??
-        if self.parent is not None:
-            self.parent.build()
+        if self.view is not None:
+            self.view.build()
 
     def rebuild_editors(self) -> None:
         """Rebuild all open Toplevels that could overwrite the Project file."""

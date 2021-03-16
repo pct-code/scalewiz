@@ -17,8 +17,6 @@ if typing.TYPE_CHECKING:
 
 logger = logging.getLogger("scalewiz")
 
-# todo #1 these frames should probably be separated into separate classes
-
 
 class TestHandlerView(ttk.Frame):
     """A form for setting up / running Tests."""
@@ -188,7 +186,7 @@ class TestHandlerView(ttk.Frame):
         self.log_text = tk.scrolledtext.ScrolledText(
             self.log_frame, background="white", height=5, width=44, state="disabled"
         )
-        # todo this is not elegant
+        # this assignment looks weird but ok
         self.handler.log_text = self.log_text
         self.log_text.grid(sticky="ew")
 
@@ -204,7 +202,6 @@ class TestHandlerView(ttk.Frame):
         label.grid(row=row, column=0, sticky=tk.N + tk.E)
         entry.grid(row=row, column=1, sticky=tk.N + tk.E + tk.W, pady=1, padx=1)
 
-    # todo shouldn't this be held by the test handler?
     def update_devices_list(self, *args) -> None:
         """Updates the devices list held by the TestHandler."""
         # extra unused args are passed in by tkinter
@@ -224,7 +221,6 @@ class TestHandlerView(ttk.Frame):
 
     def update_input_frame(self, *args) -> None:
         """Disables widgets in the input frame if a Test is running."""
-        # extra unused args are passed in by tkinter
         if self.handler.is_running.get():
             for widget in self.inputs:
                 widget.configure(state="disabled")
@@ -234,7 +230,6 @@ class TestHandlerView(ttk.Frame):
 
     def update_start_button(self, *args) -> None:
         """Changes the "Start" button to a "New" button when the Test finishes."""
-        # extra unused args are passed in by tkinter
         if self.handler.is_done.get():
             self.start_button.configure(
                 text="New", command=lambda: self.handler.new_test()
@@ -246,7 +241,6 @@ class TestHandlerView(ttk.Frame):
 
     def update_test_type(self, *args):
         """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""
-        # extra unused args are passed in by tkinter
         if self.handler.test.is_blank.get():
             self.trial_label_frame.grid_remove()
             self.trial_entry_frame.grid_remove()
