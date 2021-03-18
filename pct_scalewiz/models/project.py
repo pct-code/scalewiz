@@ -20,7 +20,7 @@ class Project:
 
     def __init__(self) -> None:
         self.tests: list[Test] = []
-        # experiment parameters that affect score 
+        # experiment parameters that affect score
         self.baseline = tk.IntVar()
         self.limit_minutes = tk.IntVar()
         self.limit_psi = tk.IntVar()
@@ -37,17 +37,16 @@ class Project:
         self.sample_date = tk.StringVar()
         self.received_date = tk.StringVar()
         self.completed_date = tk.StringVar()
-        self.name = tk.StringVar() # identifier for the project
+        self.name = tk.StringVar()  # identifier for the project
         self.analyst = tk.StringVar()
         self.numbers = tk.StringVar()
-        self.path = tk.StringVar() # path to the project's JSON file
+        self.path = tk.StringVar()  # path to the project's JSON file
         self.notes = tk.StringVar()
         self.bicarbs = tk.IntVar()
         self.bicarbs_increased = tk.BooleanVar()
         self.chlorides = tk.IntVar()
-        self.temperature = tk.IntVar() # the test temperature
-        self.plot = tk.StringVar() # path to plot local file
-
+        self.temperature = tk.IntVar()  # the test temperature
+        self.plot = tk.StringVar()  # path to plot local file
         # set defaults
         # todo #3 abstract these out into some TOML or something ?
         self.baseline.set(75)
@@ -179,3 +178,17 @@ class Project:
         self.client.trace_remove("write", self.client.trace_info()[0][1])
         self.field.trace_remove("write", self.field.trace_info()[0][1])
         self.sample.trace_remove("write", self.sample.trace_info()[0][1])
+
+    def make_name(self, *args) -> None:
+        """Constructs a default name for the Project."""
+        # extra unused args are passed in by tkinter
+        name = ""
+        if self.client.get() != "":
+            name = self.client.get().strip()
+        else:
+            name = self.customer.get().strip()
+        if self.field.get() != "":
+            name = f"{name} - {self.field.get()}".strip()
+        if self.sample.get() != "":
+            name = f"{name} ({self.sample.get()})".strip()
+        self.name.set(name)

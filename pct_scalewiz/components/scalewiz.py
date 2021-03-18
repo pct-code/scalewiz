@@ -8,8 +8,8 @@ from tkinter import font, ttk
 
 from pct_scalewiz.components.log_frame import LogFrame
 from pct_scalewiz.components.main_frame import MainFrame
-from pct_scalewiz.models.logger import Logger
 from pct_scalewiz.helpers.set_icon import set_icon
+from pct_scalewiz.models.logger import Logger
 
 
 class ScaleWiz(ttk.Frame):

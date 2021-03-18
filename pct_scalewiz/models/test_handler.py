@@ -18,9 +18,10 @@ from pct_scalewiz.models.teledyne_pump import TeledynePump
 from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
-    from typing import List
-    from tkinter.scrolledtext import ScrolledText
     from tkinter import ttk
+    from tkinter.scrolledtext import ScrolledText
+    from typing import List
+
     from pct_scalewiz.components.test_handler_view import TestHandlerView
 
 logger = logging.getLogger("scalewiz")
@@ -87,7 +88,7 @@ class TestHandler:
                 filetypes=[("JSON files", "*.json")],
             )
 
-        if path != "":
+        if path != "" and os.path.isfile(path):
             self.project = Project()
             self.project.load_json(path)
             self.rebuild_editors()
@@ -345,7 +346,7 @@ class TestHandler:
         """Rebuild all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
             if window.winfo_exists() == 1:
-                print(window)
+                print("rebuilding", window)
                 window.build(reload=True)
         logger.info("%s has rebuilt all editor windows", self.name)
 

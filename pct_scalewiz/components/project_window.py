@@ -85,7 +85,8 @@ class ProjectWindow(tk.Toplevel):
             self.save_as()
         else:
             self.editor_project.dump_json()
-            self.handler.project.load_json(self.editor_project.path.get())
+            ### todo wait up just use the handler's load project
+            self.handler.load_project(self.editor_project.path.get())
             self.handler.view.build()
 
     def save_as(self) -> None:

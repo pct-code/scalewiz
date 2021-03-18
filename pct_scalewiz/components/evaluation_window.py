@@ -139,9 +139,9 @@ class EvaluationWindow(tk.Toplevel):
         self.tab_control.add(log_frame, text="   Calculations   ")
 
         button_frame = ttk.Frame(self)
-        ttk.Button(
-            button_frame, text="Save", command=self.save, width=10
-        ).grid(row=0, column=0, padx=5)
+        ttk.Button(button_frame, text="Save", command=self.save, width=10).grid(
+            row=0, column=0, padx=5
+        )
         ttk.Button(
             button_frame,
             text="Export",

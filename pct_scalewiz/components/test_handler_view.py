@@ -13,6 +13,8 @@ import serial.tools.list_ports as list_ports
 from pct_scalewiz.components.live_plot import LivePlot
 
 if typing.TYPE_CHECKING:
+    from typing import List
+
     from pct_scalewiz.models.test_handler import TestHandler
 
 logger = logging.getLogger("scalewiz")
@@ -26,14 +28,19 @@ class TestHandlerView(ttk.Frame):
         self.parent = parent
         self.handler = handler
         self.handler.parent = self
-        self.devices_list: [str] = []
+        self.devices_list: List[str] = []
         self.build()
 
     def add_traces(self) -> None:
         """Sets tkVar bindings for attributes on the current TestHandler."""
+        # todo change these to validate commands ....
+        # use command field on radio buttons
         self.handler.test.is_blank.trace_add("write", self.update_test_type)
+        # these might have to stay as traces
         self.handler.is_running.trace_add("write", self.update_input_frame)
         self.handler.is_done.trace_add("write", self.update_start_button)
+        # these can use a validatecommand + binding to "<MouseWheel>"
+        # might need an after/lambda type call
         self.handler.dev1.trace_add("write", self.update_devices_list)
         self.handler.dev2.trace_add("write", self.update_devices_list)
 

@@ -2,7 +2,6 @@
 
 # util
 import logging
-import sys
 from tkinter import ttk
 
 from pct_scalewiz.components.menu_bar import MenuBar

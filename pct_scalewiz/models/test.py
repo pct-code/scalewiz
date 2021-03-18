@@ -10,19 +10,19 @@ class Test:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
-        self.is_blank = tk.BooleanVar() # boolean for blank vs chemical trial
-        self.name = tk.StringVar() # identifier for the test
-        self.chemical = tk.StringVar() # chemical, if any, to be tested
-        self.rate = tk.IntVar() # the treating rate of the test
-        self.label = tk.StringVar() # how the test will be labeled on the report/plot
-        self.clarity = tk.StringVar() # the clarity of the treated water
-        self.notes = tk.StringVar() # misc notes on the experiment
-        self.pump_to_score = tk.StringVar() # which series of PSIs to use
-        self.result = tk.DoubleVar() # represents the test's performance vs the blank
-        self.include_on_report = tk.BooleanVar() # condition for scoring
-        self.readings: list[dict] = [] # list of flat reading dicts
-        self.max_psi = tk.IntVar() # the highest psi of the test
-        self.observed_baseline = tk.IntVar() # a guess at the baseline for the test
+        self.is_blank = tk.BooleanVar()  # boolean for blank vs chemical trial
+        self.name = tk.StringVar()  # identifier for the test
+        self.chemical = tk.StringVar()  # chemical, if any, to be tested
+        self.rate = tk.IntVar()  # the treating rate of the test
+        self.label = tk.StringVar()  # how the test will be labeled on the report/plot
+        self.clarity = tk.StringVar()  # the clarity of the treated water
+        self.notes = tk.StringVar()  # misc notes on the experiment
+        self.pump_to_score = tk.StringVar()  # which series of PSIs to use
+        self.result = tk.DoubleVar()  # represents the test's performance vs the blank
+        self.include_on_report = tk.BooleanVar()  # condition for scoring
+        self.readings: list[dict] = []  # list of flat reading dicts
+        self.max_psi = tk.IntVar()  # the highest psi of the test
+        self.observed_baseline = tk.IntVar()  # a guess at the baseline for the test
         # set defaults
         self.pump_to_score.set("pump 1")
         self.is_blank.set(True)
