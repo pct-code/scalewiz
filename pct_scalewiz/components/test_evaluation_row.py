@@ -93,7 +93,7 @@ class TestResultRow(ttk.Frame):
         cols.append(
             ttk.Button(
                 self.parent,
-                command=lambda: self.remove_from_project(),
+                command=self.remove_from_project,
                 text="Delete",
                 width=7,
             )

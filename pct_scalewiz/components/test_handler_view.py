@@ -151,13 +151,11 @@ class TestHandlerView(ttk.Frame):
         # row 1 ---------------------------------------------------------------
         ent = ttk.Frame(self)
         self.start_button = ttk.Button(
-            ent, text="Start", command=lambda: self.handler.start_test()
+            ent, text="Start", command=self.handler.start_test
         )
-        stop_button = ttk.Button(
-            ent, text="Stop", command=lambda: self.handler.request_stop()
-        )
+        stop_button = ttk.Button(ent, text="Stop", command=self.handler.request_stop)
         details_button = ttk.Button(
-            ent, text="Toggle Details", command=lambda: self.update_plot_visible()
+            ent, text="Toggle Details", command=self.update_plot_visible
         )
 
         self.start_button.grid(row=0, column=0)
@@ -170,9 +168,7 @@ class TestHandlerView(ttk.Frame):
         self.elapsed_label = ttk.Label(ent, textvariable=self.handler.elapsed)
         self.elapsed_label.grid(row=1, column=1)
         ent.grid(row=1, column=0, padx=1, pady=1, sticky="n")
-        self.new_button = ttk.Button(
-            ent, text="New", command=lambda: self.handler.new_test()
-        )
+        self.new_button = ttk.Button(ent, text="New", command=self.handler.new_test)
 
         # rows 0-1 -------------------------------------------------------------
         # close all pyplots to prevent memory leak
@@ -231,13 +227,9 @@ class TestHandlerView(ttk.Frame):
     def update_start_button(self, *args) -> None:
         """Changes the "Start" button to a "New" button when the Test finishes."""
         if self.handler.is_done.get():
-            self.start_button.configure(
-                text="New", command=lambda: self.handler.new_test()
-            )
+            self.start_button.configure(text="New", command=self.handler.new_test)
         else:
-            self.start_button.configure(
-                text="Start", command=lambda: self.handler.start_test()
-            )
+            self.start_button.configure(text="Start", command=self.handler.start_test)
 
     def update_test_type(self, *args):
         """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""

@@ -53,13 +53,13 @@ class ProjectWindow(tk.Toplevel):
         tab_control.add(ProjectReport(self), text="Report settings")
 
         button_frame = ttk.Frame(self)
-        ttk.Button(
-            button_frame, text="Save", width=7, command=lambda: self.save()
-        ).grid(row=0, column=0, padx=5)
-        ttk.Button(
-            button_frame, text="Save as", width=7, command=lambda: self.save_as()
-        ).grid(row=0, column=1, padx=10)
-        ttk.Button(button_frame, text="New", width=7, command=lambda: self.new()).grid(
+        ttk.Button(button_frame, text="Save", width=7, command=self.save).grid(
+            row=0, column=0, padx=5
+        )
+        ttk.Button(button_frame, text="Save as", width=7, command=self.save_as).grid(
+            row=0, column=1, padx=10
+        )
+        ttk.Button(button_frame, text="New", width=7, command=self.new).grid(
             row=0, column=2, padx=5
         )
         button_frame.grid(row=1, column=0)

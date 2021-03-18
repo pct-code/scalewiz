@@ -36,7 +36,7 @@ class RinseWindow(tk.Toplevel):
         ent.grid(row=0, column=1)
 
         self.button = ttk.Button(
-            self, textvariable=self.txt, command=lambda: self.request_rinse()
+            self, textvariable=self.txt, command=self.request_rinse
         )
         self.button.grid(row=2, column=0, columnspan=2)
 

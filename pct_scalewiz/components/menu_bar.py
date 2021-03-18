@@ -23,26 +23,24 @@ class MenuBar:
         self.main_frame = parent
 
         menubar = tk.Menu()
-        menubar.add_command(
-            label="Add System", command=lambda: self.main_frame.add_handler()
-        )
+        menubar.add_command(label="Add System", command=self.main_frame.add_handler)
 
         project_menu = tk.Menu(tearoff=0)
-        project_menu.add_command(label="New/Edit", command=lambda: self.spawn_editor())
+        project_menu.add_command(label="New/Edit", command=self.spawn_editor)
         project_menu.add_command(
-            label="Load existing", command=lambda: self.request_project_load()
+            label="Load existing", command=self.request_project_load
         )
 
         menubar.add_cascade(label="Project", menu=project_menu)
-        menubar.add_command(label="Evaluation", command=lambda: self.spawn_evaluator())
+        menubar.add_command(label="Evaluation", command=self.spawn_evaluator)
         menubar.add_command(
-            label="Log", command=lambda: self.main_frame.parent.log_window.deiconify()
+            label="Log", command=self.main_frame.parent.log_window.deiconify
         )
-        menubar.add_command(label="Rinse", command=lambda: self.spawn_rinse())
-        menubar.add_command(label="Help", command=lambda: show_help())
+        menubar.add_command(label="Rinse", command=self.spawn_rinse)
+        menubar.add_command(label="Help", command=show_help)
 
         # debug
-        menubar.add_command(label="Debug", command=lambda: self.debug())
+        menubar.add_command(label="Debug", command=self.debug)
 
         self.main_frame.winfo_toplevel().configure(menu=menubar)
 
