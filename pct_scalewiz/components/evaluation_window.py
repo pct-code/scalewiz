@@ -49,13 +49,6 @@ class EvaluationWindow(tk.Toplevel):
         self.plot_frame = tk.Frame(self)  # this gets destroyed in plot()
         self.build()
 
-    def add_traces(self) -> None:
-        """Applies a tkVar trace to properties on every test object."""
-        for test in self.editor_project.tests:
-            # test.label.trace_add("write", self.score)
-            test.pump_to_score.trace_add("write", self.score)
-            test.include_on_report.trace_add("write", self.score)
-
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Renders a given label and entry on the passed row."""
         # pylint: disable=no-self-use
@@ -65,6 +58,10 @@ class EvaluationWindow(tk.Toplevel):
     def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
         if reload and os.path.exists(self.handler.project.path.get()):
+            # cleanup for the GC
+            for test in self.editor_project.tests:
+                test.remove_traces()
+            self.editor_project.remove_traces()
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
@@ -98,8 +95,6 @@ class EvaluationWindow(tk.Toplevel):
             label.grid(row=0, column=i, padx=3, sticky="w")
 
         self.grid_columnconfigure(0, weight=1)
-        # add traces for scoring
-        self.add_traces()
 
         self.blanks = []
         for test in self.editor_project.tests:

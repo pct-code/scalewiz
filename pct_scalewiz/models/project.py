@@ -56,35 +56,14 @@ class Project:
         self.interval.set(3)
         self.uptake.set(60)
         self.output_format.set("CSV")
+        self.add_traces()  # these need to be cleaned up later
 
-        self.add_traces() # these need to be cleaned up later
-
-        
     def add_traces(self) -> None:
+        """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
         self.customer.trace_add("write", self.make_name)
         self.client.trace_add("write", self.make_name)
         self.field.trace_add("write", self.make_name)
         self.sample.trace_add("write", self.make_name)
-    
-    def remove_traces(self) -> None:
-        self.customer.trace_remove("write", self.customer.trace_info())
-        self.client.trace_remove("write", self.make_name)
-        self.field.trace_remove("write", self.make_name)
-        self.sample.trace_remove("write", self.make_name)
-
-    def make_name(self, *args) -> None:
-        """Constructs a default name for the Project."""
-        # extra unused args are passed in by tkinter
-        name = ""
-        if self.client.get() != "":
-            name = self.client.get().strip()
-        else:
-            name = self.customer.get().strip()
-        if self.field.get() != "":
-            name = f"{name} - {self.field.get()}".strip()
-        if self.sample.get() != "":
-            name = f"{name} ({self.sample.get()})".strip()
-        self.name.set(name)
 
     def dump_json(self, path=None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
@@ -193,3 +172,10 @@ class Project:
             test = Test()
             test.load_json(entry)
             self.tests.append(test)
+
+    def remove_traces(self) -> None:
+        """Remove tkVar traces to allow the GC to do its thing."""
+        self.customer.trace_remove("write", self.customer.trace_info()[0][1])
+        self.client.trace_remove("write", self.client.trace_info()[0][1])
+        self.field.trace_remove("write", self.field.trace_info()[0][1])
+        self.sample.trace_remove("write", self.sample.trace_info()[0][1])

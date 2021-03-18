@@ -49,16 +49,18 @@ class TestResultRow(ttk.Frame):
                 anchor="center",
             )
         )
-        # col 3 - to consider
-        cols.append(
-            ttk.Combobox(
-                self.parent,
-                textvariable=self.test.pump_to_score,
-                values=["pump 1", "pump 2", "average"],
-                state="readonly",
-                width=7,
-            )
+        # col 3 - pump to score
+        to_score = ttk.Combobox(
+            self.parent,
+            textvariable=self.test.pump_to_score,
+            values=["pump 1", "pump 2", "average"],
+            state="readonly",
+            width=7,
+            validate="all",
+            validatecommand=self.update_score,
         )
+        to_score.bind("<MouseWheel>", self.update_score)
+        cols.append(to_score)
         # col 4 - obs baseline
         cols.append(
             ttk.Label(
@@ -79,8 +81,14 @@ class TestResultRow(ttk.Frame):
         cols.append(
             ttk.Label(self.parent, textvariable=self.test.result, anchor="center")
         )
-        # col 9 - on report
-        cols.append(ttk.Checkbutton(self.parent, variable=self.test.include_on_report))
+        # col 9 - include on report
+        cols.append(
+            ttk.Checkbutton(
+                self.parent,
+                variable=self.test.include_on_report,
+                command=self.update_score,
+            )
+        )
         # col 10 - delete
         cols.append(
             ttk.Button(
@@ -119,5 +127,7 @@ class TestResultRow(ttk.Frame):
 
     def update_score(self, *args) -> True:
         """Method to call score from a validation callback. Doesn't check anything."""
-        self.parent.master.score()
+        self.after(
+            1, self.parent.master.score
+        )  # prevents a race condition when setting the score
         return True

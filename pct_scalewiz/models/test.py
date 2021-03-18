@@ -26,7 +26,7 @@ class Test:
         # set defaults
         self.pump_to_score.set("pump 1")
         self.is_blank.set(True)
-        self.add_traces() # will need to clean these up later for the GC
+        self.add_traces()  # will need to clean these up later for the GC
 
     def add_traces(self) -> None:
         """Adds tkVar traces. Need to be removed with remove_traces."""
@@ -90,9 +90,10 @@ class Test:
             self.max_psi.set(max(pressures))
             baselines = pressures[0:4]
             self.observed_baseline.set(round(sum(baselines) / 4))
-    
+
     def remove_traces(self) -> None:
-        self.chemical.trace_remove("write", self.make_name)
-        self.rate.trace_remove("write", self.make_name)
-        self.name.trace_remove("write", self.make_label)
-        self.pump_to_score.trace_remove("write", self.set_observed_baseline)
+        """Remove tkVar traces to allow the GC to do its thing."""
+        self.chemical.trace_remove("write", self.chemical.trace_info()[0][1])
+        self.rate.trace_remove("write", self.rate.trace_info()[0][1])
+        self.name.trace_remove("write", self.name.trace_info()[0][1])
+        self.pump_to_score.trace_remove("write", self.pump_to_score.trace_info()[0][1])
