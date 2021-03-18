@@ -91,34 +91,22 @@ class Project:
         if path is None:
             path = self.path.get()
 
-        # filter the data alphanumerically by label
-        _blanks = {}  # put in dicts to allow for popping later
-        _trials = {}
-        keys = []
-        for test in self.tests:
-            key = test.label.get().lower()  # eliminate capitalization discrepancies
-            while key in keys:  # checking for duplicate values
-                test.label.set(test.label.get() + " - copy")
-                key = test.label.get().lower()
+        blanks = [test for test in self.tests if test.is_blank.get()]
+        trials = [test for test in self.tests if not test.is_blank.get()]
+        blank_labels = sort_nicely([test.label.get().lower() for test in blanks])
+        trial_labels = sort_nicely([test.label.get().lower() for test in trials])
+        tests = []
+        for label in blank_labels:
+            for test in self.tests:
+                if test.label.get().lower() == label:
+                    tests.append(test)
 
-            keys.append(key)
+        for label in trial_labels:
+            for test in self.tests:
+                if test.label.get().lower() == label:
+                    tests.append(test)
 
-            if test.is_blank.get():
-                _blanks[key] = test
-            else:
-                _trials[key] = test
-
-        blank_labels = sort_nicely(
-            [blank.label.get().lower() for blank in list(_blanks.values())]
-        )
-        blanks = [_blanks.pop(name) for name in blank_labels]
-
-        trial_labels = sort_nicely(
-            [trial.label.get().lower() for trial in list(_trials.values())]
-        )
-        trials = [_trials.pop(name) for name in trial_labels]
-
-        self.tests = [*blanks, *trials]
+        self.tests = tests
 
         this = {
             "info": {
