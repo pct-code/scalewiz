@@ -145,7 +145,7 @@ class EvaluationWindow(tk.Toplevel):
 
         button_frame = ttk.Frame(self)
         ttk.Button(
-            button_frame, text="Save", command=lambda: self.save(), width=10
+            button_frame, text="Save", command=self.save, width=10
         ).grid(row=0, column=0, padx=5)
         ttk.Button(
             button_frame,

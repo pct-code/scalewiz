@@ -18,6 +18,7 @@ from pct_scalewiz.models.teledyne_pump import TeledynePump
 from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
+    from typing import List
     from tkinter.scrolledtext import ScrolledText
     from tkinter import ttk
     from pct_scalewiz.components.test_handler_view import TestHandlerView
@@ -72,6 +73,13 @@ class TestHandler:
 
     def load_project(self, path: str = None) -> None:
         """Opens a file dialog then loads the selected Project file."""
+        # traces are set in Project and Test __init__s
+        # we need to explicitly clean them up here
+        if self.project is not None:
+            for test in self.project.tests:
+                test.remove_traces()
+            self.project.remove_traces()
+
         if path is None:
             path = filedialog.askopenfilename(
                 initialdir='C:"',
@@ -274,7 +282,7 @@ class TestHandler:
         self.load_project(path=self.project.path.get())
         self.rebuild_editors()
 
-    def setup_pumps(self, issues: [str] = None) -> None:
+    def setup_pumps(self, issues: List[str] = None) -> None:
         """Set up the pumps with some default values."""
         if issues is None:
             issues = []

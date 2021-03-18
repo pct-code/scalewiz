@@ -19,52 +19,58 @@ class Project:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
-        # serializable test info
+        self.tests: list[Test] = []
+        # experiment parameters that affect score 
+        self.baseline = tk.IntVar()
+        self.limit_minutes = tk.IntVar()
+        self.limit_psi = tk.IntVar()
+        self.interval = tk.IntVar()
+        self.uptake = tk.IntVar()
+        # report stuff
+        self.output_format = tk.StringVar()
+        # metadata for reporting
         self.customer = tk.StringVar()
         self.submitted_by = tk.StringVar()
         self.client = tk.StringVar()
         self.field = tk.StringVar()
         self.sample = tk.StringVar()
-
         self.sample_date = tk.StringVar()
         self.received_date = tk.StringVar()
         self.completed_date = tk.StringVar()
-        self.name = tk.StringVar()
+        self.name = tk.StringVar() # identifier for the project
         self.analyst = tk.StringVar()
         self.numbers = tk.StringVar()
-        self.path = tk.StringVar()
+        self.path = tk.StringVar() # path to the project's JSON file
         self.notes = tk.StringVar()
-        # serializable test params
         self.bicarbs = tk.IntVar()
         self.bicarbs_increased = tk.BooleanVar()
         self.chlorides = tk.IntVar()
-        self.baseline = tk.IntVar()
-        self.temperature = tk.IntVar()
-        self.limit_psi = tk.IntVar()
-        self.limit_minutes = tk.IntVar()
-        self.interval = tk.IntVar()
-        self.uptake = tk.IntVar()
-        # report stuff
-        self.output_format = tk.StringVar()
-        self.plot = tk.StringVar()
-
-        self.tests: list[dict] = []
-
-        # maintain live fields
-        self.customer.trace_add("write", self.make_name)
-        self.client.trace_add("write", self.make_name)
-        self.field.trace_add("write", self.make_name)
-        self.sample.trace_add("write", self.make_name)
+        self.temperature = tk.IntVar() # the test temperature
+        self.plot = tk.StringVar() # path to plot local file
 
         # set defaults
-        # todo #3 abstract these out into some TOML or something
-
+        # todo #3 abstract these out into some TOML or something ?
         self.baseline.set(75)
         self.limit_psi.set(1500)
         self.limit_minutes.set(90)
         self.interval.set(3)
         self.uptake.set(60)
         self.output_format.set("CSV")
+
+        self.add_traces() # these need to be cleaned up later
+
+        
+    def add_traces(self) -> None:
+        self.customer.trace_add("write", self.make_name)
+        self.client.trace_add("write", self.make_name)
+        self.field.trace_add("write", self.make_name)
+        self.sample.trace_add("write", self.make_name)
+    
+    def remove_traces(self) -> None:
+        self.customer.trace_remove("write", self.customer.trace_info())
+        self.client.trace_remove("write", self.make_name)
+        self.field.trace_remove("write", self.make_name)
+        self.sample.trace_remove("write", self.make_name)
 
     def make_name(self, *args) -> None:
         """Constructs a default name for the Project."""
@@ -141,22 +147,23 @@ class Project:
                 "interval": self.interval.get(),
                 "uptake": self.uptake.get(),
             },
-            "tests": [test.dump_json() for test in self.tests],
+            "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
             "plot": os.path.abspath(self.plot.get()),
         }
 
-        with open(path, "w") as file:
-            json.dump(this, file, indent=4)
-
-        logger.info("Saved %s to %s", self.name.get(), path)
+        if os.path.isfile(path):
+            with open(path, "w") as file:
+                json.dump(this, file, indent=4)
+                logger.info("Saved %s to %s", self.name.get(), path)
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
         path = os.path.abspath(path)
-        logger.info("Loading from %s", path)
-        with open(path, "r") as file:
-            obj = json.load(file)
+        if os.path.isfile(path):
+            logger.info("Loading from %s", path)
+            with open(path, "r") as file:
+                obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
         if path != obj.get("info").get("path"):

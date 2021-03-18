@@ -10,49 +10,32 @@ class Test:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
-        self.is_blank = tk.BooleanVar()
-        self.name = tk.StringVar()
-        self.chemical = tk.StringVar()
-        self.rate = tk.IntVar()
-        self.label = tk.StringVar()
-        self.clarity = tk.StringVar()
-        self.notes = tk.StringVar()
-        self.pump_to_score = tk.StringVar()
-        self.result = tk.DoubleVar()
-        self.include_on_report = tk.BooleanVar()
-        self.readings: list[dict] = []
-        self.max_psi = tk.IntVar()
-        self.observed_baseline = tk.IntVar()
+        self.is_blank = tk.BooleanVar() # boolean for blank vs chemical trial
+        self.name = tk.StringVar() # identifier for the test
+        self.chemical = tk.StringVar() # chemical, if any, to be tested
+        self.rate = tk.IntVar() # the treating rate of the test
+        self.label = tk.StringVar() # how the test will be labeled on the report/plot
+        self.clarity = tk.StringVar() # the clarity of the treated water
+        self.notes = tk.StringVar() # misc notes on the experiment
+        self.pump_to_score = tk.StringVar() # which series of PSIs to use
+        self.result = tk.DoubleVar() # represents the test's performance vs the blank
+        self.include_on_report = tk.BooleanVar() # condition for scoring
+        self.readings: list[dict] = [] # list of flat reading dicts
+        self.max_psi = tk.IntVar() # the highest psi of the test
+        self.observed_baseline = tk.IntVar() # a guess at the baseline for the test
+        # set defaults
+        self.pump_to_score.set("pump 1")
+        self.is_blank.set(True)
+        self.add_traces() # will need to clean these up later for the GC
 
+    def add_traces(self) -> None:
+        """Adds tkVar traces. Need to be removed with remove_traces."""
         self.chemical.trace_add("write", self.make_name)
         self.rate.trace_add("write", self.make_name)
         self.name.trace_add("write", self.make_label)
         self.pump_to_score.trace_add("write", self.set_observed_baseline)
 
-        self.pump_to_score.set("pump 1")
-        self.is_blank.set(True)
-
-    def make_name(self, *args) -> None:
-        """Makes a name by concatenating the chemical name and rate."""
-        if not (self.chemical.get() == "" or self.rate.get() == 0):
-            self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
-
-        if self.chemical.get().strip() != self.chemical.get():
-            self.chemical.set(self.chemical.get().strip())
-
-    def make_label(self, *args) -> None:
-        """Sets the label to the current name as a default value."""
-        self.label.set(self.name.get().strip())
-
-    def set_observed_baseline(self, *args) -> None:
-        """Sets the observed baseline psi."""
-        pressures = [reading[self.pump_to_score.get()] for reading in self.readings]
-        if len(pressures) > 0:
-            self.max_psi.set(max(pressures))
-            baselines = pressures[0:4]
-            self.observed_baseline.set(round(sum(baselines) / 4))
-
-    def dump_json(self) -> dict:
+    def to_dict(self) -> dict:
         """Returns a dict representation of a Test."""
         return {
             "name": self.name.get(),
@@ -87,3 +70,29 @@ class Test:
     def get_readings(self) -> list[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         return [reading[self.pump_to_score.get()] for reading in self.readings]
+
+    def make_name(self, *args) -> None:
+        """Makes a name by concatenating the chemical name and rate."""
+        if not (self.chemical.get() == "" or self.rate.get() == 0):
+            self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
+
+        if self.chemical.get().strip() != self.chemical.get():
+            self.chemical.set(self.chemical.get().strip())
+
+    def make_label(self, *args) -> None:
+        """Sets the label to the current name as a default value."""
+        self.label.set(self.name.get().strip())
+
+    def set_observed_baseline(self, *args) -> None:
+        """Sets the observed baseline psi."""
+        pressures = [reading[self.pump_to_score.get()] for reading in self.readings]
+        if len(pressures) > 0:
+            self.max_psi.set(max(pressures))
+            baselines = pressures[0:4]
+            self.observed_baseline.set(round(sum(baselines) / 4))
+    
+    def remove_traces(self) -> None:
+        self.chemical.trace_remove("write", self.make_name)
+        self.rate.trace_remove("write", self.make_name)
+        self.name.trace_remove("write", self.make_label)
+        self.pump_to_score.trace_remove("write", self.set_observed_baseline)

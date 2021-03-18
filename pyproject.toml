@@ -30,7 +30,7 @@ isort = "^5.7.0"
 line-length = 88
 
 [tool.pylint.message_control]
-disable = "unnecessary-lambda, unused-argument"
+disable = "unused-argument"
 
 [tool.pylint.design]
 max-parents = 10

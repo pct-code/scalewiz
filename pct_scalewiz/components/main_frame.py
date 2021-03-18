@@ -17,7 +17,6 @@ class MainFrame(ttk.Frame):
 
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
-        # hijack closing protocol
         self.parent = parent
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
         self.build()
@@ -25,7 +24,6 @@ class MainFrame(ttk.Frame):
     def build(self) -> None:
         """Build the UI."""
         MenuBar(self)  # this will apply itself to the current Toplevel
-
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(sticky="nsew")
         self.add_handler()
@@ -52,4 +50,4 @@ class MainFrame(ttk.Frame):
                         widget.handler.name,
                     )
                     return
-        sys.exit()
+        self.quit()
