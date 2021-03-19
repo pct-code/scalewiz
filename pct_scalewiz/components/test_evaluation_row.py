@@ -127,7 +127,6 @@ class TestResultRow(ttk.Frame):
 
     def update_score(self, *args) -> True:
         """Method to call score from a validation callback. Doesn't check anything."""
-        self.after(
-            1, self.parent.master.score
-        )  # prevents a race condition when setting the score
+        # prevents a race condition when setting the score
+        self.after(1, self.parent.master.score)
         return True
