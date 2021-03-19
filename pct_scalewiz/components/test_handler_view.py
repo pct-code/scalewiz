@@ -29,27 +29,17 @@ class TestHandlerView(ttk.Frame):
         self.handler = handler
         self.handler.parent = self
         self.devices_list: List[str] = []
-        self.build()
-
-    def add_traces(self) -> None:
-        """Sets tkVar bindings for attributes on the current TestHandler."""
-        # todo change these to validate commands ....
-        # use command field on radio buttons
-        self.handler.test.is_blank.trace_add("write", self.update_test_type)
-        # these might have to stay as traces
+        # we don't have to worry about cleaning up these traces
+        # the same handler instance will persist across projects
         self.handler.is_running.trace_add("write", self.update_input_frame)
         self.handler.is_done.trace_add("write", self.update_start_button)
-        # these can use a validatecommand + binding to "<MouseWheel>"
-        # might need an after/lambda type call
-        self.handler.dev1.trace_add("write", self.update_devices_list)
-        self.handler.dev2.trace_add("write", self.update_devices_list)
+        self.build()
 
     def build(self) -> None:
         """Builds the UI, destroying any currently existing widgets."""
         for child in self.winfo_children():
             child.destroy()
 
-        self.add_traces()
         # use this list to hold refs so we can easily disable later
         self.inputs = []
         self.inputs_frame = ttk.Frame(self)
@@ -57,16 +47,20 @@ class TestHandlerView(ttk.Frame):
 
         # row 0 ---------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="      Devices:")
-        lbl.bind("<Button-1>", lambda _: self.update_devices_list())
+        lbl.bind("<Button-1>", self.update_devices_list)
 
         # put the boxes in a frame to make life easier
         ent = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
         self.device1_entry = ttk.Combobox(
-            ent, width=15, textvariable=self.handler.dev1, values=self.devices_list
+            ent, width=15, textvariable=self.handler.dev1, values=self.devices_list,
+            validate="all", validatecommand=self.update_devices_list
         )
+        self.device1_entry.bind("<MouseWheel>", self.update_devices_list)
         self.device2_entry = ttk.Combobox(
-            ent, width=15, textvariable=self.handler.dev2, values=self.devices_list
+            ent, width=15, textvariable=self.handler.dev2, values=self.devices_list,
+            validate="all", validatecommand=self.update_devices_list
         )
+        self.device2_entry.bind("<MouseWheel>", self.update_devices_list)
         self.device1_entry.grid(row=0, column=0, sticky=tk.W)
         self.device2_entry.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
         self.inputs.append(self.device1_entry)
@@ -87,10 +81,18 @@ class TestHandlerView(ttk.Frame):
         ent.grid_columnconfigure(0, weight=1)
         ent.grid_columnconfigure(1, weight=1)
         blank_radio = ttk.Radiobutton(
-            ent, text="Blank", variable=self.handler.test.is_blank, value=True
+            ent,
+            text="Blank",
+            variable=self.handler.test.is_blank,
+            value=True,
+            command=self.update_test_type,
         )
         trial_radio = ttk.Radiobutton(
-            ent, text="Trial", variable=self.handler.test.is_blank, value=False
+            ent,
+            text="Trial",
+            variable=self.handler.test.is_blank,
+            value=False,
+            command=self.update_test_type,
         )
         blank_radio.grid(row=0, column=0)
         trial_radio.grid(row=0, column=1)
@@ -208,19 +210,22 @@ class TestHandlerView(ttk.Frame):
     def update_devices_list(self, *args) -> None:
         """Updates the devices list held by the TestHandler."""
         # extra unused args are passed in by tkinter
-        self.devices_list = sorted([i.device for i in list_ports.comports()])
-        if len(self.devices_list) < 1:
-            self.devices_list = ["None found"]
+        def update():
+            self.devices_list = sorted([i.device for i in list_ports.comports()])
+            if len(self.devices_list) < 1:
+                self.devices_list = ["None found"]
 
-        self.device1_entry.configure(values=self.devices_list)
-        self.device2_entry.configure(values=self.devices_list)
+            self.device1_entry.configure(values=self.devices_list)
+            self.device2_entry.configure(values=self.devices_list)
 
-        if len(self.devices_list) > 1:
-            self.device1_entry.current(0)
-            self.device2_entry.current(1)
+            if len(self.devices_list) > 1:
+                self.device1_entry.current(0)
+                self.device2_entry.current(1)
 
-        if not "None found" in self.devices_list:
-            logger.debug("%s found devices: %s", self.handler.name, self.devices_list)
+            if not "None found" in self.devices_list:
+                logger.debug("%s found devices: %s", self.handler.name, self.devices_list)
+        # after here to prevent race conditions
+        self.after(1, update)
 
     def update_input_frame(self, *args) -> None:
         """Disables widgets in the input frame if a Test is running."""
