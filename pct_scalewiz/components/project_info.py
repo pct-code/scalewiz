@@ -6,9 +6,8 @@ import tkinter as tk
 import typing
 from tkinter import ttk
 
-from pct_scalewiz.helpers.render import render
-
 import tkcalendar as tkcal
+from pct_scalewiz.helpers.render import render
 
 if typing.TYPE_CHECKING:
     from pct_scalewiz.models.project import Project

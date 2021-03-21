@@ -6,7 +6,7 @@ import tkinter as tk
 from importlib.metadata import version
 from tkinter import font, ttk
 
-from pct_scalewiz.components.log_frame import LogFrame
+from pct_scalewiz.components.log_window import LogWindow
 from pct_scalewiz.components.main_frame import MainFrame
 from pct_scalewiz.helpers.set_icon import set_icon
 from pct_scalewiz.models.logger import Logger
@@ -46,5 +46,4 @@ class ScaleWiz(ttk.Frame):
         self.log_window = LogWindow(Logger())
         logging.getLogger("scalewiz").info("Starting in %s", os.getcwd())
         self.log_window.withdraw()  # 🏌️‍♀️👋
-        # this will hijack the window closing protocol
         MainFrame(self).grid()
