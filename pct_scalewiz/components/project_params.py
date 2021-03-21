@@ -19,11 +19,21 @@ class ProjectParams(ttk.Frame):
 
     def __init__(self, parent: ttk.Frame, project: Project):
         ttk.Frame.__init__(self, parent)
+        # validation command to ensure numeric inputs
+        vcmd = self.register(lambda s: s.isnumeric())
+
         self.grid_columnconfigure(1, weight=1)
 
         # row 0 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Bicarbonates (mg/L):")
-        ent = ttk.Spinbox(self, textvariable=project.bicarbs, from_=0, to=999999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.bicarbs,
+            from_=0,
+            to=999999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 0)
 
         # row 1 ---------------------------------------------------------------
@@ -47,35 +57,84 @@ class ProjectParams(ttk.Frame):
 
         # row 2 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Chlorides (mg/L):")
-        ent = ttk.Spinbox(self, textvariable=project.chlorides, from_=0, to=999999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.chlorides,
+            from_=0,
+            to=999999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 2)
 
         # row 3 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Test temperature (°F):")
-        ent = ttk.Spinbox(self, textvariable=project.temperature, from_=0, to=9999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.temperature,
+            from_=0,
+            to=9999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 3)
 
         # row 4 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Baseline pressure (PSI):")
-        ent = ttk.Spinbox(self, textvariable=project.baseline, from_=0, to=9999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.baseline,
+            from_=0,
+            to=9999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 4)
 
         # row 5 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Limiting pressure (PSI):")
-        ent = ttk.Spinbox(self, textvariable=project.limit_psi, from_=0, to=9999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.limit_psi,
+            from_=0,
+            to=9999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 5)
 
         # row 6 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Time limit (min.):")
-        ent = ttk.Spinbox(self, textvariable=project.limit_minutes, from_=0, to=9999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.limit_minutes,
+            from_=0,
+            to=9999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 6)
 
         # row 7 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Reading interval (s):")
-        ent = ttk.Spinbox(self, textvariable=project.interval, from_=0, to=9999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.interval,
+            from_=0,
+            to=9999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 7)
 
         # row 8 ---------------------------------------------------------------
         lbl = ttk.Label(self, text="Uptake time (s):")
-        ent = ttk.Spinbox(self, textvariable=project.uptake, from_=0, to=9999)
+        ent = ttk.Spinbox(
+            self,
+            textvariable=project.uptake,
+            from_=0,
+            to=9999,
+            validate="key",
+            validatecommand=(vcmd, "%P"),
+        )
         render(lbl, ent, 8)

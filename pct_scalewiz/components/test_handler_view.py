@@ -44,7 +44,8 @@ class TestHandlerView(ttk.Frame):
         self.inputs = []
         self.inputs_frame = ttk.Frame(self)
         self.inputs_frame.grid(row=0, column=0, sticky="new")
-
+        # validation command to ensure numeric inputs
+        vcmd = self.register(lambda s: s.isnumeric())
         # row 0 ---------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="      Devices:")
         lbl.bind("<Button-1>", self.update_devices_list)
@@ -52,13 +53,21 @@ class TestHandlerView(ttk.Frame):
         # put the boxes in a frame to make life easier
         ent = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
         self.device1_entry = ttk.Combobox(
-            ent, width=15, textvariable=self.handler.dev1, values=self.devices_list,
-            validate="all", validatecommand=self.update_devices_list
+            ent,
+            width=15,
+            textvariable=self.handler.dev1,
+            values=self.devices_list,
+            validate="all",
+            validatecommand=self.update_devices_list,
         )
         self.device1_entry.bind("<MouseWheel>", self.update_devices_list)
         self.device2_entry = ttk.Combobox(
-            ent, width=15, textvariable=self.handler.dev2, values=self.devices_list,
-            validate="all", validatecommand=self.update_devices_list
+            ent,
+            width=15,
+            textvariable=self.handler.dev2,
+            values=self.devices_list,
+            validate="all",
+            validatecommand=self.update_devices_list,
         )
         self.device2_entry.bind("<MouseWheel>", self.update_devices_list)
         self.device1_entry.grid(row=0, column=0, sticky=tk.W)
@@ -110,7 +119,7 @@ class TestHandlerView(ttk.Frame):
             row=0, column=0, sticky=tk.E, pady=1
         )
         ttk.Label(self.trial_label_frame, text="Rate (ppm):").grid(
-            row=1, column=0, sticky=tk.E, pady=1
+            row=1, column=0, sticky=tk.E, pady=1,
         )
         ttk.Label(self.trial_label_frame, text="Clarity:").grid(
             row=2, column=0, sticky=tk.E, pady=1
@@ -122,11 +131,15 @@ class TestHandlerView(ttk.Frame):
             self.trial_entry_frame, textvariable=self.handler.test.chemical
         )
         chemical_entry.grid(row=0, column=0, sticky="ew", pady=1)
+        # validation command to ensure numeric inputs
+        vcmd = self.register(lambda s: s.isnumeric())
         rate_entry = ttk.Spinbox(
             self.trial_entry_frame,
             textvariable=self.handler.test.rate,
             from_=0,
             to=999999,
+            validate="key",
+            validatecommand=(vcmd, "%P")
         )
         rate_entry.grid(row=1, column=0, sticky="ew", pady=1)
         clarity_entry = ttk.Combobox(
@@ -223,7 +236,10 @@ class TestHandlerView(ttk.Frame):
                 self.device2_entry.current(1)
 
             if not "None found" in self.devices_list:
-                logger.debug("%s found devices: %s", self.handler.name, self.devices_list)
+                logger.debug(
+                    "%s found devices: %s", self.handler.name, self.devices_list
+                )
+
         # after here to prevent race conditions
         self.after(1, update)
 
@@ -273,3 +289,9 @@ class TestHandlerView(ttk.Frame):
                 logger.info("%s: Hiding details view", this.handler.name)
                 this.plot_frame.grid_remove()
                 this.log_frame.grid_remove()
+
+    def validate(self, value) -> bool:
+        if self.is_numeric.search(value) is None:
+            return True
+        else:
+            return False
