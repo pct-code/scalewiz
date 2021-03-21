@@ -1,10 +1,10 @@
 """A Toplevel with a ScrolledText. Displays messages from a Logger."""
+
 from __future__ import annotations
 
 import queue
 import tkinter as tk
 import typing
-from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
 from pct_scalewiz.models.logger import Logger
@@ -15,11 +15,11 @@ if typing.TYPE_CHECKING:
 # thanks https://github.com/beenje/tkinter-logging-text-widget
 
 
-class LogFrame(ttk.Frame):
+class LogWindow(tk.Toplevel):
     """A Toplevel with a ScrolledText. Displays messages from a Logger."""
 
-    def __init__(self, parent: tk.Toplevel, logger: Logger) -> None:
-        ttk.Frame.__init__(self, parent)
+    def __init__(self, logger: Logger) -> None:
+        tk.Toplevel.__init__(self)
         self.winfo_toplevel().title("Log Window")
         # replace the window closing behavior with withdrawing instead 🐱‍👤
         self.winfo_toplevel().protocol(

@@ -43,8 +43,7 @@ class ScaleWiz(ttk.Frame):
         ttk.Style().configure("TNotebook.Tab", font=bold_font)
 
         # holding a ref to the toplevel for the menubar to find
-        self.log_window = tk.Toplevel(self)
-        LogFrame(self.log_window, Logger()).grid()
+        self.log_window = LogWindow(Logger())
         logging.getLogger("scalewiz").info("Starting in %s", os.getcwd())
         self.log_window.withdraw()  # 🏌️‍♀️👋
         # this will hijack the window closing protocol
