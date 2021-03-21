@@ -1,7 +1,7 @@
 # pct-scalewiz
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-![pylint Score](https://mperlet.github.io/pybadge/badges/9.89.svg)
+![pylint Score](https://mperlet.github.io/pybadge/badges/9.91.svg)
 
 A graphical user interface designed to work with Teledyne SSI MX-class HPLC pumps for the purpose of calcite scale inhibitor chemical performance testing.
 
@@ -10,6 +10,7 @@ A graphical user interface designed to work with Teledyne SSI MX-class HPLC pump
 
 
 # Installation
+Clone the repo, open a terminal there, then run
 ```
 poetry install
 ```
@@ -18,3 +19,4 @@ poetry install
 ```
 poetry run scalewiz
 ```
+Further instructions can be viewed with the Help button on the main menu.

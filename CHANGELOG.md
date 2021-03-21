@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.2.1]
+### Added
+ - entry validation ensuring only numeric inputs are obtained when necessary
+### Changed
+ - refactored some UI rendering 
+
+## [v0.2.0]
 ### Added
  - clicking a date entry label in the 'Project info' view will clear its contents
  - report export as CSV (default)
