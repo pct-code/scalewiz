@@ -7,6 +7,7 @@ import typing
 from tkinter import ttk
 
 import tkcalendar as tkcal
+
 from pct_scalewiz.helpers.render import render
 
 if typing.TYPE_CHECKING:

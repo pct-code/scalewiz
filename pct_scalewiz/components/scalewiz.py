@@ -2,7 +2,6 @@
 
 import logging
 import os
-import tkinter as tk
 from importlib.metadata import version
 from tkinter import font, ttk
 

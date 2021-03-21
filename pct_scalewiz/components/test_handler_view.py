@@ -119,7 +119,10 @@ class TestHandlerView(ttk.Frame):
             row=0, column=0, sticky=tk.E, pady=1
         )
         ttk.Label(self.trial_label_frame, text="Rate (ppm):").grid(
-            row=1, column=0, sticky=tk.E, pady=1,
+            row=1,
+            column=0,
+            sticky=tk.E,
+            pady=1,
         )
         ttk.Label(self.trial_label_frame, text="Clarity:").grid(
             row=2, column=0, sticky=tk.E, pady=1
@@ -139,7 +142,7 @@ class TestHandlerView(ttk.Frame):
             from_=0,
             to=999999,
             validate="key",
-            validatecommand=(vcmd, "%P")
+            validatecommand=(vcmd, "%P"),
         )
         rate_entry.grid(row=1, column=0, sticky="ew", pady=1)
         clarity_entry = ttk.Combobox(
@@ -289,9 +292,3 @@ class TestHandlerView(ttk.Frame):
                 logger.info("%s: Hiding details view", this.handler.name)
                 this.plot_frame.grid_remove()
                 this.log_frame.grid_remove()
-
-    def validate(self, value) -> bool:
-        if self.is_numeric.search(value) is None:
-            return True
-        else:
-            return False

@@ -10,9 +10,6 @@ from pct_scalewiz.helpers.render import render
 if typing.TYPE_CHECKING:
     from pct_scalewiz.models.project import Project
 
-# todo #6 implement some form of entry validation
-# targeting non-whole number inputs (or make allowances for doubles)
-
 
 class ProjectParams(ttk.Frame):
     """A form for mutating experiment-relevant attributes of the Project."""
