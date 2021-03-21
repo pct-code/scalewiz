@@ -52,9 +52,13 @@ class ProjectWindow(tk.Toplevel):
         self.grid_columnconfigure(0, weight=1)
         tab_control = ttk.Notebook(self)
         tab_control.grid(row=0, column=0)
-        tab_control.add(ProjectInfo(self), text="Project info")
-        tab_control.add(ProjectParams(self), text="Experiment parameters")
-        tab_control.add(ProjectReport(self), text="Report settings")
+        tab_control.add(ProjectInfo(self, self.editor_project), text="Project info")
+        tab_control.add(
+            ProjectParams(self, self.editor_project), text="Experiment parameters"
+        )
+        tab_control.add(
+            ProjectReport(self, self.editor_project), text="Report settings"
+        )
 
         button_frame = ttk.Frame(self)
         ttk.Button(button_frame, text="Save", width=7, command=self.save).grid(
@@ -68,12 +72,6 @@ class ProjectWindow(tk.Toplevel):
         )
         button_frame.grid(row=1, column=0)
 
-    def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
-        """Render the passed label and entry on the passed row."""
-        # pylint: disable=no-self-use
-        label.grid(row=row, column=0, sticky=tk.E)
-        entry.grid(row=row, column=1, sticky=tk.E + tk.W, pady=1)
-
     def new(self) -> None:
         """Resets the form by connecting to a new Project."""
         self.editor_project = Project()
@@ -85,7 +83,6 @@ class ProjectWindow(tk.Toplevel):
             self.save_as()
         else:
             self.editor_project.dump_json()
-            ### todo wait up just use the handler's load project
             self.handler.load_project(self.editor_project.path.get())
             self.handler.view.build()
 
