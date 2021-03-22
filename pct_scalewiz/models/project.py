@@ -84,7 +84,9 @@ class Project:
                 if test.label.get().lower() == label:
                     tests.append(test)
 
-        self.tests = tests
+        self.tests.clear()
+        for test in tests:
+            self.tests.append(test)
 
         this = {
             "info": {
@@ -118,10 +120,9 @@ class Project:
             "plot": os.path.abspath(self.plot.get()),
         }
 
-        if os.path.isfile(path):
-            with open(path, "w") as file:
-                json.dump(this, file, indent=4)
-                logger.info("Saved %s to %s", self.name.get(), path)
+        with open(path, "w") as file:
+            json.dump(this, file, indent=4)
+            logger.info("Saved %s to %s", self.name.get(), path)
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""

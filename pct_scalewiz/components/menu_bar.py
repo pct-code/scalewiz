@@ -69,11 +69,11 @@ class MenuBar:
         """Shows a RinseFrame in a new Toplevel."""
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        window = RinseWindow(widget.handler)
-        widget.handler.editors.append(window)
+        RinseWindow(widget.handler)
 
     def debug(self) -> None:
         """used for debugging"""
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
         widget.handler.rebuild_editors()
+        widget.bell()

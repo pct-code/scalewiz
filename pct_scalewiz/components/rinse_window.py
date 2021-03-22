@@ -59,7 +59,7 @@ class RinseWindow(tk.Toplevel):
                 time.sleep(1)
             else:
                 break
-
+        self.bell()
         self.end_rinse()
         self.button.configure(state="normal")
 
