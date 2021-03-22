@@ -60,7 +60,6 @@ class TestHandlerView(ttk.Frame):
             validate="all",
             validatecommand=self.update_devices_list,
         )
-        self.device1_entry.bind("<MouseWheel>", self.update_devices_list)
         self.device2_entry = ttk.Combobox(
             ent,
             width=15,
@@ -69,7 +68,6 @@ class TestHandlerView(ttk.Frame):
             validate="all",
             validatecommand=self.update_devices_list,
         )
-        self.device2_entry.bind("<MouseWheel>", self.update_devices_list)
         self.device1_entry.grid(row=0, column=0, sticky=tk.W)
         self.device2_entry.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
         self.inputs.append(self.device1_entry)
