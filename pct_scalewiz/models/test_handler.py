@@ -115,7 +115,7 @@ class TestHandler:
 
         # this method will append issue msgs if any occur
         self.setup_pumps(issues)  # hooray for pointers
-
+        # believe it or not, issues will get populated if any occur
         if len(issues) > 0:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
             return
@@ -284,7 +284,9 @@ class TestHandler:
         self.rebuild_editors()
 
     def setup_pumps(self, issues: List[str] = None) -> None:
-        """Set up the pumps with some default values."""
+        """Set up the pumps with some default values.
+        Appends errors to the passed list
+        """
         if issues is None:
             issues = []
         if self.dev1.get() == "" or self.dev1.get() == "None found":
