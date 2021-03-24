@@ -258,7 +258,7 @@ class TestHandler:
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.name,
-                self.pump1.port.port,
+                self.pump1.port.name,
             )
 
         if self.pump2.port.isOpen():
@@ -267,7 +267,7 @@ class TestHandler:
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.name,
-                self.pump1.port.port,
+                self.pump1.port.name,
             )
 
         self.is_done.set(True)
