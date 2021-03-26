@@ -175,10 +175,10 @@ class Project:
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""
-        self.customer.trace_remove("write", self.customer.trace_info()[0][1])
-        self.client.trace_remove("write", self.client.trace_info()[0][1])
-        self.field.trace_remove("write", self.field.trace_info()[0][1])
-        self.sample.trace_remove("write", self.sample.trace_info()[0][1])
+        vars = (self.customer, self.client, self.field, self.sample)
+        for var in vars:
+            # logger.debug(var.trace_info())
+            var.trace_remove("write", var.trace_info()[0][1])
 
     def make_name(self, *args) -> None:
         """Constructs a default name for the Project."""

@@ -2,7 +2,9 @@
 
 # util
 import tkinter as tk
+import logging
 
+logger = logging.getLogger("scalewiz")
 
 class Test:
     """Object for holding all the data associated with a Test."""
@@ -93,7 +95,12 @@ class Test:
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""
-        self.chemical.trace_remove("write", self.chemical.trace_info()[0][1])
-        self.rate.trace_remove("write", self.rate.trace_info()[0][1])
-        self.name.trace_remove("write", self.name.trace_info()[0][1])
-        self.pump_to_score.trace_remove("write", self.pump_to_score.trace_info()[0][1])
+        vars = (self.chemical, self.rate, self.name, self.pump_to_score)
+        for var in vars:
+            logger.debug(var.trace_info())
+            var.trace_remove("write", var.trace_info()[0][1])
+        # todo remove these
+        # self.chemical.trace_remove("write", self.chemical.trace_info()[0][1])
+        # self.rate.trace_remove("write", self.rate.trace_info()[0][1])
+        # self.name.trace_remove("write", self.name.trace_info()[0][1])
+        # self.pump_to_score.trace_remove("write", self.pump_to_score.trace_info()[0][1])
