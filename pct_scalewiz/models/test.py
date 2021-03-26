@@ -1,10 +1,11 @@
 """Model object for a Test."""
 
 # util
-import tkinter as tk
 import logging
+import tkinter as tk
 
 logger = logging.getLogger("scalewiz")
+
 
 class Test:
     """Object for holding all the data associated with a Test."""

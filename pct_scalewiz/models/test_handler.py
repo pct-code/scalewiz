@@ -14,9 +14,8 @@ from tkinter import filedialog, messagebox
 from serial import Serial, SerialException
 
 from pct_scalewiz.models.project import Project
-
-# from pct_scalewiz.models.teledyne_pump import TeledynePump
-from pct_scalewiz.models.teledyne_pump2 import TeledynePump
+# from pct_scalewiz.models.teledyne_pump import NextGenPump
+from pct_scalewiz.models.teledyne_pump2 import NextGenPump
 from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
@@ -55,8 +54,8 @@ class TestHandler:
         self.progress = tk.IntVar()
         self.elapsed = tk.StringVar()
 
-        self.pump1: TeledynePump = None
-        self.pump2: TeledynePump = None
+        self.pump1: NextGenPump = None
+        self.pump2: NextGenPump = None
 
         # UI concerns
         self.is_running = tk.BooleanVar()
@@ -307,24 +306,8 @@ class TestHandler:
             issues.append(msg)
             return
 
-        self.pump1 = TeledynePump(self.dev1.get(), logger)
-        self.pump2 = TeledynePump(self.dev2.get(), logger)
-
-        # the timeout values are an alternative to using TextIOWrapper
-        # the values chosen were suggested by the pump's documentation
-        # try:
-        #     port1 = Serial(self.dev1.get(), timeout=0.05)
-        #     self.pump1 = TeledynePump(port1, logger=logger)
-        #     logger.info("%s: established a connection to %s", self.name, port1.port)
-        # except SerialException as error:
-        #     logger.exception(error)
-
-        # try:
-        #     port2 = Serial(self.dev2.get(), timeout=0.05)
-        #     self.pump2 = TeledynePump(port2, logger=logger)
-        #     logger.info("%s: established a connection to %s", self.name, port2.port)
-        # except SerialException as error:
-        #     logger.exception(error)
+        self.pump1 = NextGenPump(self.dev1.get(), logger)
+        self.pump2 = NextGenPump(self.dev2.get(), logger)
 
         if not None in (self.pump1, self.pump2):
             if not self.pump1.is_open():
