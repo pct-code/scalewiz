@@ -65,22 +65,22 @@ class RinseWindow(tk.Toplevel):
 
     def end_rinse(self) -> None:
         """Stop the pumps if they are running, then close their ports."""
-        if self.handler.pump1.port.isOpen():
+        if self.handler.pump1.is_open():
             self.handler.pump1.stop()
             self.handler.pump1.close()
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.handler.name,
-                self.handler.pump1.port.name,
+                self.handler.pump1.serial.name,
             )
 
-        if self.handler.pump2.port.isOpen():
+        if self.handler.pump2.is_open():
             self.handler.pump2.stop()
             self.handler.pump2.close()
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.handler.name,
-                self.handler.pump2.port.name,
+                self.handler.pump2.serial.name,
             )
 
     def close(self) -> None:
