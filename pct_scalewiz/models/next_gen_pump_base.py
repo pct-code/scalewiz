@@ -13,15 +13,28 @@ if TYPE_CHECKING:
     from logging import Logger
 
 
-COMMAND_END = "\r".encode() # terminates messages sent
-MESSAGE_END = "/".encode() # terminates messages received
+COMMAND_END = "\r".encode()  # terminates messages sent
+MESSAGE_END = "/".encode()  # terminates messages received
+LEAK_MODES = {
+    0: "leak sensor disabled",
+    1: "detected leak does not cause fault",
+    2: "detected leak does cause fault"
+}
+SOLVENT_COMPRESSIBILITY = { # units are 10 ** (-6) per bar
+    "acetonitrile": 115,
+    "hexane": 167,
+    "isopropanol": 84,
+    "methanol": 121,
+    "tetrahydrofuran": 54,
+    "water": 46 
+}
 
 
 class NextGenPumpBase:
     """Serial port wrapper for MX-class Teledyne pumps."""
 
     def __init__(self, device: str, logger: Logger = None) -> None:
-        if logger is None: # append to the root logger
+        if logger is None:  # append to the root logger
             logger = logging.getLogger(logging.getLogger().name + "." + device)
         self.logger = logging.getLogger(logger.name + "." + device)
         # fetch a platform-appropriate serial interface
@@ -35,12 +48,15 @@ class NextGenPumpBase:
             timeout=0.1,  # 100 ms
         )
         # persistent identifying attributes
+        self.max_flowrate: float = None
+        self.max_pressure: Union[int, float] = None
+        self.id: str = None
+        self.pressure_units: str = None
+        self.head: str = None # todo
+        # other
         self.high_res: bool = None  # 0.00 mL vs 0.000 mL; could rep. as 2 || 3?
         self.flowrate_factor: int = None
-        self.max_flowrate: Union[int, float] = None
-        self.part_number: int = None
-        self.firmware_version: str = None
-        self.pressure_units: str = None
+
         # todo head identification ?
         # other configuration logic here
         self.open()  # open the serial connection
@@ -57,22 +73,37 @@ class NextGenPumpBase:
 
     def identify(self):
         """Get persistent pump properties."""
+        # general properties ----------------------------------------------------------
+
         # firmware
-        response = self.write("id")  # expect OK, <ID> Version <ver>/
-        self.part_number = int(response.split(",")[1].split("Version")[0])
-        self.firmware_version = response.split("Version")[1][:-1]
+        response = self.write("id")  # expect "OK,<ID> Version <ver>/"
+        if "OK" in response:
+            self.id = response.split(",")[1][:-1]
+        
+        # max flowrate
+        response = self.write("mf")
+        if "OK" in response: # expect  "OK,MF:<max_flow>/"
+            self.max_flowrate = float(response.split(":")[:-1])
+        
         # volumetric resolution - used for setting flowrate
         response = self.write("cs")  # expect OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
         flow = len(response.split(",")[1])
         if flow == 4:  # eg. "5.00"
             self.flowrate_factor = 1 * 10 ** (-5)
-        else:  # eg. "5.000" -- hopefully
+        elif flow == 5:  # eg. "5.000" -- hopefully
             self.flowrate_factor = 1 * 10 ** (-6)
-        # pressure units, if we have a sensor
+
+        # for pumps that have a pressure sensor ---------------------------------------
+
+        # pressure units
         response = self.write("pu")
         if "OK" in response:  # expect "OK,<p_units>/"
             self.pressure_units = response.split(",")[1][:-1]
-
+        # max pressure
+        response = self.write("mp")
+        if "OK" in response:  # expect "OK,MP:<max_pressure>/"
+            self.max_pressure = float(response.split(":")[:-1])
+    
     def write(self, msg: str, delay=0.015) -> str:
         """Write a command to the pump.A response will be returned after delay seconds.
         Defaults to 0.015 s per pump documentation.
@@ -104,3 +135,6 @@ class NextGenPumpBase:
         self.serial.close()
         self.logger.info("Serial port closed")
 
+    def is_open(self) -> bool:
+        """Returns True if the internal serial port is open."""
+        return self.serial.is_open
