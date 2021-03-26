@@ -14,7 +14,9 @@ from tkinter import filedialog, messagebox
 from serial import Serial, SerialException
 
 from pct_scalewiz.models.project import Project
-from pct_scalewiz.models.teledyne_pump import TeledynePump
+
+# from pct_scalewiz.models.teledyne_pump import TeledynePump
+from pct_scalewiz.models.teledyne_pump2 import TeledynePump
 from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
@@ -165,6 +167,7 @@ class TestHandler:
                 self.progress.set(round(i / uptake * 100))
                 time.sleep(1)
             else:
+                logger.debug("hit rinse else")
                 self.stop_test()
                 break
 
@@ -174,10 +177,11 @@ class TestHandler:
 
         test_start_time = time.monotonic()
         reading_start = test_start_time - interval
-
+        logger.debug("stepping in, %s", self.get_can_run())
         # readings loop -------------------------------------------------------
         while self.get_can_run():
             if time.monotonic() - reading_start >= interval:
+                logger.debug("in if")
                 reading_start = time.monotonic()
                 minutes_elapsed = round((time.monotonic() - test_start_time) / 60, 2)
 
@@ -186,6 +190,7 @@ class TestHandler:
                 collected = time.monotonic() - reading_start
                 logger.debug("%s collected both PSIs in %s s", self.name, collected)
                 average = round(((psi1 + psi2) / 2))
+                logger.debug("postavg")
 
                 reading = {
                     "elapsedMin": minutes_elapsed,
@@ -252,22 +257,22 @@ class TestHandler:
 
     def stop_test(self) -> None:
         """Stops the pumps, closes their ports."""
-        if self.pump1.port.isOpen():
+        if self.pump1.is_open():
             self.pump1.stop()
             self.pump1.close()
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.name,
-                self.pump1.port.name,
+                self.pump1.serial.name,
             )
 
-        if self.pump2.port.isOpen():
+        if self.pump2.is_open():
             self.pump2.stop()
             self.pump2.close()
             logger.info(
                 "%s: Stopped and closed the device @ %s",
                 self.name,
-                self.pump1.port.name,
+                self.pump1.serial.name,
             )
 
         self.is_done.set(True)
@@ -301,29 +306,33 @@ class TestHandler:
             msg = "Select two unique ports"
             issues.append(msg)
             return
+
+        self.pump1 = TeledynePump(self.dev1.get(), logger)
+        self.pump2 = TeledynePump(self.dev2.get(), logger)
+
         # the timeout values are an alternative to using TextIOWrapper
         # the values chosen were suggested by the pump's documentation
-        try:
-            port1 = Serial(self.dev1.get(), timeout=0.05)
-            self.pump1 = TeledynePump(port1, logger=logger)
-            logger.info("%s: established a connection to %s", self.name, port1.port)
-        except SerialException as error:
-            logger.exception(error)
+        # try:
+        #     port1 = Serial(self.dev1.get(), timeout=0.05)
+        #     self.pump1 = TeledynePump(port1, logger=logger)
+        #     logger.info("%s: established a connection to %s", self.name, port1.port)
+        # except SerialException as error:
+        #     logger.exception(error)
 
-        try:
-            port2 = Serial(self.dev2.get(), timeout=0.05)
-            self.pump2 = TeledynePump(port2, logger=logger)
-            logger.info("%s: established a connection to %s", self.name, port2.port)
-        except SerialException as error:
-            logger.exception(error)
+        # try:
+        #     port2 = Serial(self.dev2.get(), timeout=0.05)
+        #     self.pump2 = TeledynePump(port2, logger=logger)
+        #     logger.info("%s: established a connection to %s", self.name, port2.port)
+        # except SerialException as error:
+        #     logger.exception(error)
 
         if not None in (self.pump1, self.pump2):
-            if not self.pump1.port.isOpen():
-                msg = f"Couldn't connect to {self.pump1.port.name}"
+            if not self.pump1.is_open():
+                msg = f"Couldn't connect to {self.pump1.serial.name}"
                 issues.append(msg)
 
-            if not self.pump2.port.isOpen():
-                msg = f"Couldn't connect to {self.pump2.port.name}"
+            if not self.pump2.is_open():
+                msg = f"Couldn't connect to {self.pump2.serial.name}"
                 issues.append(msg)
 
     # methods that affect UI
@@ -348,7 +357,7 @@ class TestHandler:
         """Rebuild all open Toplevels that could overwrite the Project file."""
         for window in self.editors:
             if window.winfo_exists() == 1:
-                print("rebuilding", window)
+                logger.debug("rebuilding %s", window)
                 window.build(reload=True)
         logger.info("%s has rebuilt all editor windows", self.name)
 
