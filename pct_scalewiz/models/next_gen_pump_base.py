@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import logging
+from pct_scalewiz.models.pump_error import PumpError
 import time
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union, Any
 
 from serial import SerialException, serial_for_url
 from serial.serialutil import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
@@ -18,15 +19,16 @@ MESSAGE_END = "/".encode()  # terminates messages received
 LEAK_MODES = {
     0: "leak sensor disabled",
     1: "detected leak does not cause fault",
-    2: "detected leak does cause fault"
+    2: "detected leak does cause fault",
 }
-SOLVENT_COMPRESSIBILITY = { # units are 10 ** (-6) per bar
+# units are 10 ** (-6) per bar
+SOLVENT_COMPRESSIBILITY = {
     "acetonitrile": 115,
     "hexane": 167,
     "isopropanol": 84,
     "methanol": 121,
     "tetrahydrofuran": 54,
-    "water": 46 
+    "water": 46,
 }
 
 
@@ -52,7 +54,7 @@ class NextGenPumpBase:
         self.max_pressure: Union[int, float] = None
         self.id: str = None
         self.pressure_units: str = None
-        self.head: str = None # todo
+        self.head: str = None  # todo
         # other
         self.high_res: bool = None  # 0.00 mL vs 0.000 mL; could rep. as 2 || 3?
         self.flowrate_factor: int = None
@@ -76,17 +78,17 @@ class NextGenPumpBase:
         # general properties ----------------------------------------------------------
 
         # firmware
-        response = self.write("id")  # expect "OK,<ID> Version <ver>/"
+        response = self.command("id")  # expect "OK,<ID> Version <ver>/"
         if "OK" in response:
             self.id = response.split(",")[1][:-1]
-        
+
         # max flowrate
-        response = self.write("mf")
-        if "OK" in response: # expect  "OK,MF:<max_flow>/"
+        response = self.command("mf")
+        if "OK" in response:  # expect  "OK,MF:<max_flow>/"
             self.max_flowrate = float(response.split(":")[:-1])
-        
+
         # volumetric resolution - used for setting flowrate
-        response = self.write("cs")  # expect OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
+        response = self.command("cs")  # expect OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
         flow = len(response.split(",")[1])
         if flow == 4:  # eg. "5.00"
             self.flowrate_factor = 1 * 10 ** (-5)
@@ -96,17 +98,32 @@ class NextGenPumpBase:
         # for pumps that have a pressure sensor ---------------------------------------
 
         # pressure units
-        response = self.write("pu")
+        response = self.command("pu")
         if "OK" in response:  # expect "OK,<p_units>/"
             self.pressure_units = response.split(",")[1][:-1]
         # max pressure
-        response = self.write("mp")
+        response = self.command("mp")
         if "OK" in response:  # expect "OK,MP:<max_pressure>/"
             self.max_pressure = float(response.split(":")[:-1])
-    
+
+    def command(self, command: bytes) -> dict[str, Any]:
+        response = self.write(command)
+        if "Er/" in response:
+            raise PumpError(
+                command=command,
+                response=response,
+                message="The pump threw an error in response to a command.",
+                port=self.serial.name,
+                logger=self.logger
+            )
+        else:
+            return {"response": response}
+
     def write(self, msg: str, delay=0.015) -> str:
         """Write a command to the pump.A response will be returned after delay seconds.
         Defaults to 0.015 s per pump documentation.
+
+        Returns the pump's response string.
         """
         response = ""
         tries = 0
@@ -115,7 +132,7 @@ class NextGenPumpBase:
             # the pump will look for "\r" as an end-of-command
             tries += 1
             self.serial.write((msg).encode() + COMMAND_END)
-            self.logger.debug("Sent %s", msg)
+            self.logger.debug("Sent %s (attempt %s/3)", msg, tries)
             time.sleep(delay)
             response = self.read()
         return response
@@ -128,6 +145,7 @@ class NextGenPumpBase:
             tries += 1
             response = self.serial.read_until(MESSAGE_END).decode()
             self.logger.debug("Got response: %s", response)
+
         return response
 
     def close(self) -> None:
