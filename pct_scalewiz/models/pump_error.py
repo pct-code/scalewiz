@@ -4,8 +4,8 @@ from logging import Logger
 class PumpError(Exception):
     """Raised when the pump responds with the error code "Er/"."""
 
-    def __init__(self, command: str, response: str, message: str, port:str) -> None:
-        """[summary]
+    def __init__(self, command: str, response: str, message: str, port: str) -> None:
+        """Raised when the pump responds with the error code "Er/".
 
         Args:
             command (str): The command that resulted in an error.
@@ -16,4 +16,4 @@ class PumpError(Exception):
         super().__init__(self, message)
         self.command: str = command
         self.response: str = response
-        self.port: str= port
+        self.port: str = port

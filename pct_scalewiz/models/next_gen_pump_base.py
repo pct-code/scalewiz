@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import logging
-from pct_scalewiz.models.pump_error import PumpError
 import time
-from typing import TYPE_CHECKING, Union, Any
+from typing import TYPE_CHECKING, Any, Union
 
 from serial import SerialException, serial_for_url
 from serial.serialutil import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
+
+from pct_scalewiz.models.pump_error import PumpError
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 
 COMMAND_END = "\r".encode()  # terminates messages sent
 MESSAGE_END = "/".encode()  # terminates messages received
+# these are more or less useful than an int
 LEAK_MODES = {
     0: "leak sensor disabled",
     1: "detected leak does not cause fault",
@@ -88,7 +90,8 @@ class NextGenPumpBase:
             self.max_flowrate = float(response.split(":")[:-1])
 
         # volumetric resolution - used for setting flowrate
-        response = self.command("cs")  # expect OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
+        # expect OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
+        response = self.command("cs")
         flow = len(response.split(",")[1])
         if flow == 4:  # eg. "5.00"
             self.flowrate_factor = 1 * 10 ** (-5)
@@ -114,7 +117,7 @@ class NextGenPumpBase:
                 response=response,
                 message="The pump threw an error in response to a command.",
                 port=self.serial.name,
-                logger=self.logger
+                logger=self.logger,
             )
         else:
             return {"response": response}
@@ -129,9 +132,9 @@ class NextGenPumpBase:
         tries = 0
         # pump docs recommend  3 attempts
         while tries < 3 and "OK" not in response:
-            # the pump will look for "\r" as an end-of-command
+            # the pump will look for b"\r" as an end-of-command
             tries += 1
-            self.serial.write((msg).encode() + COMMAND_END)
+            self.serial.write(msg.encode() + COMMAND_END)
             self.logger.debug("Sent %s (attempt %s/3)", msg, tries)
             time.sleep(delay)
             response = self.read()
