@@ -1,6 +1,8 @@
 """Serial port wrapper for Next Generation pumps."""
 
 from __future__ import annotations
+from logging import Logger
+from tkinter.constants import NONE
 
 from typing import TYPE_CHECKING, Any, Union
 
@@ -20,20 +22,20 @@ class NextGenPump(NextGenPumpBase):
     This dict will contain at least a "response" key whose value is a string represtation of the pump's response.
     """
 
-    def __init__(self, device: str, *args, **kwargs) -> None:
+    def __init__(self, device: str, logger:Logger = None, *args, **kwargs) -> None:
         """[summary]
 
         Args:
             device (str): [description]
             logger (Logger, optional): [description]. Defaults to None.
         """
-        super().__init__(self, device)
+        super().__init__(device, logger)
 
     # general pump commands ------------------------------------------------------------
 
     def run(self) -> None:
         """Runs the pump. 🏃‍♀️"""
-        self.command("cc")
+        return self.command("ru")
 
     def stop(self) -> None:
         """Stops the pump. 🛑 """
