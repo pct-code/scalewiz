@@ -115,7 +115,6 @@ class TestHandler:
 
         # this method will append issue msgs if any occur
         self.setup_pumps(issues)  # hooray for pointers
-        # believe it or not, issues will get populated if any occur
         if len(issues) > 0:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
             return

@@ -4,7 +4,13 @@ from logging import Logger
 class PumpError(Exception):
     """Raised when the pump responds with the error code "Er/"."""
 
-    def __init__(self, command: str, response: str, message: str, port: str) -> None:
+    def __init__(
+        self,
+        command: str,
+        response: str,
+        message: str,
+        port: str,
+    ) -> None:
         """Raised when the pump responds with the error code "Er/".
 
         Args:

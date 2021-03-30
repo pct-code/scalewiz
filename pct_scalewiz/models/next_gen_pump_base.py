@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from logging import Logger
 
 
-COMMAND_END = "\r".encode()  # terminates messages sent
-MESSAGE_END = "/".encode()  # terminates messages received
+COMMAND_END = b"\r"  # terminates messages sent
+MESSAGE_END = b"/"  # terminates messages received
 # these are more or less useful than an int
 LEAK_MODES = {
     0: "leak sensor disabled",
@@ -39,17 +39,9 @@ class NextGenPumpBase:
 
     def __init__(self, device: str, logger: Logger = None) -> None:
         if logger is None:  # append to the root logger
-            self.logger = logging.getLogger(logging.getLogger().name + "." + device)
+            self.logger = logging.getLogger(f"{logging.getLogger().name}.{device}")
         else:
-            self.logger = logging.getLogger(logger.name + "." + device)
-
-        root = logging.getLogger()
-        root.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        handler.setFormatter(formatter)
-        root.addHandler(handler)
+            self.logger = logging.getLogger(f"{logger.name}.{device}")
 
         # fetch a platform-appropriate serial interface
         self.serial = serial_for_url(
@@ -68,10 +60,9 @@ class NextGenPumpBase:
         self.pressure_units: str = None
         self.head: str = None  # todo
         # other
-        self.high_res: bool = None  # 0.00 mL vs 0.000 mL; could rep. as 2 || 3?
-        self.flowrate_factor: int = None
-
-        # todo head identification ?
+        # 0.00 mL vs 0.000 mL; could rep. as 2 || 3?
+        self.high_res: bool = None
+        self.flowrate_factor: int = None  # used as 10 ** flowrate_factor
         # other configuration logic here
         self.open()  # open the serial connection
         self.identify()  # populate attributes
@@ -87,48 +78,33 @@ class NextGenPumpBase:
 
     def identify(self):
         """Get persistent pump properties."""
-        # general properties ----------------------------------------------------------
-
+        # general properties -----------------------------------------------------------
         # firmware
         response = self.command("id")["response"]  # expect "OK,<ID> Version <ver>/"
         if "OK" in response:
             self.id = response.split(",")[1][:-1].strip()
-
-        print("pre is id", response)
         # max flowrate
         response = self.command("mf")["response"]
-        print("post is mf", response)
-
         if "OK" in response:  # expect "OK,MF:<max_flow>/"
-            # print(response)
-            # print(response.split(":"))
-            # print(response.split(":")[1])
-            # print(response.split(":")[1][:-1])
-            # print("length ", len(response.split(":")[1]))
             mf = response.split(":")[1][:-1]
             self.max_flowrate = float(mf)
-
         # volumetric resolution - used for setting flowrate
         # expect OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
         response = self.command("cs")["response"]
         flow = len(response.split(",")[1])
         if flow == 4:  # eg. "5.00"
-            self.flowrate_factor = 1 * 10 ** (-5)
+            self.flowrate_factor = -5  # FI takes microliters/min * 10 ints
         elif flow == 5:  # eg. "5.000" -- hopefully
-            self.flowrate_factor = 1 * 10 ** (-6)
+            self.flowrate_factor = -6  # FI takes microliters/min as ints
 
-        # for pumps that have a pressure sensor ---------------------------------------
-
+        # for pumps that have a pressure sensor ----------------------------------------
         # pressure units
         response = self.command("pu")["response"]
         if "OK" in response:  # expect "OK,<p_units>/"
             self.pressure_units = response.split(",")[1][:-1]
         # max pressure
-        print("should be pu ", response)
         response = self.command("mp")["response"]
-        print("should be mp ", response)
         if "OK" in response:  # expect "OK,MP:<max_pressure>/"
-            print(response)
             self.max_pressure = float(response.split(":")[1][:-1])
 
     def command(self, command: bytes) -> dict[str, Any]:
@@ -139,10 +115,9 @@ class NextGenPumpBase:
                 response=response,
                 message="The pump threw an error in response to a command.",
                 port=self.serial.name,
-                logger=self.logger,
             )
         else:
-            return {"response": response}
+            return {"response": response}  # we parse this later and add entries
 
     def write(self, msg: str, delay=0.015) -> str:
         """Write a command to the pump.A response will be returned after delay seconds.
@@ -152,17 +127,20 @@ class NextGenPumpBase:
         """
         response = ""
         tries = 0
-
         # self.serial.write(b"#" + COMMAND_END)
-        # pump docs recommend  3 attempts
+        # pump docs recommend 3 attempts
         while tries < 3 and "OK" not in response:
-            # the pump will look for b"\r" as an end-of-command
             self.serial.reset_input_buffer()
-            tries += 1
+            # after some testing it seems getting pre-encoded strings from
+            # a dict is only slightly faster, and only some of the time,
+            # compared to just encoding on the fly
+            # the pump will look for b"\r" as an end-of-command
             self.serial.write(msg.encode() + COMMAND_END)
             self.logger.debug("Sent %s (attempt %s/3)", msg, tries)
-            time.sleep(delay)
-            response = self.read()
+            if msg != "#": # this won't give a response
+                time.sleep(delay)  # could defer here if async
+                response = self.read()
+                tries += 1
         return response
 
     def read(self) -> str:
@@ -170,11 +148,9 @@ class NextGenPumpBase:
         response = ""
         tries = 0
         while tries < 3 and "/" not in response:
-            tries += 1
             response = self.serial.read_until(MESSAGE_END).decode()
             self.logger.debug("Got response: %s", response)
-
-
+            tries += 1
         return response
 
     def close(self) -> None:

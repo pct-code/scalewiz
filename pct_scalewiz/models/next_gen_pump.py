@@ -8,9 +8,11 @@ from typing import TYPE_CHECKING, Any, Union
 
 from serial import serial_for_url
 
-from pct_scalewiz.models.next_gen_pump_base import (LEAK_MODES,
-                                                    SOLVENT_COMPRESSIBILITY,
-                                                    NextGenPumpBase)
+from pct_scalewiz.models.next_gen_pump_base import (
+    LEAK_MODES,
+    SOLVENT_COMPRESSIBILITY,
+    NextGenPumpBase,
+)
 from pct_scalewiz.models.pump_error import PumpError
 
 
@@ -22,7 +24,7 @@ class NextGenPump(NextGenPumpBase):
     This dict will contain at least a "response" key whose value is a string represtation of the pump's response.
     """
 
-    def __init__(self, device: str, logger:Logger = None, *args, **kwargs) -> None:
+    def __init__(self, device: str, logger: Logger = None) -> None:
         """[summary]
 
         Args:
@@ -244,7 +246,6 @@ class NextGenPump(NextGenPumpBase):
         return mode
 
     # properties for pumps with a solvent select feature ------------------------------
-
     # these could be wrapped in a @property
     def get_solvent(self) -> int:
         """Gets the solvent compressibility value in 10 ** (-6) per bar.
