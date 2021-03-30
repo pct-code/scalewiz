@@ -143,23 +143,21 @@ class NextGenPump(NextGenPumpBase):
         return int(result["response"].split(":")[1][:-1])
 
     # flowrate compensation
-    # these could get wrapped in @property
-    def get_flowrate_compensation(self) -> float:
-        """[summary]
-
-        Returns:
-            float: [description]
-        """
+    @property
+    def flowrate_compensation(self) -> float:
+        """Returns the flowrate in mL per minute as a float."""
         result = self.command("uc")
         # OK,UC:<user_comp>/
         return float(result["response"].split(":")[1][:-1]) / 100
 
-    def set_flowrate_compensation(self, value: float) -> None:
+    @flowrate_compensation.setter
+    def flowrate_compensation(self, value: float) -> None:
         """Sets the flowrate compensation to a factor between 0.85 and 1.15.
         Passing in a value out of bounds will default to the nearest bound.
 
         Args:
-            value (float): [description]
+            value (float): The desired flowrate compensation,
+            bounded between 0.85 and 1.15.
         """
         value = round(value, 2)
         if value < 0.85:
@@ -193,19 +191,21 @@ class NextGenPump(NextGenPumpBase):
         # OK,<pressure>/
         return float(result["response"].split(",")[1][:-1])
 
-    # pressure limits
-    # these could get wrapped in @property
-    def get_upper_pressure(self) -> float:
+    # upper and lower pressure limits
+    @property
+    def upper_pressure(self) -> float:
         """Gets the pump's current upper pressure limit as a float."""
         result = self.command("up")
         # OK,<UPL>/
         return float(result["response"].split(",")[1][:-1])
-
-    def set_upper_presure(self, limit: float) -> None:
+    
+    @upper_pressure.setter
+    def upper_presure(self, limit: float) -> None:
         """Sets the pump's upper pressure limit."""
         raise NotImplementedError
-
-    def get_lower_pressure(self) -> float:
+    
+    @property
+    def lower_pressure(self) -> float:
         """Gets the pump's current lower pressure limit as an int.
         Returns -1 if an error occurs."""
         # todo deal with bar/MPa responses
@@ -213,8 +213,9 @@ class NextGenPump(NextGenPumpBase):
         # OK,<LPL>/
         result["lower pressure limit"] = int(result["response"].split(",")[1][:-1])
         return result
-
-    def set_lower_presure(self, limit: float) -> None:
+    
+    @lower_pressure.setter
+    def lower_presure(self, limit: float) -> None:
         """Sets the pump's lower pressure limit."""
         raise NotImplementedError
 
@@ -244,29 +245,29 @@ class NextGenPump(NextGenPumpBase):
         return mode
 
     # properties for pumps with a solvent select feature ------------------------------
-    # these could be wrapped in a @property
-    def get_solvent(self) -> int:
+    @property
+    def solvent(self) -> int:
         """Gets the solvent compressibility value in 10 ** (-6) per bar.
         See NextGenPumpBase.SOLVENT_COMPRESSIBILITY to get the solvent name.
 
         Returns:
             int: the solvent compressibility value in 10 ** (-6) per bar
         """
-        result = self.command("rs")
         # OK,<solvent>/
-        return int(result["response"].split(",")[1][:-1])
+        return int(self.command("rs")["response"].split(",")[1][:-1])
 
-    def set_solvent(self, value: Union[str, int]) -> None:
+    @solvent.setter
+    def solvent(self, value: Union[str, int]) -> None:
         """Sets the solvent compressibility value in 10 ** (-6) per bar.
         Alternatively, accepts the name of a solvent as mapped in SOLVENT_COMPRESSIBILITY.
 
         Args:
             value (Union[str, int]): The name of a solvent defined in
             SOLVENT_COMPRESSIBILITY, or a compressibility value in
-            units of 10 ** (-6) bar.
+            units of 10 ** (-6) per bar.
         """
         # if we got a solvent name string, convert it to an int
         if value in SOLVENT_COMPRESSIBILITY.keys():
             value = SOLVENT_COMPRESSIBILITY.get(value)
         # OK/
-        self.command("ss" + f"{value}")
+        self.command(f"ss{value}")
