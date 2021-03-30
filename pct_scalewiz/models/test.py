@@ -1,8 +1,11 @@
 """Model object for a Test."""
 
+from __future__ import annotations
+
 # util
 import logging
 import tkinter as tk
+from typing import Any, Union
 
 logger = logging.getLogger("scalewiz")
 
@@ -38,7 +41,7 @@ class Test:
         self.name.trace_add("write", self.make_label)
         self.pump_to_score.trace_add("write", self.set_observed_baseline)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Union[bool, int, str]]:
         """Returns a dict representation of a Test."""
         return {
             "name": self.name.get(),
@@ -55,7 +58,7 @@ class Test:
             "readings": self.readings,
         }
 
-    def load_json(self, obj: dict) -> None:
+    def load_json(self, obj: dict[str, Any]) -> None:
         """Load a Test with values from a JSON object."""
         self.name.set(obj.get("name"))
         self.is_blank.set(obj.get("isBlank"))
@@ -98,10 +101,5 @@ class Test:
         """Remove tkVar traces to allow the GC to do its thing."""
         vars = (self.chemical, self.rate, self.name, self.pump_to_score)
         for var in vars:
-            logger.debug(var.trace_info())
+            # logger.debug(var.trace_info())
             var.trace_remove("write", var.trace_info()[0][1])
-        # todo remove these
-        # self.chemical.trace_remove("write", self.chemical.trace_info()[0][1])
-        # self.rate.trace_remove("write", self.rate.trace_info()[0][1])
-        # self.name.trace_remove("write", self.name.trace_info()[0][1])
-        # self.pump_to_score.trace_remove("write", self.pump_to_score.trace_info()[0][1])

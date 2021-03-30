@@ -55,10 +55,6 @@ class NextGenPump(NextGenPumpBase):
         """Clears the pump's faults. 😇"""
         self.command("cf")
 
-    def clear_buffer(self) -> None:
-        """Clears the pump's command buffer."""
-        self.command("#")  # gives no response
-
     def reset(self) -> None:
         """Resets the pump's user-adjustable values to factory defaults. ✨"""
         self.command("re")
@@ -68,12 +64,13 @@ class NextGenPump(NextGenPumpBase):
         self.command("zs")
 
     # bundled info retrieval -- these will return dicts -------------------------------
+    # all dicts have a "response" key whose value is the pump's decoded response string
 
     def current_conditions(self) -> dict[str, Union[float, str]]:
         """Returns a dictionary describing the current conditions of the pump.
 
         Returns:
-            dict[str, Union[float, int, str]]: [description]
+            dict[str, Union[float, int, str]]: keys "pressure", "flowrate", "response"
         """
         result = self.command("cc")
         msg = result["response"].split(",")
@@ -86,8 +83,8 @@ class NextGenPump(NextGenPumpBase):
         """Returns a dictionary describing the current state of the pump.
 
         Returns:
-            dict[str, Union[bool, float, str]]: "flowrate", "upper limit", "lower limit",
-             "pressure units", "is running", and "response"
+            dict[str, Union[bool, float, str]]: keys "flowrate", "upper limit",
+            "lower limit", "pressure units", "is running", "response"
         """
         result = self.command("cs")
         # OK,<flow>,<UPL>,<LPL>,<p_units>,0,<R/S>,0/
@@ -104,8 +101,8 @@ class NextGenPump(NextGenPumpBase):
 
         Returns:
             dict[str, Union[float, int, str]]: "flowrate", "is running",
-            "pressure compensation", "head", "upper limit", "lower limit",
-            "in prime", "keypad enabled", and "motor stall fault"
+            "pressure compensation", "head", "upper limit", "lower limit", "in prime",
+            "keypad enabled", "motor stall fault", "response"
         """
         result = self.command("pi")
         # OK,<flow>,<R/S>,<p_comp>,<head>,0,1,0,0,
@@ -123,10 +120,11 @@ class NextGenPump(NextGenPumpBase):
         return result
 
     def read_faults(self) -> dict[str, bool]:
-        """[summary]
+        """Returns a dictionary representing the pump's fault status.
 
         Returns:
-            dict[str, bool]: [description]
+            dict[str, bool]: "motor stall fault", "upper pressure fault",
+            "lower pressure fault", "reponse"
         """
         result = self.command("rf")
         msg = result["response"].split(",")
@@ -236,7 +234,7 @@ class NextGenPump(NextGenPumpBase):
         """Gets the pump's current leak mode as an int.
 
         Returns:
-            int: 0 if disabled. 1 if will fault. 2 if will not fault.
+            int: 0 if disabled. 1 if detected leak will fault. 2 if it will not fault.
         """
         result = self.command("lm")
         # OK,LM:<mode>/

@@ -38,9 +38,10 @@ class NextGenPumpBase:
     """Serial port wrapper for MX-class Teledyne pumps."""
 
     def __init__(self, device: str, logger: Logger = None) -> None:
+        # you'll have to reach in and add handlers yourself from the calling code
         if logger is None:  # append to the root logger
             self.logger = logging.getLogger(f"{logging.getLogger().name}.{device}")
-        else:
+        else:  # append to the passed logger
             self.logger = logging.getLogger(f"{logger.name}.{device}")
 
         # fetch a platform-appropriate serial interface
@@ -53,16 +54,17 @@ class NextGenPumpBase:
             stopbits=STOPBITS_ONE,
             timeout=0.1,  # 100 ms
         )
+
         # persistent identifying attributes
         self.max_flowrate: float = None
         self.max_pressure: Union[int, float] = None
         self.id: str = None
         self.pressure_units: str = None
         self.head: str = None  # todo
-        # other
+        # other -- for converting user args on the fly
         # 0.00 mL vs 0.000 mL; could rep. as 2 || 3?
-        self.high_res: bool = None
         self.flowrate_factor: int = None  # used as 10 ** flowrate_factor
+
         # other configuration logic here
         self.open()  # open the serial connection
         self.identify()  # populate attributes
@@ -137,7 +139,7 @@ class NextGenPumpBase:
             # the pump will look for b"\r" as an end-of-command
             self.serial.write(msg.encode() + COMMAND_END)
             self.logger.debug("Sent %s (attempt %s/3)", msg, tries)
-            if msg != "#": # this won't give a response
+            if msg != "#":  # this won't give a response
                 time.sleep(delay)  # could defer here if async
                 response = self.read()
                 tries += 1
