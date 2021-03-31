@@ -67,7 +67,7 @@ class NextGenPumpBase:
 
         # other configuration logic here
         self.open()  # open the serial connection
-        self.identify()  # populate attributes
+        self.identify()  # populate attributes, takes about 0.16 s on avg
 
     def open(self) -> None:
         """Open the serial port associated with the pump."""
@@ -106,7 +106,7 @@ class NextGenPumpBase:
             self.pressure_units = response.split(",")[1][:-1]
         # max pressure
         response = self.command("mp")["response"]
-        if "OK" in response:  # expect "OK,MP:<max_pressure>/"
+        if "OK" in response: # expect "OK,MP:<max_pressure>/"
             self.max_pressure = float(response.split(":")[1][:-1])
 
     def command(self, command: bytes) -> dict[str, Any]:
@@ -122,27 +122,29 @@ class NextGenPumpBase:
             return {"response": response}  # we parse this later and add entries
 
     def write(self, msg: str, delay=0.015) -> str:
-        """Write a command to the pump.A response will be returned after delay seconds.
+        """Write a command to the pump. A response will be returned after 2 * delay seconds.
         Defaults to 0.015 s per pump documentation.
 
         Returns the pump's response string.
         """
         response = ""
         tries = 0
-        # self.serial.write(b"#" + COMMAND_END)
         # pump docs recommend 3 attempts
         while tries < 3 and "OK" not in response:
+            # this would clear the pump's command buffer, but shouldn't be relied upon
+            # self.serial.write(b"#")  
             self.serial.reset_input_buffer()
-            # after some testing it seems getting pre-encoded strings from
-            # a dict is only slightly faster, and only some of the time,
-            # compared to just encoding on the fly
-            # the pump will look for b"\r" as an end-of-command
+            self.serial.reset_output_buffer()
+            time.sleep(delay) # could defer here if async
+            # it seems getting pre-encoded strings from a dict is only slightly faster,
+            # and only some of the time, when compared to just encoding on the fly.
             self.serial.write(msg.encode() + COMMAND_END)
             self.logger.debug("Sent %s (attempt %s/3)", msg, tries)
-            if msg != "#":  # this won't give a response
-                time.sleep(delay)  # could defer here if async
-                response = self.read()
-                tries += 1
+            if msg == "#": # this won't give a response
+                 break
+            time.sleep(delay)  # could defer here if async
+            response = self.read()
+            tries += 1
         return response
 
     def read(self) -> str:
