@@ -9,7 +9,7 @@ import tkinter as tk
 import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
-from tkinter import filedialog, messagebox
+from tkinter import EXCEPTION, filedialog, messagebox
 
 from serial import Serial, SerialException
 
@@ -117,6 +117,15 @@ class TestHandler:
         self.setup_pumps(issues)  # hooray for pointers
         if len(issues) > 0:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
+            # todo clean this up
+            try:
+                self.pump1.close()
+            except Exception:
+                 pass
+            try:
+              self.pump2.close()
+            except Exception:
+              pass
             return
 
         self.stop_requested = False
@@ -315,6 +324,9 @@ class TestHandler:
             if not self.pump2.is_open():
                 msg = f"Couldn't connect to {self.pump2.serial.name}"
                 issues.append(msg)
+
+      
+
 
     # methods that affect UI
     def new_test(self) -> None:
