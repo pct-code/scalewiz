@@ -18,6 +18,7 @@ from pct_scalewiz.models.project import Project
 from pct_scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
+    import tkinter as tk
     from tkinter import ttk
     from tkinter.scrolledtext import ScrolledText
     from typing import List
@@ -39,9 +40,9 @@ class TestHandler:
         self.test: Test = None
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.queue: list[dict] = []
-        self.editors = []  # list of views displaying the project
-        self.max_readings = int()  # max # of readings to collect
-        self.max_pressures: dict[str, int] = {"pump 1": int(), "pump 2": int()}
+        self.editors: list[tk.Toplevel] = []  # list of views displaying the project
+        self.max_readings: int = None  # max # of readings to collect
+        self.max_pressures: dict[str, int] = {"pump 1": None, "pump 2": None}
         self.log_handler: logging.FileHandler = None
 
         # test handler view overwrites this attribute in the view's build()

@@ -141,7 +141,7 @@ class NextGenPumpBase:
             self.serial.write(msg.encode() + COMMAND_END)
             self.logger.debug("Sent %s (attempt %s/3)", msg, tries)
             if msg == "#": # this won't give a response
-                 break
+                break
             time.sleep(delay)  # could defer here if async
             response = self.read()
             tries += 1

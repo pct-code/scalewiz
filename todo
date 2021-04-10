@@ -1,16 +1,17 @@
+next_gen_pump_base ln 144 indent error
+
 #1 refactor TestHandlerView
-#2 entry validation in project info (filename chars)
 #4 support for program settings stored in TOML or similar
-#6 entry validation in experiment params (ints/doubles)
 #7 refactor state management in the test handler
-#8 refactor that Project vs editor_project silliness 
 #9 port over the old chlorides / ppm calculators
 
 
 don't allow a project to be loaded to more than one system
     OR allow it but ensure data loss can't occur
-entry validation 
+
+
 ??? remove last three tabs of evaluation window?
+
 'add system' -> 'system' > 'add new', 'remove current'
-anything called 'Report as' either in code or UI should be renamed to something like 'label'
+
 
