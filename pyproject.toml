@@ -15,6 +15,7 @@ pyserial = "^3.5"
 tkcalendar = "^1.6.1"
 Markdown = "^3.3.3"
 pandas = "^1.2.2"
+py-hplc = "^0.1.0"
 
 [tool.poetry.scripts]
 scalewiz = "pct_scalewiz.__main__:main"

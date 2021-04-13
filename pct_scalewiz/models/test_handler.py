@@ -13,7 +13,8 @@ from tkinter import EXCEPTION, filedialog, messagebox
 
 from serial import Serial, SerialException
 
-from pct_scalewiz.models.next_gen_pump import NextGenPump
+from py_hplc import NextGenPump
+
 from pct_scalewiz.models.project import Project
 from pct_scalewiz.models.test import Test
 
@@ -192,13 +193,11 @@ class TestHandler:
                 reading_start = time.monotonic()
                 minutes_elapsed = round((time.monotonic() - test_start_time) / 60, 2)
 
-                psi1 = self.pump1.get_pressure()
-                psi2 = self.pump2.get_pressure()
+                psi1 = self.pump1.pressure
+                psi2 = self.pump2.pressure
                 collected = time.monotonic() - reading_start
                 logger.debug("%s collected both PSIs in %s s", self.name, collected)
                 average = round(((psi1 + psi2) / 2))
-                logger.debug("postavg")
-
                 reading = {
                     "elapsedMin": minutes_elapsed,
                     "pump 1": psi1,
@@ -318,16 +317,13 @@ class TestHandler:
         self.pump2 = NextGenPump(self.dev2.get(), logger)
 
         if not None in (self.pump1, self.pump2):
-            if not self.pump1.is_open():
+            if not self.pump1.is_open:
                 msg = f"Couldn't connect to {self.pump1.serial.name}"
                 issues.append(msg)
 
-            if not self.pump2.is_open():
+            if not self.pump2.is_open:
                 msg = f"Couldn't connect to {self.pump2.serial.name}"
                 issues.append(msg)
-
-      
-
 
     # methods that affect UI
     def new_test(self) -> None:
