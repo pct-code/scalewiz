@@ -11,8 +11,6 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from tkinter import EXCEPTION, filedialog, messagebox
 
-from serial import Serial, SerialException
-
 from py_hplc import NextGenPump
 
 from pct_scalewiz.models.project import Project
@@ -263,7 +261,7 @@ class TestHandler:
 
     def stop_test(self) -> None:
         """Stops the pumps, closes their ports."""
-        if self.pump1.is_open():
+        if self.pump1.is_open:
             self.pump1.stop()
             self.pump1.close()
             logger.info(
@@ -272,7 +270,7 @@ class TestHandler:
                 self.pump1.serial.name,
             )
 
-        if self.pump2.is_open():
+        if self.pump2.is_open:
             self.pump2.stop()
             self.pump2.close()
             logger.info(
