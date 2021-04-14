@@ -1,17 +1,11 @@
-next_gen_pump_base ln 144 indent error
-
-#1 refactor TestHandlerView
 #4 support for program settings stored in TOML or similar
 #7 refactor state management in the test handler
 #9 port over the old chlorides / ppm calculators
-
+#1 refactor TestHandlerView
 
 don't allow a project to be loaded to more than one system
     OR allow it but ensure data loss can't occur
 
-
 ??? remove last three tabs of evaluation window?
 
 'add system' -> 'system' > 'add new', 'remove current'
-
-
