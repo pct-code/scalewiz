@@ -25,7 +25,6 @@ pylint = "^2.7.1"
 rope = "^0.18.0"
 mypy = "^0.812"
 isort = "^5.7.0"
-auto-py-to-exe = "^2.8.0"
 
 [tool.black]
 line-length = 88
