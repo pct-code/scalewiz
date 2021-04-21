@@ -71,7 +71,7 @@ class TestHandler:
                 self.max_psi_1 <= self.project.limit_psi.get()
                 or self.max_psi_2 <= self.project.limit_psi.get()
             )
-            and len(self.readings) < self.max_readings
+            and len(self.readings.queue) < self.max_readings
             and not self.stop_requested.is_set()
         )
 
@@ -129,12 +129,11 @@ class TestHandler:
         self.update_log_handler()
         self.pool.submit(self.take_readings, self.stop_requested)
 
-    
-
     def take_readings(self, event: Event) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
         # set default values for this instance of the test loop
-        self.readings.clear()
+        with self.readings.mutex:  # currently doing this in 2 places ...
+            self.readings.queue.clear()
         self.max_psi_1 = self.max_psi_2 = 0
         # start the pumps
         self.pump1.run()
@@ -155,8 +154,11 @@ class TestHandler:
         
         test_start_time = monotonic()
         reading_start = test_start_time - interval
+        print("preloop")
         # readings loop ----------------------------------------------------------------
         while self.get_can_run():
+            print("INloop")
+
             minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
 
             psi1 = self.pump1.pressure
@@ -179,7 +181,7 @@ class TestHandler:
             self.readings.append(reading)
 
             self.elapsed.set(f"{minutes_elapsed} min.")
-            self.progress.set(round(len(self.readings) / self.max_readings * 100))
+            self.progress.set(round(len(self.readings.queue) / self.max_readings * 100))
 
             if psi1 > self.max_psi_1:
                 self.max_psi_1 = psi1
@@ -201,7 +203,7 @@ class TestHandler:
                 self.name,
                 minutes_elapsed,
                 actual_elapsed,
-                len(self.readings) / self.max_readings,
+                len(self.readings.queue) / self.max_readings,
             )
 
         self.stop_test()
@@ -273,7 +275,8 @@ class TestHandler:
         """Initialize a new test."""
         logger.info("%s: Initialized a new test", self.name)
         self.test = Test()
-        self.readings.clear()
+        with self.readings.mutex:
+            self.readings.queue.clear()
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)

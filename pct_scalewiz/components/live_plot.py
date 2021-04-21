@@ -59,7 +59,8 @@ class LivePlot(ttk.Frame):
                 pump1 = []
                 pump2 = []
                 elapsed = []  # we will share this series as an axis
-                for reading in self.handler.readings:
+                readings = list(self.handler.readings.queue)
+                for reading in readings:
                     pump1.append(reading["pump 1"])
                     pump2.append(reading["pump 2"])
                     elapsed.append(reading["elapsedMin"])
@@ -69,6 +70,6 @@ class LivePlot(ttk.Frame):
                 logger.debug(
                     "%s: Drew a new plot for %s data points in %s s",
                     self.handler.name,
-                    len(self.handler.readings),
+                    len(readings),
                     round(time.time() - start, 3),
                 )
