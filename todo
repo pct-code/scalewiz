@@ -1,3 +1,7 @@
+update documentation
+add to readthedocs
+upload to pypi
+
 #4 support for program settings stored in TOML or similar
 #7 refactor state management in the test handler
 #9 port over the old chlorides / ppm calculators
