@@ -6,8 +6,8 @@ import typing
 from tkinter import messagebox, ttk
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.project import Project
-    from pct_scalewiz.models.test import Test
+    from scalewiz.models.project import Project
+    from scalewiz.models.test import Test
 
 
 class TestResultRow(ttk.Frame):
@@ -41,7 +41,9 @@ class TestResultRow(ttk.Frame):
             )
         )
         # col 2 - duration
-        duration = round(len(self.test.readings) * self.project.interval.get() / 60, 2)
+        duration = round(
+            len(self.test.readings) * self.project.interval_seconds.get() / 60, 2
+        )
         cols.append(
             ttk.Label(
                 self.parent,

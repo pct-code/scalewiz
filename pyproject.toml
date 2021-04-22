@@ -4,8 +4,8 @@ version = "0.3.1"
 description = "A graphical user interface for chemical performance testing designed to work with Teledyne SSI MX-class HPLC pumps."
 authors = ["Alex Whittington <alex@southsun.tech>"]
 packages = [
-    {include = "pct_scalewiz/"},
-    {include = "pct_scalewiz/**/*.py"}
+    {include = "scalewiz/"},
+    {include = "scalewiz/**/*.py"}
 ]
 
 [tool.poetry.dependencies]
@@ -17,7 +17,7 @@ Markdown = "^3.3.3"
 py-hplc = "^0.1.6"
 
 [tool.poetry.scripts]
-scalewiz = "pct_scalewiz.__main__:main"
+scalewiz = "scalewiz.__main__:main"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"

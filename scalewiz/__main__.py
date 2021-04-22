@@ -2,7 +2,7 @@
 
 import tkinter as tk
 
-from pct_scalewiz.components.scalewiz import ScaleWiz
+from scalewiz.components.scalewiz import ScaleWiz
 
 
 def main() -> None:

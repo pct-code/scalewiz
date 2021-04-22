@@ -4,9 +4,9 @@
 import logging
 from tkinter import ttk
 
-from pct_scalewiz.components.menu_bar import MenuBar
-from pct_scalewiz.components.test_handler_view import TestHandlerView
-from pct_scalewiz.models.test_handler import TestHandler
+from scalewiz.components.menu_bar import MenuBar
+from scalewiz.components.test_handler_view import TestHandlerView
+from scalewiz.models.test_handler import TestHandler
 
 logger = logging.getLogger("scalewiz")
 

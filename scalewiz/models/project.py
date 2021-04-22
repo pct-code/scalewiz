@@ -7,8 +7,8 @@ import logging
 import os
 import tkinter as tk
 
-from pct_scalewiz.helpers.sort_nicely import sort_nicely
-from pct_scalewiz.models.test import Test
+from scalewiz.helpers.sort_nicely import sort_nicely
+from scalewiz.models.test import Test
 
 logger = logging.getLogger("scalewiz")
 
@@ -24,8 +24,8 @@ class Project:
         self.baseline = tk.IntVar()
         self.limit_minutes = tk.IntVar()
         self.limit_psi = tk.IntVar()
-        self.interval = tk.IntVar()
-        self.uptake = tk.IntVar()
+        self.interval_seconds = tk.IntVar()
+        self.uptake_seconds = tk.IntVar()
         # report stuff
         self.output_format = tk.StringVar()
         # metadata for reporting
@@ -52,8 +52,8 @@ class Project:
         self.baseline.set(75)
         self.limit_psi.set(1500)
         self.limit_minutes.set(90)
-        self.interval.set(3)
-        self.uptake.set(60)
+        self.interval_seconds.set(3)
+        self.uptake_seconds.set(60)  # seconds
         self.output_format.set("CSV")
         self.add_traces()  # these need to be cleaned up later
 
@@ -112,8 +112,8 @@ class Project:
                 "temperature": self.temperature.get(),
                 "limitPSI": self.limit_psi.get(),
                 "limitMin": self.limit_minutes.get(),
-                "interval": self.interval.get(),
-                "uptake": self.uptake.get(),
+                "interval": self.interval_seconds.get(),
+                "uptake": self.uptake_seconds.get(),
             },
             "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
@@ -162,8 +162,8 @@ class Project:
         self.temperature.set(params.get("temperature"))
         self.limit_psi.set(params.get("limitPSI"))
         self.limit_minutes.set(params.get("limitMin"))
-        self.interval.set(params.get("interval"))
-        self.uptake.set(params.get("uptake"))
+        self.interval_seconds.set(params.get("interval"))
+        self.uptake_seconds.set(params.get("uptake"))
 
         self.plot.set(obj.get("plot"))
         self.output_format.set(obj.get("outputFormat"))
@@ -175,10 +175,12 @@ class Project:
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""
-        vars = (self.customer, self.client, self.field, self.sample)
-        for var in vars:
-            # logger.debug(var.trace_info())
-            var.trace_remove("write", var.trace_info()[0][1])
+        variables = (self.customer, self.client, self.field, self.sample)
+        for var in variables:
+            try:
+                var.trace_remove("write", var.trace_info()[0][1])
+            except IndexError:  # sometimes this spaghets when loading empty projects...
+                pass
 
     def make_name(self, *args) -> None:
         """Constructs a default name for the Project."""

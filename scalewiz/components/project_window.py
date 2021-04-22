@@ -7,14 +7,14 @@ import tkinter as tk
 import typing
 from tkinter import filedialog, ttk
 
-from pct_scalewiz.components.project_info import ProjectInfo
-from pct_scalewiz.components.project_params import ProjectParams
-from pct_scalewiz.components.project_report import ProjectReport
-from pct_scalewiz.helpers.set_icon import set_icon
-from pct_scalewiz.models.project import Project
+from scalewiz.components.project_info import ProjectInfo
+from scalewiz.components.project_params import ProjectParams
+from scalewiz.components.project_report import ProjectReport
+from scalewiz.helpers.set_icon import set_icon
+from scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.test_handler import TestHandler
+    from scalewiz.models.test_handler import TestHandler
 
 
 class ProjectWindow(tk.Toplevel):

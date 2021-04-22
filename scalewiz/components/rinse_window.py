@@ -6,7 +6,7 @@ import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
 from tkinter import ttk
 
-from pct_scalewiz.helpers.set_icon import set_icon
+from scalewiz.helpers.set_icon import set_icon
 
 logger = logging.getLogger("pct-scalewiz")
 

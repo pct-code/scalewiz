@@ -14,7 +14,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from matplotlib.ticker import MultipleLocator
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.test_handler import TestHandler
+    from scalewiz.models.test_handler import TestHandler
 
 logger = logging.getLogger("scalewiz")
 
@@ -40,7 +40,7 @@ class LivePlot(ttk.Frame):
         plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
         self.canvas = FigureCanvasTkAgg(fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
-        interval = handler.project.interval.get() * 1000  # ms
+        interval = handler.project.interval_seconds.get() * 1000  # ms
         self.ani = FuncAnimation(fig, self.animate, interval=interval)
 
     def animate(self, interval: float) -> None:

@@ -2,22 +2,24 @@
 
 from __future__ import annotations
 
-import logging
+import queue
 import tkinter as tk
 import typing
+from logging import LogRecord, getLogger
 from tkinter import ttk
+from tkinter.scrolledtext import ScrolledText
 
 import matplotlib.pyplot as plt
 import serial.tools.list_ports as list_ports
 
-from pct_scalewiz.components.live_plot import LivePlot
+from scalewiz.components.live_plot import LivePlot
 
 if typing.TYPE_CHECKING:
     from typing import List
 
-    from pct_scalewiz.models.test_handler import TestHandler
+    from scalewiz.models.test_handler import TestHandler
 
-logger = logging.getLogger("scalewiz")
+logger = getLogger("scalewiz")
 
 
 class TestHandlerView(ttk.Frame):
@@ -29,11 +31,25 @@ class TestHandlerView(ttk.Frame):
         self.handler = handler
         self.handler.parent = self
         self.devices_list: List[str] = []
+        self.inputs: List[tk.Widget] = []
+        self.inputs_frame: ttk.Frame = None
+        self.device1_entry: ttk.Combobox = None
+        self.device2_entry: ttk.Combobox = None
+        self.trial_entry_frame: ttk.Frame = None
+        self.blank_entry: ttk.Label = None
+        self.blank_entry: ttk.Label = None
+        self.start_button: ttk.Button = None
+        self.new_button: ttk.Button = None
+        self.elapsed_label: ttk.Label = None
+        self.plot_frame: ttk.Frame = None
+        self.log_frame: ttk.Frame = None
+        self.log_text: ScrolledText = None
         # we don't have to worry about cleaning up these traces
         # the same handler instance will persist across projects
         self.handler.is_running.trace_add("write", self.update_input_frame)
         self.handler.is_done.trace_add("write", self.update_start_button)
         self.build()
+        self.poll_log_queue()
 
     def build(self) -> None:
         """Builds the UI, destroying any currently existing widgets."""
@@ -41,12 +57,12 @@ class TestHandlerView(ttk.Frame):
             child.destroy()
 
         # use this list to hold refs so we can easily disable later
-        self.inputs = []
+        self.inputs.clear()
         self.inputs_frame = ttk.Frame(self)
         self.inputs_frame.grid(row=0, column=0, sticky="new")
         # validation command to ensure numeric inputs
         vcmd = self.register(lambda s: s.isnumeric())
-        # row 0 ---------------------------------------------------------------
+        # row 0 ------------------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="      Devices:")
         lbl.bind("<Button-1>", self.update_devices_list)
 
@@ -74,7 +90,7 @@ class TestHandlerView(ttk.Frame):
         self.inputs.append(self.device2_entry)
         self.render(lbl, ent, 0)
 
-        # row 1 ---------------------------------------------------------------
+        # row 1 ------------------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="Project:")
         btn = ttk.Label(
             self.inputs_frame, textvariable=self.handler.project.name, anchor="center"
@@ -82,7 +98,7 @@ class TestHandlerView(ttk.Frame):
         self.inputs.append(btn)
         self.render(lbl, btn, 1)
 
-        # row 2 ---------------------------------------------------------------
+        # row 2 ------------------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="Test Type:")
         ent = ttk.Frame(self.inputs_frame)
         ent.grid_columnconfigure(0, weight=1)
@@ -107,10 +123,10 @@ class TestHandlerView(ttk.Frame):
         self.inputs.append(trial_radio)
         self.render(lbl, ent, 2)
 
-        # row 3 ---------------------------------------------------------------
+        # row 3 ------------------------------------------------------------------------
         self.grid_rowconfigure(3, weight=1)
         # row 3a is used when the TestHandlerView is in "Blank" mode
-        # row 3a --------------------------------------------------------------
+        # row 3a -----------------------------------------------------------------------
         self.trial_label_frame = ttk.Frame(self.inputs_frame)
 
         ttk.Label(self.trial_label_frame, text="Chemical:").grid(
@@ -156,22 +172,22 @@ class TestHandlerView(ttk.Frame):
         self.inputs.append(clarity_entry)
 
         # row 3b is used when the TestHandlerView is in "Trial" mode
-        # row 3b --------------------------------------------------------------
+        # row 3b -----------------------------------------------------------------------
         self.blank_label = ttk.Label(self.inputs_frame, text="Name:")
         self.blank_entry = ttk.Entry(
             self.inputs_frame, textvariable=self.handler.test.name
         )
         self.inputs.append(self.blank_entry)
 
-        # row 4 ---------------------------------------------------------------
+        # row 4 ------------------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="Notes:")
         ent = ttk.Entry(self.inputs_frame, textvariable=self.handler.test.notes)
         self.inputs.append(ent)
         self.render(lbl, ent, 4)
 
-        # inputs_frame end ----------------------------------------------------
+        # inputs_frame end -------------------------------------------------------------
 
-        # row 1 ---------------------------------------------------------------
+        # row 1 ------------------------------------------------------------------------
         ent = ttk.Frame(self)
         self.start_button = ttk.Button(
             ent, text="Start", command=self.handler.start_test
@@ -193,27 +209,25 @@ class TestHandlerView(ttk.Frame):
         ent.grid(row=1, column=0, padx=1, pady=1, sticky="n")
         self.new_button = ttk.Button(ent, text="New", command=self.handler.new_test)
 
-        # rows 0-1 -------------------------------------------------------------
+        # rows 0-1 ---------------------------------------------------------------------
         # close all pyplots to prevent memory leak
         plt.close("all")
         self.plot_frame = LivePlot(self, self.handler)
         self.grid_columnconfigure(1, weight=1)  # let it grow
         self.grid_rowconfigure(1, weight=1)
 
-        # row 2 ---------------------------------------------------------------
+        # row 2 ------------------------------------------------------------------------
         self.log_frame = ttk.Frame(self)
-        self.log_text = tk.scrolledtext.ScrolledText(
+        self.log_text = ScrolledText(
             self.log_frame, background="white", height=5, width=44, state="disabled"
         )
-        # this assignment looks weird but ok
-        self.handler.log_text = self.log_text
         self.log_text.grid(sticky="ew")
 
         self.update_test_type()
         self.update_start_button()
         self.update_devices_list()
 
-    # methods to update local state
+    # methods to update local state ----------------------------------------------------
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Renders a row on the UI. As method for convenience."""
@@ -290,3 +304,24 @@ class TestHandlerView(ttk.Frame):
                 logger.info("%s: Hiding details view", this.handler.name)
                 this.plot_frame.grid_remove()
                 this.log_frame.grid_remove()
+
+    def poll_log_queue(self) -> None:
+        """Checks every 100ms if there is a new message in the queue to display."""
+        while True:
+            try:
+                record = self.handler.log_queue.get(block=False)
+            except queue.Empty:
+                break
+            else:
+                self.display(record)
+        self.after(100, self.poll_log_queue)
+
+    def display(self, msg: str) -> None:
+        """Displays a message in the log."""
+        
+        self.log_text.configure(state="normal")
+        self.log_text.insert(
+            tk.END, msg + "\n"
+        )  # last arg is for the tag
+        self.log_text.configure(state="disabled")
+        self.log_text.yview(tk.END)  # scroll to bottom

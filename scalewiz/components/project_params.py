@@ -5,10 +5,10 @@ from __future__ import annotations
 import typing
 from tkinter import ttk
 
-from pct_scalewiz.helpers.render import render
+from scalewiz.helpers.render import render
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.project import Project
+    from scalewiz.models.project import Project
 
 
 class ProjectParams(ttk.Frame):
@@ -116,7 +116,7 @@ class ProjectParams(ttk.Frame):
         lbl = ttk.Label(self, text="Reading interval (s):")
         ent = ttk.Spinbox(
             self,
-            textvariable=project.interval,
+            textvariable=project.interval_seconds,
             from_=0,
             to=9999,
             validate="key",
@@ -128,7 +128,7 @@ class ProjectParams(ttk.Frame):
         lbl = ttk.Label(self, text="Uptake time (s):")
         ent = ttk.Spinbox(
             self,
-            textvariable=project.uptake,
+            textvariable=project.uptake_seconds,
             from_=0,
             to=9999,
             validate="key",

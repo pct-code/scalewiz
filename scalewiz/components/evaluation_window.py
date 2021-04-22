@@ -13,13 +13,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
-from pct_scalewiz.components.test_evaluation_row import TestResultRow
-from pct_scalewiz.helpers.export_csv import export_csv
-from pct_scalewiz.helpers.set_icon import set_icon
-from pct_scalewiz.models.project import Project
+from scalewiz.components.test_evaluation_row import TestResultRow
+from scalewiz.helpers.export_csv import export_csv
+from scalewiz.helpers.set_icon import set_icon
+from scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.test_handler import TestHandler
+    from scalewiz.models.test_handler import TestHandler
 
 COLORS = [
     "orange",
@@ -248,7 +248,7 @@ class EvaluationWindow(tk.Toplevel):
         max_readings = round(
             self.editor_project.limit_minutes.get()
             * 60
-            / self.editor_project.interval.get()
+            / self.editor_project.interval_seconds.get()
             + 1
         )
         log.append("Max readings: limitMin * 60 / reading interval")

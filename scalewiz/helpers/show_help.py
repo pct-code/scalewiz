@@ -7,7 +7,7 @@ import webbrowser
 from markdown import markdownFromFile
 from markdown.extensions.toc import TocExtension
 
-from pct_scalewiz.helpers.get_resource import get_resource
+from scalewiz.helpers.get_resource import get_resource
 
 logger = logging.getLogger("scalewiz")
 

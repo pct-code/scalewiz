@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import tkinter as tk
 
-from pct_scalewiz.helpers.get_resource import get_resource
+from scalewiz.helpers.get_resource import get_resource
 
 
 def set_icon(widget: tk.Widget):

@@ -8,10 +8,10 @@ from tkinter import ttk
 
 import tkcalendar as tkcal
 
-from pct_scalewiz.helpers.render import render
+from scalewiz.helpers.render import render
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.project import Project
+    from scalewiz.models.project import Project
 
 
 class ProjectInfo(ttk.Frame):

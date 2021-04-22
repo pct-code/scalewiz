@@ -7,7 +7,7 @@ import time
 
 from pandas import DataFrame
 
-from pct_scalewiz.models.project import Project
+from scalewiz.models.project import Project
 
 logger = logging.getLogger("scalewiz")
 
@@ -62,7 +62,8 @@ def export_csv(project: Project) -> None:
     output_dict["chemical"] = [test.chemical.get() for test in tests]
     output_dict["rate"] = [test.rate.get() for test in tests]
     output_dict["duration"] = [
-        round(len(test.readings) * project.interval.get() / 60, 2) for test in tests
+        round(len(test.readings) * project.interval_seconds.get() / 60, 2)
+        for test in tests
     ]
     output_dict["maxPsi"] = [test.max_psi.get() for test in tests]
     output_dict["result"] = [test.result.get() for test in tests]

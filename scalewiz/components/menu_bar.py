@@ -5,10 +5,10 @@ from __future__ import annotations
 import logging
 import tkinter as tk
 
-from pct_scalewiz.components.evaluation_window import EvaluationWindow
-from pct_scalewiz.components.project_window import ProjectWindow
-from pct_scalewiz.components.rinse_window import RinseWindow
-from pct_scalewiz.helpers.show_help import show_help
+from scalewiz.components.evaluation_window import EvaluationWindow
+from scalewiz.components.project_window import ProjectWindow
+from scalewiz.components.rinse_window import RinseWindow
+from scalewiz.helpers.show_help import show_help
 
 # todo #9 port over the old chlorides / ppm calculators
 

@@ -5,10 +5,10 @@ from __future__ import annotations
 import typing
 from tkinter import ttk
 
-from pct_scalewiz.helpers.render import render
+from scalewiz.helpers.render import render
 
 if typing.TYPE_CHECKING:
-    from pct_scalewiz.models.project import Project
+    from scalewiz.models.project import Project
 
 
 class ProjectReport(ttk.Frame):

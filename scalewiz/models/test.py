@@ -99,7 +99,9 @@ class Test:
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""
-        vars = (self.chemical, self.rate, self.name, self.pump_to_score)
-        for var in vars:
-            # logger.debug(var.trace_info())
-            var.trace_remove("write", var.trace_info()[0][1])
+        variables = (self.chemical, self.rate, self.name, self.pump_to_score)
+        for var in variables:
+            try:
+                var.trace_remove("write", var.trace_info()[0][1])
+            except IndexError:  # sometimes this spaghets when loading empty projects...
+                pass

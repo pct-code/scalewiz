@@ -4,19 +4,19 @@ from __future__ import annotations
 
 import logging
 import os
-from time import monotonic, sleep, time
 import tkinter as tk
 import typing
 from concurrent.futures import ThreadPoolExecutor
-from threading import Event
-from queue import Queue
 from datetime import date
+from queue import Queue
+from threading import Event
+from time import monotonic, sleep, time
 from tkinter import filedialog, messagebox
 
 from py_hplc import NextGenPump
 
-from pct_scalewiz.models.project import Project
-from pct_scalewiz.models.test import Test
+from scalewiz.models.project import Project
+from scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
     import tkinter as tk
@@ -24,7 +24,7 @@ if typing.TYPE_CHECKING:
     from tkinter.scrolledtext import ScrolledText
     from typing import List
 
-    from pct_scalewiz.components.test_handler_view import TestHandlerView
+    from scalewiz.components.test_handler_view import TestHandlerView
 
 logger = logging.getLogger("scalewiz")
 
@@ -45,10 +45,10 @@ class TestHandler:
         self.max_readings: int = None  # max # of readings to collect
         self.max_psi_1: int = None
         self.max_psi_2: int = None
-        self.log_handler: logging.FileHandler = None
-
+        self.log_handler: logging.FileHandler = None  # handles logging to log window
         # test handler view overwrites this attribute in the view's build()
         self.log_text: ScrolledText = None
+        self.log_queue: Queue[str] = Queue()  # view pulls from this queue 
 
         self.dev1 = tk.StringVar()
         self.dev2 = tk.StringVar()
@@ -122,24 +122,19 @@ class TestHandler:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
             for pump in (self.pump1, self.pump2):
                 pump.close()
+        else:
+            self.stop_requested.clear()
+            self.is_done.set(False)
+            self.is_running.set(True)
+            self.update_log_handler()
+            self.pool.submit(self.take_readings)
 
-        self.stop_requested.clear()
-        self.is_done.set(False)
-        self.is_running.set(True)
-        self.update_log_handler()
-        self.pool.submit(self.take_readings, self.stop_requested)
-
-    def take_readings(self, event: Event) -> None:
+    def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
-        # set default values for this instance of the test loop
-        with self.readings.mutex:  # currently doing this in 2 places ...
-            self.readings.queue.clear()
-        self.max_psi_1 = self.max_psi_2 = 0
-        # start the pumps
         self.pump1.run()
         self.pump2.run()
         # run the uptake cycle
-        uptake = self.project.uptake.get()
+        uptake = self.project.uptake_seconds.get()
         for i in range(uptake):
             if self.get_can_run():
                 self.elapsed.set(f"{uptake - i} s")
@@ -149,16 +144,12 @@ class TestHandler:
                 self.stop_test()
                 break
 
-        self.to_log("")
-        interval = self.project.interval.get()
-        
+        self.log_queue.put("")
+        interval = self.project.interval_seconds.get()
+
         test_start_time = monotonic()
-        reading_start = test_start_time - interval
-        print("preloop")
         # readings loop ----------------------------------------------------------------
         while self.get_can_run():
-            print("INloop")
-
             minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
 
             psi1 = self.pump1.pressure
@@ -172,15 +163,14 @@ class TestHandler:
             }
 
             # make a message for the log in the test handler view
-            msg = "@ {} min; pump1: {}, pump2: {}, avg: {}".format(
+            msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
                 minutes_elapsed, psi1, psi2, average
             )
-            self.to_log(msg)
+            self.log_queue.put(msg)
             logger.info("%s - %s", self.name, msg)
 
-            self.readings.append(reading)
-
-            self.elapsed.set(f"{minutes_elapsed} min.")
+            self.readings.put(reading)
+            self.elapsed.set(f"{minutes_elapsed:.2f} min.")
             self.progress.set(round(len(self.readings.queue) / self.max_readings * 100))
 
             if psi1 > self.max_psi_1:
@@ -188,24 +178,9 @@ class TestHandler:
             if psi2 > self.max_psi_2:
                 self.max_psi_2 = psi2
 
-            event.wait(interval - ((monotonic() - test_start_time) % interval))
+            # TYSM https://stackoverflow.com/a/25251804
+            sleep(interval - ((monotonic() - test_start_time) % interval))
         # end of readings loop ---------------------------------------------------------
-
-        # find the actual elapsed time
-        actual_elapsed = round((monotonic() - test_start_time) / 60, 2)
-        # compare to the most recent minutes_elapsed value
-        if actual_elapsed != minutes_elapsed:
-            # maybe make a dialog pop up instead?
-            self.to_log(f"The test says it took {minutes_elapsed} min.")
-            self.to_log(f"but really it took {actual_elapsed} min. (I counted)")
-            logger.warning(
-                "%s - %s was really %s (%s)",
-                self.name,
-                minutes_elapsed,
-                actual_elapsed,
-                len(self.readings.queue) / self.max_readings,
-            )
-
         self.stop_test()
         self.save_test()
 
@@ -216,7 +191,7 @@ class TestHandler:
         """Requests that the Test stop."""
         if self.is_running.get():
             # the readings loop thread checks this flag on each iteration
-            self.stop_requested = True
+            self.stop_requested.set()
             logger.info("%s: Received a stop request", self.name)
 
     def stop_test(self) -> None:
@@ -236,7 +211,7 @@ class TestHandler:
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
-        for reading in self.readings:
+        for reading in list(self.readings.queue):
             self.test.readings.append(reading)
         self.project.tests.append(self.test)
         self.project.dump_json()
@@ -251,16 +226,13 @@ class TestHandler:
             issues = []
 
         if self.dev1.get() in ("", "None found"):
-            msg = "Select a port for pump 1"
-            issues.append(msg)
+            issues.append("Select a port for pump 1")
 
         if self.dev2.get() in ("", "None found"):
-            msg = "Select a port for pump 2"
-            issues.append(msg)
+            issues.append("Select a port for pump 2")
 
         if self.dev1.get() == self.dev2.get():
-            msg = "Select two unique ports"
-            issues.append(msg)
+            issues.append("Select two unique ports")
         else:
             self.pump1 = NextGenPump(self.dev1.get(), logger)
             self.pump2 = NextGenPump(self.dev2.get(), logger)
@@ -269,7 +241,6 @@ class TestHandler:
             if pump is None or not pump.is_open:
                 issues.append(f"Couldn't connect to {pump.serial.name}")
 
-
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""
@@ -277,12 +248,17 @@ class TestHandler:
         self.test = Test()
         with self.readings.mutex:
             self.readings.queue.clear()
+        self.max_psi_1 = self.max_psi_2 = 0
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)
         self.elapsed.set("")
         self.max_readings = (
-            round(self.project.limit_minutes.get() * 60 / self.project.interval.get())
+            round(
+                self.project.limit_minutes.get()
+                * 60
+                / self.project.interval_seconds.get()
+            )
             + 1
         )
         # rebuild the TestHandlerView
@@ -320,13 +296,7 @@ class TestHandler:
         logger.info("%s set up a log file at %s", self.name, log_file)
         logger.info("%s is starting a test for %s", self.name, self.project.name.get())
 
-    def to_log(self, msg) -> None:
-        """Pass a message to the log."""
-        self.log_text.configure(state="normal")
-        self.log_text.insert("end", msg + "\n")
-        self.log_text.configure(state="disabled")
-        self.log_text.see("end")
-
     def set_view(self, view: ttk.Frame) -> None:
         """Stores a ref to the view displaying the handler."""
         self.view = view
+        self.log_text = view.log_text
