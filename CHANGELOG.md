@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - major performance / accuracy improvement to readings collection
  - updated pump interface to use py-hplc v0.1.6
+ - improved logging implementation 
  - improved documentation
 ### Removed
  - some smelly / unused code
