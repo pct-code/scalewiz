@@ -30,21 +30,6 @@ readme-renderer = "^29.0"
 [tool.black]
 line-length = 88
 
-[tool.pylint.message_control]
-disable = "unused-argument"
-
-[tool.pylint.design]
-max-parents = 10
-
-[tool.pylint.reports]
-output-format = "colorized"
-
-[tool.pylint.format]
-max-line-length = 88
-
-[tool.pylint.similarities]
-ignore-imports = "yes"
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -16,3 +16,7 @@ def set_icon(widget: tk.Widget):
 
     if os.path.exists(icon_path):
         widget.winfo_toplevel().wm_iconbitmap(icon_path)
+
+    if os.name == 'nt':
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('scalewiz')

@@ -1,4 +1,4 @@
-"""Core object for the application."""
+"""Core object for the application. Used for defining application-scope settings."""
 
 import logging
 import os
@@ -15,7 +15,6 @@ class ScaleWiz(ttk.Frame):
     """Core object for the application."""
 
     def __init__(self, parent):
-        # expects the parent to be the root Tk object (and/or it's assoc. toplevel...?)
         ttk.Frame.__init__(self, parent)
 
         # set UI

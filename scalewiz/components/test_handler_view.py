@@ -297,11 +297,11 @@ class TestHandlerView(ttk.Frame):
         for tab in self.parent.tabs():
             this = self.parent.nametowidget(tab)
             if not is_visible:  # show the details view
-                logger.info("%s: Showing details view", this.handler.name)
+                logger.debug("%s: Showing details view", this.handler.name)
                 this.plot_frame.grid(row=0, column=1, rowspan=3)
                 this.log_frame.grid(row=2, column=0, sticky="ew")
             else:  # hide the details view
-                logger.info("%s: Hiding details view", this.handler.name)
+                logger.debug("%s: Hiding details view", this.handler.name)
                 this.plot_frame.grid_remove()
                 this.log_frame.grid_remove()
 
