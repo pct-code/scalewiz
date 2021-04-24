@@ -2,7 +2,7 @@
 this space is under construction!
 =================================
 
-pct-scalewiz
+scalewiz
 ============
 
 |Code style: black| |pylint Score|
@@ -26,12 +26,23 @@ Clone the repo, open a terminal there, then run
 
     poetry install
 
+Or, if using `pip`, 
+
+::
+    pip install -r requirements.txt
+
 Usage
 =====
 
 ::
 
     poetry run scalewiz
+
+or
+
+::
+
+    python -m scalewiz
 
 Further instructions can be viewed with the Help button on the main
 menu.

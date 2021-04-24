@@ -1,18 +1,15 @@
 ScaleWiz User Guide
 ===================
 
-[TOC]
-
 Starting a new project
 ----------------------
 
 Launch ScaleWiz using your preferred method, then click 'Project' >
 'New/Edit' from the menu bar.
 
-.. figure:: ../img/main_menu(project).PNG
+.. image:: ../img/main_menu(project).PNG
    :alt: main menu
 
-   main menu
 This is the project editor screen. You'll mostly just use it for making
 new projects. The information is conveniently divided into three
 sections.
@@ -27,10 +24,9 @@ as you wish.
 
 If you need to clear a date field, just click its label.
 
-.. figure:: ../img/project_editor.PNG
+.. image:: ../img/project_editor.PNG
    :alt: project editor
 
-   project editor
 Experiment parameters
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -47,10 +43,9 @@ and scored.
 -  Uptake time: time to wait between starting a test and the first
    measurement
 
-.. figure:: ../img/project_editor(experiment).PNG
+.. image:: ../img/project_editor(experiment).PNG
    :alt: experiment params
 
-   experiment params
 Report settings
 ~~~~~~~~~~~~~~~
 
@@ -58,10 +53,9 @@ Used to select the report template file. Clicking the file path label
 allows you to select the template you want to use for the report.
 Currently, the only supported file format is .xlsx.
 
-.. figure:: ../img/project_editor(report).PNG
+.. image:: ../img/project_editor(report).PNG
    :alt: report settings
 
-   report settings
 Once you're done filling out all that, click 'Save' to generate the
 project file. We will use this to save our data as we run tests, and to
 generate a report from later. You can always come back here later to
@@ -79,10 +73,9 @@ If you don't already have a project loaded, click 'Project' > 'Load
 existing' from the menu bar. If a project is currently loaded, it's name
 will be displayed as shown below.
 
-.. figure:: ../img/main_menu(loaded).PNG
+.. image:: ../img/main_menu(loaded).PNG
    :alt: main menu with loaded project
 
-   main menu with loaded project
 Use the 'Devices' dropdown boxes to select the serial ports the pumps
 are connected to. Clicking the 'Devices' label will refresh the devices
 list.
@@ -104,20 +97,18 @@ will appear. Enter the chemical name and the treating rate to the
 nearest whole part per million. Use the 'Clarity' dropdown box to select
 the treated brine's water quality, or type in your own description.
 
-.. figure:: ../img/main_menu(trial).PNG
+.. image:: ../img/main_menu(trial).PNG
    :alt: trial entry
 
-   trial entry
 Running the test
 ~~~~~~~~~~~~~~~~
 
 When you're ready to start the test, hit the 'Start' button. The uptake
 cycle will begin, and its status will be shown in the progress bar.
 
-.. figure:: ../img/main_menu(uptake).PNG
+.. image:: ../img/main_menu(uptake).PNG
    :alt: uptake cycle
 
-   uptake cycle
 You can interrupt the uptake cycle (or the test itself) at any time by
 clicking the 'Stop' button. This will stop the pumps, then attempt to
 save the data to file.
@@ -126,10 +117,9 @@ While a test is running, you may click 'Toggle Details' to show/hide a
 more detailed view of the experiment state, including a live plot of the
 data as it is collected.
 
-.. figure:: ../img/main_menu(details).PNG
+.. image:: ../img/main_menu(details).PNG
    :alt: live plot
 
-   live plot
 A test will automatically stop itself and the pumps when either the time
 limit or pressure limit has been reached. The 'Start' button will become
 a 'New' button, which you can use to initialize a new test.
@@ -140,7 +130,9 @@ Rinses
 Between each test, it is necessary to rinse the system. Clicking 'Rinse'
 from the menu bar will create a small dialog that can do this for you.
 
-|rinse dialog| |rinse dialog in progress|
+|rinse dialog|
+
+|rinse dialog in progress|
 
 The button will temporarily disable while acting as a status label to
 show the progression of the rinse. Closing the dialog will terminate the
@@ -151,10 +143,9 @@ Analyzing data
 
 Click 'Evaluation' from the menu bar to open the Evalutaion Window.
 
-.. figure:: ../img/evaluation(data).PNG
+.. image:: ../img/evaluation(data).PNG
    :alt: evaluation frame with some data
 
-   evaluation frame with some data
 The data for each test in the project will be displayed horizontally as
 a row.
 
@@ -176,10 +167,10 @@ Plot
 The 'Plot' tab displays the most recent plot of all tests with a ticked
 'Include on Report' box.
 
-.. figure:: ../img/evaluation(plot).PNG
+.. image:: ../img/evaluation(plot).PNG
    :alt: plot frame with some data
 
-   plot frame with some data
+
 Calculations
 ~~~~~~~~~~~~
 
@@ -198,10 +189,9 @@ Running tests concurrently
 To run tests concurrently, click 'Add System' from the menu bar. A new
 tab will appear on the main menu, and can be used normally.
 
-.. figure:: ../img/main_menu(concurrent).PNG
+.. image:: ../img/main_menu(concurrent).PNG
    :alt: two systems
 
-   two systems
 At the time of writing, a particular project may only be loaded to one
 system at a time. Loading the same project to more than one system may
 result in data loss.
