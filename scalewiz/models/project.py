@@ -49,12 +49,12 @@ class Project:
         self.plot = tk.StringVar()  # path to plot local file
         # set defaults
         # todo #3 abstract these out into some TOML or something ?
-        self.baseline.set(75)
-        self.limit_psi.set(1500)
-        self.limit_minutes.set(90)
-        self.interval_seconds.set(3)
-        self.uptake_seconds.set(60)  # seconds
-        self.output_format.set("CSV")
+        # self.baseline.set(75)
+        # self.limit_psi.set(1500)
+        # self.limit_minutes.set(90)
+        # self.interval_seconds.set(3)
+        # self.uptake_seconds.set(60)  # seconds
+        # self.output_format.set("CSV")
         self.add_traces()  # these need to be cleaned up later
 
     def add_traces(self) -> None:

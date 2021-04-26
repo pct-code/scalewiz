@@ -15,6 +15,7 @@ tkcalendar = "^1.6.1"
 pandas = "^1.2.2"
 Markdown = "^3.3.3"
 py-hplc = "^0.1.6"
+tomlkit = "^0.7.0"
 
 [tool.poetry.scripts]
 scalewiz = "scalewiz.__main__:main"
