@@ -23,10 +23,10 @@ class Project:
         self.tests: list[Test] = []
         # experiment parameters that affect score
         self.baseline = tk.IntVar()
-        self.limit_minutes = tk.IntVar()
+        self.limit_minutes = tk.DoubleVar()
         self.limit_psi = tk.IntVar()
-        self.interval_seconds = tk.IntVar()
-        self.uptake_seconds = tk.IntVar()
+        self.interval_seconds = tk.DoubleVar()
+        self.uptake_seconds = tk.DoubleVar()
         # report stuff
         self.output_format = tk.StringVar()
         # metadata for reporting
@@ -43,10 +43,10 @@ class Project:
         self.numbers = tk.StringVar()
         self.path = tk.StringVar()  # path to the project's JSON file
         self.notes = tk.StringVar()
-        self.bicarbs = tk.IntVar()
+        self.bicarbs = tk.DoubleVar()
         self.bicarbs_increased = tk.BooleanVar()
-        self.chlorides = tk.IntVar()
-        self.temperature = tk.IntVar()  # the test temperature
+        self.chlorides = tk.DoubleVar()
+        self.temperature = tk.DoubleVar()  # the test temperature
         self.plot = tk.StringVar()  # path to plot local file
         self.set_defaults()  # get default values from the config
         self.add_traces()  # these need to be cleaned up later
@@ -78,7 +78,7 @@ class Project:
         self.field.trace_add("write", self.make_name)
         self.sample.trace_add("write", self.make_name)
 
-    def dump_json(self, path=None) -> None:
+    def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
         if path is None:
             path = self.path.get()
