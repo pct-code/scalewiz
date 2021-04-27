@@ -10,7 +10,7 @@ import tkinter as tk
 from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.models.test import Test
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class Project:
@@ -122,19 +122,19 @@ class Project:
 
         with open(path, "w") as file:
             json.dump(this, file, indent=4)
-            logger.info("Saved %s to %s", self.name.get(), path)
+        LOGGER.info("Saved %s to %s", self.name.get(), path)
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
         path = os.path.abspath(path)
         if os.path.isfile(path):
-            logger.info("Loading from %s", path)
+            LOGGER.info("Loading from %s", path)
             with open(path, "r") as file:
                 obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
         if path != obj.get("info").get("path"):
-            logger.warning(
+            LOGGER.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )
             obj["info"]["path"] = path

@@ -9,18 +9,9 @@ from markdown.extensions.toc import TocExtension
 
 from scalewiz.helpers.get_resource import get_resource
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 def show_help() -> None:
     """Displays the documentation in a web browser."""
-    logger.info("Opening the help file")
-    mdfile = get_resource(r"../../doc/index.md")
-    htmlfile = mdfile[:-2] + "html"
-    markdownFromFile(
-        input=mdfile,
-        output=htmlfile,
-        extensions=[TocExtension(toc_depth="2-6")],
-        encoding="utf8",
-    )
-    webbrowser.open_new(os.path.abspath(htmlfile))
+    LOGGER.info("Opening the docs")

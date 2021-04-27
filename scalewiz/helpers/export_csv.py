@@ -9,13 +9,13 @@ from pandas import DataFrame
 
 from scalewiz.models.project import Project
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 def export_csv(project: Project) -> None:
     """Generates a report for a Project in a flattened CSV format (or ugly JSON)."""
     start_time = time.time()
-    logger.info("Beginning export of %s", project.name.get())
+    LOGGER.info("Beginning export of %s", project.name.get())
 
     output_dict = {
         "customer": project.customer.get(),
@@ -80,7 +80,7 @@ def export_csv(project: Project) -> None:
         elif project.output_format.get() == "JSON":
             json.dump(output_dict, output, indent=4)
 
-    logger.info(
+    LOGGER.info(
         "Finished export of %s as %s in %s s",
         project.name.get(),
         project.output_format.get(),

@@ -8,7 +8,7 @@ from tkinter import ttk
 
 from scalewiz.helpers.set_icon import set_icon
 
-logger = logging.getLogger("pct-scalewiz")
+LOGGER = logging.getLogger("pct-scalewiz")
 
 
 class RinseWindow(tk.Toplevel):
@@ -68,7 +68,7 @@ class RinseWindow(tk.Toplevel):
         if self.handler.pump1.is_open:
             self.handler.pump1.stop()
             self.handler.pump1.close()
-            logger.info(
+            LOGGER.info(
                 "%s: Stopped and closed the device @ %s",
                 self.handler.name,
                 self.handler.pump1.serial.name,
@@ -77,7 +77,7 @@ class RinseWindow(tk.Toplevel):
         if self.handler.pump2.is_open:
             self.handler.pump2.stop()
             self.handler.pump2.close()
-            logger.info(
+            LOGGER.info(
                 "%s: Stopped and closed the device @ %s",
                 self.handler.name,
                 self.handler.pump2.serial.name,

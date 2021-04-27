@@ -12,7 +12,7 @@ from scalewiz.helpers.show_help import show_help
 
 # todo #9 port over the old chlorides / ppm calculators
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class MenuBar:
@@ -50,6 +50,7 @@ class MenuBar:
         widget = self.main_frame.nametowidget(current_tab)
         window = ProjectWindow(widget.handler)
         widget.handler.editors.append(window)
+        LOGGER.debug('Spawned a Project Editor window for %s', widget.handler.name)
 
     def spawn_evaluator(self) -> None:
         """Requests to open an evalutaion window for the currently selected Project."""
@@ -57,6 +58,7 @@ class MenuBar:
         widget = self.main_frame.nametowidget(current_tab)
         window = EvaluationWindow(widget.handler)
         widget.handler.editors.append(window)
+        LOGGER.debug('Spawned an Evaluation window for %s', widget.handler.name)
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
@@ -70,6 +72,7 @@ class MenuBar:
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
         RinseWindow(widget.handler)
+        LOGGER.debug('Spawned a Rinse window for %s', widget.handler.name)
 
     def debug(self) -> None:
         """used for debugging"""

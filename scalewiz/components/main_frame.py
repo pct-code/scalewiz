@@ -8,7 +8,7 @@ from scalewiz.components.menu_bar import MenuBar
 from scalewiz.components.test_handler_view import TestHandlerView
 from scalewiz.models.test_handler import TestHandler
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class MainFrame(ttk.Frame):
@@ -36,7 +36,7 @@ class MainFrame(ttk.Frame):
         handler.set_view(view)  # we want to be able to rebuild it later
         self.tab_control.add(view, sticky="nsew")
         self.tab_control.tab(view, text=system_name)
-        logger.info("Added %s to main window", handler.name)
+        LOGGER.info("Added %s to main window", handler.name)
 
     def close(self) -> None:
         """Closes the program if no tests are running."""
@@ -44,7 +44,7 @@ class MainFrame(ttk.Frame):
             widget = self.nametowidget(tab)
             if widget.handler.is_running.get():
                 if not widget.handler.is_done.get():
-                    logger.warning(
+                    LOGGER.warning(
                         "Attempted to close while a test was running on %s",
                         widget.handler.name,
                     )

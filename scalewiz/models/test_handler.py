@@ -26,7 +26,7 @@ if typing.TYPE_CHECKING:
 
     from scalewiz.components.test_handler_view import TestHandlerView
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class TestHandler:
@@ -95,7 +95,7 @@ class TestHandler:
             self.project = Project()
             self.project.load_json(path)
             self.rebuild_editors()
-            logger.info("Loaded %s to %s", self.project.name.get(), self.name)
+            LOGGER.info("Loaded %s to %s", self.project.name.get(), self.name)
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
@@ -167,7 +167,7 @@ class TestHandler:
                 minutes_elapsed, psi1, psi2, average
             )
             self.log_queue.put(msg)
-            logger.info("%s - %s", self.name, msg)
+            LOGGER.info("%s - %s", self.name, msg)
 
             self.readings.put(reading)
             self.elapsed.set(f"{minutes_elapsed:.2f} min.")
@@ -192,7 +192,7 @@ class TestHandler:
         if self.is_running.get():
             # the readings loop thread checks this flag on each iteration
             self.stop_requested.set()
-            logger.info("%s: Received a stop request", self.name)
+            LOGGER.info("%s: Received a stop request", self.name)
 
     def stop_test(self) -> None:
         """Stops the pumps, closes their ports."""
@@ -200,14 +200,14 @@ class TestHandler:
             if pump.is_open:
                 pump.stop()
                 pump.close()
-                logger.info(
+                LOGGER.info(
                     "%s: Stopped and closed the device @ %s",
                     self.name,
                     pump.serial.name,
                 )
 
         self.is_done.set(True)
-        logger.info("%s: Test for %s has been stopped", self.name, self.test.name.get())
+        LOGGER.info("%s: Test for %s has been stopped", self.name, self.test.name.get())
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
@@ -234,8 +234,8 @@ class TestHandler:
         if self.dev1.get() == self.dev2.get():
             issues.append("Select two unique ports")
         else:
-            self.pump1 = NextGenPump(self.dev1.get(), logger)
-            self.pump2 = NextGenPump(self.dev2.get(), logger)
+            self.pump1 = NextGenPump(self.dev1.get(), LOGGER)
+            self.pump2 = NextGenPump(self.dev2.get(), LOGGER)
 
         for pump in (self.pump1, self.pump2):
             if pump is None or not pump.is_open:
@@ -244,7 +244,7 @@ class TestHandler:
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""
-        logger.info("%s: Initialized a new test", self.name)
+        LOGGER.info("%s: Initialized a new test", self.name)
         self.test = Test()
         with self.readings.mutex:
             self.readings.queue.clear()
@@ -266,12 +266,8 @@ class TestHandler:
             self.view.build()
 
     def rebuild_editors(self) -> None:
-        """Rebuild all open Toplevels that could overwrite the Project file."""
-        for window in self.editors:
-            if window.winfo_exists() == 1:
-                logger.debug("rebuilding %s", window)
-                window.build(reload=True)
-        logger.info("%s has rebuilt all editor windows", self.name)
+                LOGGER.debug("rebuilding %s", widget)
+        LOGGER.info("%s has rebuilt all view widgets", self.name)
 
     def update_log_handler(self) -> None:
         """Sets up the logging FileHandler to the passed path."""
@@ -282,8 +278,8 @@ class TestHandler:
             os.mkdir(logs_dir)
         log_path = os.path.join(logs_dir, log_file)
 
-        if self.log_handler in logger.handlers:
-            logger.removeHandler(self.log_handler)
+        if self.log_handler in LOGGER.handlers:
+            LOGGER.removeHandler(self.log_handler)
         self.log_handler = logging.FileHandler(log_path)
 
         formatter = logging.Formatter(
@@ -292,9 +288,9 @@ class TestHandler:
         )
         self.log_handler.setFormatter(formatter)
         self.log_handler.setLevel(logging.DEBUG)
-        logger.addHandler(self.log_handler)
-        logger.info("%s set up a log file at %s", self.name, log_file)
-        logger.info("%s is starting a test for %s", self.name, self.project.name.get())
+        LOGGER.addHandler(self.log_handler)
+        LOGGER.info("%s set up a log file at %s", self.name, log_file)
+        LOGGER.info("%s is starting a test for %s", self.name, self.project.name.get())
 
     def set_view(self, view: ttk.Frame) -> None:
         """Stores a ref to the view displaying the handler."""

@@ -16,7 +16,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 if typing.TYPE_CHECKING:
     from scalewiz.models.test_handler import TestHandler
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class LivePlot(ttk.Frame):
@@ -51,7 +51,7 @@ class LivePlot(ttk.Frame):
         if self.handler.is_running.get() and not self.handler.is_done.get():
             # data access here 😳
             start = time.time()
-            logger.debug("%s: Drawing a new plot ...", self.handler.name)
+            LOGGER.debug("%s: Drawing a new plot ...", self.handler.name)
             with plt.style.context("bmh"):
                 self.axis.clear()
                 self.axis.set_xlabel("Time (min)")
@@ -67,7 +67,7 @@ class LivePlot(ttk.Frame):
                 self.axis.plot(elapsed, pump1, label="Pump 1")
                 self.axis.plot(elapsed, pump2, label="Pump 2")
                 self.axis.legend(loc=0)
-                logger.debug(
+                LOGGER.debug(
                     "%s: Drew a new plot for %s data points in %s s",
                     self.handler.name,
                     len(readings),
