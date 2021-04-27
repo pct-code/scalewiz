@@ -8,6 +8,7 @@ import os
 import tkinter as tk
 
 from scalewiz.helpers.sort_nicely import sort_nicely
+from scalewiz.helpers.configuration import get_config, update_config
 from scalewiz.models.test import Test
 
 LOGGER = logging.getLogger("scalewiz")
@@ -47,15 +48,28 @@ class Project:
         self.chlorides = tk.IntVar()
         self.temperature = tk.IntVar()  # the test temperature
         self.plot = tk.StringVar()  # path to plot local file
-        # set defaults
-        # todo #3 abstract these out into some TOML or something ?
-        # self.baseline.set(75)
-        # self.limit_psi.set(1500)
-        # self.limit_minutes.set(90)
-        # self.interval_seconds.set(3)
-        # self.uptake_seconds.set(60)  # seconds
-        # self.output_format.set("CSV")
+        self.set_defaults()  # get default values from the config
         self.add_traces()  # these need to be cleaned up later
+
+    def set_defaults(self) -> None:
+        """Sets project parameters to the defaults read from the config file."""
+        config = get_config()  # load from cofig toml
+        defaults = config["defaults"]
+        # make sure we are seeing reasonable values
+        for key, value in defaults.items():
+            if value < 0:
+                defaults[key] = value * (-1)
+        # apply values
+        self.baseline.set(defaults.get("baseline"))
+        self.interval_seconds.set(defaults.get("reading_interval"))
+        self.limit_minutes.set(defaults.get("time_limit"))
+        self.limit_psi.set(defaults.get("pressure_limit"))
+        self.output_format.set(defaults.get("output_format"))
+        self.uptake_seconds.set(defaults.get("uptake_time"))
+        # this must never be <= 0
+        if self.interval_seconds.get() <= 0:
+            self.interval_seconds.set(1)
+        self.analyst.set(config["recents"].get("analyst"))
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
@@ -123,6 +137,8 @@ class Project:
         with open(path, "w") as file:
             json.dump(this, file, indent=4)
         LOGGER.info("Saved %s to %s", self.name.get(), path)
+        update_config("recents", "analyst", self.analyst.get())
+        update_config("recents", "project", self.path.get())
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""

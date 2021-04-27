@@ -2,6 +2,7 @@
 
 # util
 import logging
+from scalewiz.helpers.configuration import get_config
 from tkinter import ttk
 
 from scalewiz.components.menu_bar import MenuBar
@@ -37,6 +38,11 @@ class MainFrame(ttk.Frame):
         self.tab_control.add(view, sticky="nsew")
         self.tab_control.tab(view, text=system_name)
         LOGGER.info("Added %s to main window", handler.name)
+        # if this is the first handler, open the most recent project
+        if len(self.tab_control.tabs()) == 1:
+            config = get_config()
+            handler.load_project(config["recents"].get("project"))
+            print(handler.project.name.get())
 
     def close(self) -> None:
         """Closes the program if no tests are running."""
