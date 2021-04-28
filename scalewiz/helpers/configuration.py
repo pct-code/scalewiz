@@ -36,17 +36,19 @@ def ensure_config() -> None:
         init_config()
     # todo #19 make sure the config isn't missing keys
 
+
 def init_config():
     """Ensures a user config dir and file."""
     doc = generate_default()
     # write to file
-    with CONFIG_FILE.open('w') as file:
+    with CONFIG_FILE.open("w") as file:
         file.write(dumps(doc))
     # report
     if CONFIG_FILE.exists():
         LOGGER.info("Successfully built a new config file at %s", CONFIG_FILE)
     else:
-        LOGGER.warning('Failed to init a config file at %s', CONFIG_FILE)
+        LOGGER.warning("Failed to init a config file at %s", CONFIG_FILE)
+
 
 def generate_default() -> document:
     """Generates the default TOML doc."""
@@ -120,18 +122,21 @@ def generate_default() -> document:
     # all done
     return doc
 
+
 def open_config() -> None:
     """Opens the config file."""
     ensure_config()
     if os.path.exists(CONFIG_FILE):
         os.startfile(CONFIG_FILE)
 
+
 def get_config() -> dict[str, Union[float, int, str]]:
     """Returns the current configuration as a dict."""
     ensure_config()
-    with CONFIG_FILE.open('r') as file:
+    with CONFIG_FILE.open("r") as file:
         defaults = loads(file.read())
     return defaults
+
 
 def update_config(table: str, key: str, value: Union[float, int, str]):
     """Update the config with the passed values.
@@ -142,7 +147,7 @@ def update_config(table: str, key: str, value: Union[float, int, str]):
         value (Union[float, int, str]): the new value of `key`
     """
     ensure_config()
-    doc = loads(CONFIG_FILE.open('r').read())
+    doc = loads(CONFIG_FILE.open("r").read())
     if table in doc.keys() and key in doc[table].keys():
         doc[table][key] = value
         CONFIG_FILE.write_text(dumps(doc))
