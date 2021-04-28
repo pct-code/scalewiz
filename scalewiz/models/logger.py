@@ -20,9 +20,13 @@ class Logger:
         self.log_queue = Queue()
         logging.basicConfig(level=logging.DEBUG)
         queue_handler = QueueHandler(self.log_queue)
+        # this one is for inspecting the multithreading
+        # fmt = "%(asctime)s - %(func)s - %(thread)d - %(levelname)s - %(name)s - %(message)s"
+        fmt = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+        date_fmt = "%Y-%m-%d %H:%M:%S"
         formatter = logging.Formatter(
-            "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
-            "%Y-%m-%d %H:%M:%S",
+            fmt,
+            date_fmt,
         )
         queue_handler.setFormatter(formatter)
         queue_handler.setLevel(logging.INFO)

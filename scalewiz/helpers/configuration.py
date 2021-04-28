@@ -11,7 +11,6 @@ from typing import Union
 
 from appdirs import user_config_dir
 from tomlkit import comment, document, dumps, loads, nl, table
-import tomlkit
 
 LOGGER = getLogger("scalewiz.config")
 
@@ -49,11 +48,12 @@ def init_config():
     else:
         LOGGER.warning('Failed to init a config file at %s', CONFIG_FILE)
 
-def generate_default() -> tomlkit.document:
+def generate_default() -> document:
     """Generates the default TOML doc."""
     # make the toml
     doc = document()
     # orient the user
+    doc.add("This is the configuration file for ScaleWiz")
     doc.add(
         comment(
             "This is a TOML document, "
@@ -62,7 +62,7 @@ def generate_default() -> tomlkit.document:
     )
     doc.add(
         comment(
-            "If it behaves unexpectantly, try using "
+            "If it behaves unexpectedly, try using "
             "https://www.toml-lint.com/ to check your edits"
         )
     )
@@ -74,7 +74,7 @@ def generate_default() -> tomlkit.document:
     )
     doc.add(
         comment(
-            "If valid TOML is behaving unexpectantly in ScaleWiz, "
+            "If valid TOML is behaving unexpectedly in ScaleWiz, "
             "please open an issue at https://github.com/teauxfu/scalewiz/issues"
         )
     )
