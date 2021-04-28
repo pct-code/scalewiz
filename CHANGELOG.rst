@@ -16,9 +16,9 @@ Added
 
 - support for a config file
 
-   - can set default experiment parameters for new projects
-   - remember the most recent analyst name
-   - auto-load the most recent project on startup
+ - can set default experiment parameters for new projects
+ - remember the most recent analyst name
+ - auto-load the most recent project on startup
 
 - make sure a project is only loaded to one system at a time to prevent data loss
 
