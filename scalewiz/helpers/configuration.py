@@ -101,7 +101,9 @@ def init_config():
     params["time_limit"].comment("minutes, a float > 0.0")
 
     params["uptake_time"] = 1.0
-    params["uptake_time"].comment("seconds between pumps starting and data collection, a float => 0")
+    params["uptake_time"].comment(
+        "seconds between pumps starting and data collection, a float => 0"
+    )
 
     doc["defaults"] = params
     doc["defaults"].comment("these will get used when making new projects")

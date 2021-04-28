@@ -1,7 +1,6 @@
 """Editor for Project params."""
 
 from __future__ import annotations
-from io import SEEK_CUR
 
 import typing
 from tkinter import ttk
@@ -19,7 +18,6 @@ class ProjectParams(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         # validation commands to ensure numeric inputs
         def can_be_float(s: str):
-            print('ch float')
             try:
                 if float(s):
                     return True
@@ -27,14 +25,12 @@ class ProjectParams(ttk.Frame):
                 return False
 
         def can_be_pos_float(s: str):
-            print('ch +float')
             try:
                 return float(s) > 0
             except ValueError:
                 return False
-        
+
         def can_be_pos_int(s: str):
-            print('ch +int')
             try:
                 return int(s) > 0
             except ValueError:

@@ -318,10 +318,7 @@ class TestHandlerView(ttk.Frame):
 
     def display(self, msg: str) -> None:
         """Displays a message in the log."""
-        
         self.log_text.configure(state="normal")
-        self.log_text.insert(
-            tk.END, msg + "\n"
-        )  # last arg is for the tag
+        self.log_text.insert(tk.END, msg + "\n")  # last arg is for the tag
         self.log_text.configure(state="disabled")
         self.log_text.yview(tk.END)  # scroll to bottom

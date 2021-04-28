@@ -1,12 +1,12 @@
-"""Main Window Tkinter widget for the application"""
+"""Main frame widget for the application."""
 
 # util
 import logging
-from scalewiz.helpers.configuration import get_config
 from tkinter import ttk
 
 from scalewiz.components.menu_bar import MenuBar
 from scalewiz.components.test_handler_view import TestHandlerView
+from scalewiz.helpers.configuration import get_config
 from scalewiz.models.test_handler import TestHandler
 
 LOGGER = logging.getLogger("scalewiz")

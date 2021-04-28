@@ -10,8 +10,8 @@ from tkinter import filedialog, ttk
 from scalewiz.components.project_info import ProjectInfo
 from scalewiz.components.project_params import ProjectParams
 from scalewiz.components.project_report import ProjectReport
-from scalewiz.helpers.set_icon import set_icon
 from scalewiz.helpers.configuration import open_config
+from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:

@@ -41,14 +41,14 @@ class TestHandler:
         self.test: Test = None
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.readings: Queue[dict] = Queue()
-        self.editors: list[tk.Toplevel] = []  # list of views displaying the project
+        self.editors: list[tk.Widget] = []  # list of views displaying the project
         self.max_readings: int = None  # max # of readings to collect
         self.max_psi_1: int = None
         self.max_psi_2: int = None
         self.log_handler: logging.FileHandler = None  # handles logging to log window
         # test handler view overwrites this attribute in the view's build()
         self.log_text: ScrolledText = None
-        self.log_queue: Queue[str] = Queue()  # view pulls from this queue 
+        self.log_queue: Queue[str] = Queue()  # view pulls from this queue
 
         self.dev1 = tk.StringVar()
         self.dev2 = tk.StringVar()
@@ -94,7 +94,7 @@ class TestHandler:
         if path != "" and os.path.isfile(path):
             self.project = Project()
             self.project.load_json(path)
-            self.rebuild_editors()
+            self.rebuild_views()
             LOGGER.info("Loaded %s to %s", self.project.name.get(), self.name)
 
     def start_test(self) -> None:
@@ -215,8 +215,9 @@ class TestHandler:
             self.test.readings.append(reading)
         self.project.tests.append(self.test)
         self.project.dump_json()
+        # refresh data / UI
         self.load_project(path=self.project.path.get())
-        self.rebuild_editors()
+        self.rebuild_views()
 
     def setup_pumps(self, issues: List[str] = None) -> None:
         """Set up the pumps with some default values.
@@ -253,6 +254,7 @@ class TestHandler:
         self.is_done.set(False)
         self.progress.set(0)
         self.elapsed.set("")
+        # find how many readings we need. ++ so we have datapoint at both limits ...
         self.max_readings = (
             round(
                 self.project.limit_minutes.get()
@@ -265,8 +267,15 @@ class TestHandler:
         if self.view is not None:
             self.view.build()
 
-    def rebuild_editors(self) -> None:
+    def rebuild_views(self) -> None:
+        """Rebuild all open Widgets that could modify the Project file."""
+        for widget in self.editors:
+            if widget.winfo_exists():
                 LOGGER.debug("rebuilding %s", widget)
+                widget.build(reload=True)
+            else:  # clean up as we go
+                self.editors.remove(widget)
+        self.view.build()
         LOGGER.info("%s has rebuilt all view widgets", self.name)
 
     def update_log_handler(self) -> None:

@@ -7,8 +7,8 @@ import logging
 import os
 import tkinter as tk
 
-from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.helpers.configuration import get_config, update_config
+from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.models.test import Test
 
 LOGGER = logging.getLogger("scalewiz")

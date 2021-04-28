@@ -39,8 +39,7 @@ class MenuBar:
         menubar.add_command(label="Rinse", command=self.spawn_rinse)
         menubar.add_command(label="Help", command=show_help)
 
-        # debug
-        menubar.add_command(label="Debug", command=self.debug)
+        # menubar.add_command(label="Debug", command=self._debug)
 
         self.main_frame.winfo_toplevel().configure(menu=menubar)
 
@@ -50,7 +49,7 @@ class MenuBar:
         widget = self.main_frame.nametowidget(current_tab)
         window = ProjectWindow(widget.handler)
         widget.handler.editors.append(window)
-        LOGGER.debug('Spawned a Project Editor window for %s', widget.handler.name)
+        LOGGER.debug("Spawned a Project Editor window for %s", widget.handler.name)
 
     def spawn_evaluator(self) -> None:
         """Requests to open an evalutaion window for the currently selected Project."""
@@ -58,13 +57,13 @@ class MenuBar:
         widget = self.main_frame.nametowidget(current_tab)
         window = EvaluationWindow(widget.handler)
         widget.handler.editors.append(window)
-        LOGGER.debug('Spawned an Evaluation window for %s', widget.handler.name)
+        LOGGER.debug("Spawned an Evaluation window for %s", widget.handler.name)
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        widget.handler.load_project()
+        widget.handler.load_project()  # this will log about it
         widget.build()
 
     def spawn_rinse(self) -> None:
@@ -72,11 +71,15 @@ class MenuBar:
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
         RinseWindow(widget.handler)
-        LOGGER.debug('Spawned a Rinse window for %s', widget.handler.name)
+        LOGGER.debug("Spawned a Rinse window for %s", widget.handler.name)
 
-    def debug(self) -> None:
-        """used for debugging"""
-        current_tab = self.main_frame.tab_control.select()
-        widget = self.main_frame.nametowidget(current_tab)
-        widget.handler.rebuild_editors()
-        widget.bell()
+    def _debug(self) -> None:
+        """Used for debugging."""
+        pass
+        # from scalewiz.helpers.configuration import init_config
+
+        # init_config()
+        # current_tab = self.main_frame.tab_control.select()
+        # widget = self.main_frame.nametowidget(current_tab)
+        # widget.handler.rebuild_views()
+        # widget.bell()
