@@ -29,7 +29,7 @@ def ensure_config() -> None:
         LOGGER.info("No config directory found. Making one now at %s", CONFIG_DIR)
         CONFIG_DIR.mkdir(parents=True)
     # make sure the file exists and isn's empty
-    if not CONFIG_FILE.exists() or os.stat(CONFIG_FILE).st_size == 0:
+    if not CONFIG_FILE.is_file() or os.stat(CONFIG_FILE).st_size == 0:
         LOGGER.info(
             "No config file found in %s. Making one now at %s", CONFIG_DIR, CONFIG_FILE
         )
@@ -44,7 +44,7 @@ def init_config():
     with CONFIG_FILE.open("w") as file:
         file.write(dumps(doc))
     # report
-    if CONFIG_FILE.exists():
+    if CONFIG_FILE.is_file():
         LOGGER.info("Successfully built a new config file at %s", CONFIG_FILE)
     else:
         LOGGER.warning("Failed to init a config file at %s", CONFIG_FILE)
@@ -126,7 +126,7 @@ def generate_default() -> document:
 def open_config() -> None:
     """Opens the config file."""
     ensure_config()
-    if os.path.exists(CONFIG_FILE):
+    if CONFIG_FILE.is_file():
         os.startfile(CONFIG_FILE)
 
 

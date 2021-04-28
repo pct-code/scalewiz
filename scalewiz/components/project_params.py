@@ -6,6 +6,7 @@ import typing
 from tkinter import ttk
 
 from scalewiz.helpers.render import render
+from scalewiz.helpers.validation import can_be_float, can_be_pos_float, can_be_pos_int
 
 if typing.TYPE_CHECKING:
     from scalewiz.models.project import Project
@@ -17,24 +18,6 @@ class ProjectParams(ttk.Frame):
     def __init__(self, parent: ttk.Frame, project: Project):
         ttk.Frame.__init__(self, parent)
         # validation commands to ensure numeric inputs
-        def can_be_float(s: str):
-            try:
-                if float(s):
-                    return True
-            except ValueError:
-                return False
-
-        def can_be_pos_float(s: str):
-            try:
-                return float(s) > 0
-            except ValueError:
-                return False
-
-        def can_be_pos_int(s: str):
-            try:
-                return int(s) > 0
-            except ValueError:
-                return False
 
         is_pos_int = self.register(lambda s: can_be_pos_int(s))
         is_float = self.register(lambda s: can_be_float(s))

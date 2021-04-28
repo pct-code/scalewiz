@@ -28,7 +28,7 @@ class ProjectWindow(tk.Toplevel):
         tk.Toplevel.__init__(self)
         self.handler = handler
         self.editor_project = Project()
-        if os.path.exists(handler.project.path.get()):
+        if os.path.isfile(handler.project.path.get()):
             self.editor_project.load_json(handler.project.path.get())
         self.build()
 

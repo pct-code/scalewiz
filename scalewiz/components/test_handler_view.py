@@ -5,7 +5,7 @@ from __future__ import annotations
 import queue
 import tkinter as tk
 import typing
-from logging import LogRecord, getLogger
+from logging import getLogger
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import serial.tools.list_ports as list_ports
 
 from scalewiz.components.live_plot import LivePlot
+from scalewiz.helpers.validation import can_be_pos_float
 
 if typing.TYPE_CHECKING:
     from typing import List
@@ -60,8 +61,7 @@ class TestHandlerView(ttk.Frame):
         self.inputs.clear()
         self.inputs_frame = ttk.Frame(self)
         self.inputs_frame.grid(row=0, column=0, sticky="new")
-        # validation command to ensure numeric inputs
-        vcmd = self.register(lambda s: s.isnumeric())
+
         # row 0 ------------------------------------------------------------------------
         lbl = ttk.Label(self.inputs_frame, text="      Devices:")
         lbl.bind("<Button-1>", self.update_devices_list)
@@ -148,12 +148,13 @@ class TestHandlerView(ttk.Frame):
             self.trial_entry_frame, textvariable=self.handler.test.chemical
         )
         chemical_entry.grid(row=0, column=0, sticky="ew", pady=1)
+
         # validation command to ensure numeric inputs
-        vcmd = self.register(lambda s: s.isnumeric())
+        vcmd = self.register(lambda s: can_be_pos_float(s))
         rate_entry = ttk.Spinbox(
             self.trial_entry_frame,
             textvariable=self.handler.test.rate,
-            from_=0,
+            from_=1,
             to=999999,
             validate="key",
             validatecommand=(vcmd, "%P"),
@@ -204,7 +205,7 @@ class TestHandlerView(ttk.Frame):
         ttk.Progressbar(ent, variable=self.handler.progress).grid(
             row=1, columnspan=3, sticky="nwe"
         )
-        self.elapsed_label = ttk.Label(ent, textvariable=self.handler.elapsed)
+        self.elapsed_label = ttk.Label(ent, textvariable=self.handler.elapsed_str)
         self.elapsed_label.grid(row=1, column=1)
         ent.grid(row=1, column=0, padx=1, pady=1, sticky="n")
         self.new_button = ttk.Button(ent, text="New", command=self.handler.new_test)

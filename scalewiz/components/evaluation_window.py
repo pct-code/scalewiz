@@ -42,7 +42,7 @@ class EvaluationWindow(tk.Toplevel):
         tk.Toplevel.__init__(self)
         self.handler = handler
         self.editor_project = Project()
-        if os.path.exists(self.handler.project.path.get()):
+        if os.path.isfile(self.handler.project.path.get()):
             self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
@@ -57,7 +57,7 @@ class EvaluationWindow(tk.Toplevel):
 
     def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
-        if reload and os.path.exists(self.handler.project.path.get()):
+        if reload and os.path.isfile(self.handler.project.path.get()):
             # cleanup for the GC
             for test in self.editor_project.tests:
                 test.remove_traces()
