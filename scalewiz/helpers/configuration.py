@@ -69,7 +69,7 @@ def generate_default() -> tomlkit.document:
     doc.add(
         comment(
             "You may delete this file to generate a new one "
-            "the next time you run Scalewiz"
+            "the next time you run ScaleWiz"
         )
     )
     doc.add(
@@ -78,7 +78,6 @@ def generate_default() -> tomlkit.document:
             "please open an issue at https://github.com/teauxfu/scalewiz/issues"
         )
     )
-    doc.add(nl())
 
     # these will get updated between user sessions
     recents = table()
