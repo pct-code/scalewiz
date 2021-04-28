@@ -19,7 +19,7 @@ class Test:
         self.is_blank = tk.BooleanVar()  # boolean for blank vs chemical trial
         self.name = tk.StringVar()  # identifier for the test
         self.chemical = tk.StringVar()  # chemical, if any, to be tested
-        self.rate = tk.IntVar()  # the treating rate of the test
+        self.rate = tk.DoubleVar()  # the treating rate of the test
         self.label = tk.StringVar()  # how the test will be labeled on the report/plot
         self.clarity = tk.StringVar()  # the clarity of the treated water
         self.notes = tk.StringVar()  # misc notes on the experiment
@@ -80,7 +80,10 @@ class Test:
     def make_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""
         if not (self.chemical.get() == "" or self.rate.get() == 0):
-            self.name.set(f"{self.chemical.get()} {self.rate.get()} ppm")
+            if float(self.rate.get()) == int(self.rate.get()):
+                self.name.set(f"{self.chemical.get()} {self.rate.get():.0f} ppm")
+            else:
+                self.name.set(f"{self.chemical.get()} {self.rate.get():.2f} ppm")
 
         if self.chemical.get().strip() != self.chemical.get():
             self.chemical.set(self.chemical.get().strip())
