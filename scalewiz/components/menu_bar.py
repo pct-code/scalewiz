@@ -61,9 +61,15 @@ class MenuBar:
 
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
+        # build a list of currently loaded projects, and pass to the handler
+        currently_loaded = []
+        for tab in self.main_frame.tab_control.tabs():
+            widget = self.main_frame.nametowidget(tab)
+            currently_loaded.append(widget.handler.project.path.get())
+        # the handler will check to make sure we don't load a project in duplicate
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        widget.handler.load_project()  # this will log about it
+        widget.handler.load_project(loaded=currently_loaded)  # this will log about it
         widget.build()
 
     def spawn_rinse(self) -> None:

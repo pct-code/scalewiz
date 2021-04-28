@@ -26,8 +26,6 @@ if typing.TYPE_CHECKING:
 
     from scalewiz.components.test_handler_view import TestHandlerView
 
-LOGGER = logging.getLogger("scalewiz")
-
 
 class TestHandler:
     """Handles a Test."""
@@ -36,6 +34,7 @@ class TestHandler:
 
     def __init__(self, name: str = "Nemo") -> None:
         self.name = name
+        self.logger = logging.getLogger(f"scalewiz.{name}")
         self.view: TestHandlerView = None
         self.project = Project()
         self.test: Test = None
@@ -54,7 +53,8 @@ class TestHandler:
         self.dev2 = tk.StringVar()
         self.stop_requested: Event = Event()
         self.progress = tk.IntVar()
-        self.elapsed = tk.StringVar()
+        self.elapsed_min = tk.DoubleVar()  # used for evaluations
+        self.elapsed_str = tk.StringVar()  # used in widgets where formatting is awkward
 
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
@@ -64,20 +64,21 @@ class TestHandler:
         self.is_done = tk.BooleanVar()
         self.new_test()
 
-    def get_can_run(self) -> bool:
+    def can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
         return (
             (
                 self.max_psi_1 <= self.project.limit_psi.get()
                 or self.max_psi_2 <= self.project.limit_psi.get()
             )
+            and self.elapsed_min.get() <= self.project.limit_minutes.get()
             and len(self.readings.queue) < self.max_readings
             and not self.stop_requested.is_set()
         )
 
-    def load_project(self, path: str = None) -> None:
+    def load_project(self, path: str = None, loaded: list[str] = []) -> None:
         """Opens a file dialog then loads the selected Project file."""
-        # traces are set in Project and Test __init__s
+        # traces are set in Project and Test __init__ methods
         # we need to explicitly clean them up here
         if self.project is not None:
             for test in self.project.tests:
@@ -85,17 +86,25 @@ class TestHandler:
             self.project.remove_traces()
 
         if path is None:
-            path = filedialog.askopenfilename(
-                initialdir='C:"',
-                title="Select project file:",
-                filetypes=[("JSON files", "*.json")],
+            path = os.path.abspath(
+                filedialog.askopenfilename(
+                    initialdir='C:"',
+                    title="Select project file:",
+                    filetypes=[("JSON files", "*.json")],
+                )
             )
 
+        # check that the dialog succeeded, the file exists, and isn't already loaded
         if path != "" and os.path.isfile(path):
-            self.project = Project()
-            self.project.load_json(path)
-            self.rebuild_views()
-            LOGGER.info("Loaded %s to %s", self.project.name.get(), self.name)
+            if path in loaded:
+                msg = "Attempted to load an already-loaded project"
+                self.logger.warning(msg)
+                messagebox.showwarning("Project already loaded", msg)
+            else:
+                self.project = Project()
+                self.project.load_json(path)
+                self.rebuild_views()
+                self.logger.info("Loaded %s", self.project.name.get())
 
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
@@ -104,7 +113,7 @@ class TestHandler:
             return
 
         issues = []
-        if not os.path.exists(self.project.path.get()):
+        if not os.path.isfile(self.project.path.get()):
             msg = "Select an existing project file first"
             issues.append(msg)
 
@@ -136,20 +145,21 @@ class TestHandler:
         # run the uptake cycle
         uptake = self.project.uptake_seconds.get()
         for i in range(uptake):
-            if self.get_can_run():
-                self.elapsed.set(f"{uptake - i} s")
+            if self.can_run():
+                self.elapsed_str.set(f"{uptake - i} s")
                 self.progress.set(round(i / uptake * 100))
                 sleep(1)
             else:
                 self.stop_test()
                 break
 
-        self.log_queue.put("")
+        self.log_queue.put("")  # add newline for clarity
+        # we use these in the loop
         interval = self.project.interval_seconds.get()
-
         test_start_time = monotonic()
+        sleep(interval)
         # readings loop ----------------------------------------------------------------
-        while self.get_can_run():
+        while self.can_run():
             minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
 
             psi1 = self.pump1.pressure
@@ -167,10 +177,11 @@ class TestHandler:
                 minutes_elapsed, psi1, psi2, average
             )
             self.log_queue.put(msg)
-            LOGGER.info("%s - %s", self.name, msg)
+            self.logger.info(msg)
 
             self.readings.put(reading)
-            self.elapsed.set(f"{minutes_elapsed:.2f} min.")
+            self.elapsed_min.set(minutes_elapsed)
+            self.elapsed_str.set(f"{minutes_elapsed:.2f} min.")
             self.progress.set(round(len(self.readings.queue) / self.max_readings * 100))
 
             if psi1 > self.max_psi_1:
@@ -192,7 +203,7 @@ class TestHandler:
         if self.is_running.get():
             # the readings loop thread checks this flag on each iteration
             self.stop_requested.set()
-            LOGGER.info("%s: Received a stop request", self.name)
+            self.logger.info("Received a stop request")
 
     def stop_test(self) -> None:
         """Stops the pumps, closes their ports."""
@@ -200,14 +211,13 @@ class TestHandler:
             if pump.is_open:
                 pump.stop()
                 pump.close()
-                LOGGER.info(
-                    "%s: Stopped and closed the device @ %s",
-                    self.name,
+                self.logger.info(
+                    "Stopped and closed the device @ %s",
                     pump.serial.name,
                 )
 
         self.is_done.set(True)
-        LOGGER.info("%s: Test for %s has been stopped", self.name, self.test.name.get())
+        self.logger.info("Test for %s has been stopped", self.test.name.get())
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
@@ -235,8 +245,8 @@ class TestHandler:
         if self.dev1.get() == self.dev2.get():
             issues.append("Select two unique ports")
         else:
-            self.pump1 = NextGenPump(self.dev1.get(), LOGGER)
-            self.pump2 = NextGenPump(self.dev2.get(), LOGGER)
+            self.pump1 = NextGenPump(self.dev1.get(), self.logger)
+            self.pump2 = NextGenPump(self.dev2.get(), self.logger)
 
         for pump in (self.pump1, self.pump2):
             if pump is None or not pump.is_open:
@@ -245,7 +255,7 @@ class TestHandler:
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""
-        LOGGER.info("%s: Initialized a new test", self.name)
+        self.logger.info("Initialized a new test")
         self.test = Test()
         with self.readings.mutex:
             self.readings.queue.clear()
@@ -253,16 +263,11 @@ class TestHandler:
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)
-        self.elapsed.set("")
-        # find how many readings we need. ++ so we have datapoint at both limits ...
-        self.max_readings = (
-            round(
-                self.project.limit_minutes.get()
-                * 60
-                / self.project.interval_seconds.get()
-            )
-            + 1
+        self.elapsed_str.set("")
+        self.max_readings = round(
+            self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
         )
+
         # rebuild the TestHandlerView
         if self.view is not None:
             self.view.build()
@@ -271,12 +276,12 @@ class TestHandler:
         """Rebuild all open Widgets that could modify the Project file."""
         for widget in self.editors:
             if widget.winfo_exists():
-                LOGGER.debug("rebuilding %s", widget)
+                self.logger.debug("Rebuilding %s", widget)
                 widget.build(reload=True)
             else:  # clean up as we go
                 self.editors.remove(widget)
         self.view.build()
-        LOGGER.info("%s has rebuilt all view widgets", self.name)
+        self.logger.info("Rebuilt all view widgets")
 
     def update_log_handler(self) -> None:
         """Sets up the logging FileHandler to the passed path."""
@@ -287,8 +292,8 @@ class TestHandler:
             os.mkdir(logs_dir)
         log_path = os.path.join(logs_dir, log_file)
 
-        if self.log_handler in LOGGER.handlers:
-            LOGGER.removeHandler(self.log_handler)
+        if self.log_handler in self.logger.handlers:
+            self.logger.removeHandler(self.log_handler)
         self.log_handler = logging.FileHandler(log_path)
 
         formatter = logging.Formatter(
@@ -297,9 +302,9 @@ class TestHandler:
         )
         self.log_handler.setFormatter(formatter)
         self.log_handler.setLevel(logging.DEBUG)
-        LOGGER.addHandler(self.log_handler)
-        LOGGER.info("%s set up a log file at %s", self.name, log_file)
-        LOGGER.info("%s is starting a test for %s", self.name, self.project.name.get())
+        self.logger.addHandler(self.log_handler)
+        self.logger.info("Set up a log file at %s", log_file)
+        self.logger.info("Starting a test for %s", self.project.name.get())
 
     def set_view(self, view: ttk.Frame) -> None:
         """Stores a ref to the view displaying the handler."""
