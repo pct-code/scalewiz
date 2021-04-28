@@ -1,6 +1,7 @@
 """Editor for Project params."""
 
 from __future__ import annotations
+from io import SEEK_CUR
 
 import typing
 from tkinter import ttk
@@ -16,8 +17,33 @@ class ProjectParams(ttk.Frame):
 
     def __init__(self, parent: ttk.Frame, project: Project):
         ttk.Frame.__init__(self, parent)
-        # validation command to ensure numeric inputs
-        vcmd = self.register(lambda s: s.isnumeric())
+        # validation commands to ensure numeric inputs
+        def can_be_float(s: str):
+            print('ch float')
+            try:
+                if float(s):
+                    return True
+            except ValueError:
+                return False
+
+        def can_be_pos_float(s: str):
+            print('ch +float')
+            try:
+                return float(s) > 0
+            except ValueError:
+                return False
+        
+        def can_be_pos_int(s: str):
+            print('ch +int')
+            try:
+                return int(s) > 0
+            except ValueError:
+                return False
+
+        is_pos_int = self.register(lambda s: can_be_pos_int(s))
+        is_float = self.register(lambda s: can_be_float(s))
+        is_pos_float = self.register(lambda s: can_be_pos_float(s))
+        # see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/entry-validation.html
 
         self.grid_columnconfigure(1, weight=1)
 
@@ -29,7 +55,7 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=999999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_float, "%P"),
         )
         render(lbl, ent, 0)
 
@@ -60,7 +86,7 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=999999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_float, "%P"),
         )
         render(lbl, ent, 2)
 
@@ -72,7 +98,7 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=9999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_pos_float, "%P"),
         )
         render(lbl, ent, 3)
 
@@ -84,7 +110,7 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=9999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_pos_int, "%P"),
         )
         render(lbl, ent, 4)
 
@@ -96,7 +122,7 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=9999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_pos_int, "%P"),
         )
         render(lbl, ent, 5)
 
@@ -108,7 +134,7 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=9999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_pos_float, "%P"),
         )
         render(lbl, ent, 6)
 
@@ -117,10 +143,10 @@ class ProjectParams(ttk.Frame):
         ent = ttk.Spinbox(
             self,
             textvariable=project.interval_seconds,
-            from_=0,
+            from_=1,
             to=9999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_pos_float, "%P"),
         )
         render(lbl, ent, 7)
 
@@ -132,6 +158,6 @@ class ProjectParams(ttk.Frame):
             from_=0,
             to=9999,
             validate="key",
-            validatecommand=(vcmd, "%P"),
+            validatecommand=(is_float, "%P"),
         )
         render(lbl, ent, 8)
