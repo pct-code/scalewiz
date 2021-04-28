@@ -57,7 +57,7 @@ class Project:
         defaults = config["defaults"]
         # make sure we are seeing reasonable values
         for key, value in defaults.items():
-            if value < 0:
+            if not isinstance(value, str) and value < 0:
                 defaults[key] = value * (-1)
         # apply values
         self.baseline.set(defaults.get("baseline"))
@@ -65,6 +65,7 @@ class Project:
         self.limit_minutes.set(defaults.get("time_limit"))
         self.limit_psi.set(defaults.get("pressure_limit"))
         self.output_format.set(defaults.get("output_format"))
+        self.temperature.set(defaults.get('test_temperature'))
         self.uptake_seconds.set(defaults.get("uptake_time"))
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:
