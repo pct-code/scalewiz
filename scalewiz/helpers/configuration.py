@@ -11,6 +11,7 @@ from typing import Union
 
 from appdirs import user_config_dir
 from tomlkit import comment, document, dumps, loads, nl, table
+import tomlkit
 
 LOGGER = getLogger("scalewiz.config")
 
@@ -27,17 +28,29 @@ def ensure_config() -> None:
     # make sure we have a place to store data
     if not CONFIG_DIR.is_dir():
         LOGGER.info("No config directory found. Making one now at %s", CONFIG_DIR)
-        Path.makedir(CONFIG_DIR)
-    # make sure the file exists
+        CONFIG_DIR.mkdir(parents=True)
+    # make sure the file exists and isn's empty
     if not CONFIG_FILE.exists() or os.stat(CONFIG_FILE).st_size == 0:
         LOGGER.info(
             "No config file found in %s. Making one now at %s", CONFIG_DIR, CONFIG_FILE
         )
         init_config()
-
+    # todo #19 make sure the config isn't missing keys
 
 def init_config():
-    """Ensures a user config dir exists, and then writes a file there."""
+    """Ensures a user config dir and file."""
+    doc = generate_default()
+    # write to file
+    with CONFIG_FILE.open('w') as file:
+        file.write(dumps(doc))
+    # report
+    if CONFIG_FILE.exists():
+        LOGGER.info("Successfully built a new config file at %s", CONFIG_FILE)
+    else:
+        LOGGER.warning('Failed to init a config file at %s', CONFIG_FILE)
+
+def generate_default() -> tomlkit.document:
+    """Generates the default TOML doc."""
     # make the toml
     doc = document()
     # orient the user
@@ -55,19 +68,17 @@ def init_config():
     )
     doc.add(
         comment(
+            "You may delete this file to generate a new one "
+            "the next time you run Scalewiz"
+        )
+    )
+    doc.add(
+        comment(
             "If valid TOML is behaving unexpectantly in ScaleWiz, "
             "please open an issue at https://github.com/teauxfu/scalewiz/issues"
         )
     )
     doc.add(nl())
-    doc.add(
-        comment(
-            "You may delete this file to generate a new one "
-            "the next time you run Scalewiz"
-        )
-    )
-    doc.add(nl())
-    doc.add("title", "a configuration file for ScaleWiz")
 
     # these will get updated between user sessions
     recents = table()
@@ -102,18 +113,13 @@ def init_config():
 
     params["uptake_time"] = 1.0
     params["uptake_time"].comment(
-        "seconds between pumps starting and data collection, a float => 0"
+        "seconds between pumps starting and data collection, a float => 0.0"
     )
 
     doc["defaults"] = params
     doc["defaults"].comment("these will get used when making new projects")
-
-    # write to file
-    with open(CONFIG_FILE, "w") as file:
-        file.write(dumps(doc))
-    # report
-    if os.path.exists(CONFIG_FILE):
-        LOGGER.info("Successfully built a new config file at %s", CONFIG_FILE)
+    # all done
+    return doc
 
 def open_config() -> None:
     """Opens the config file."""
@@ -124,7 +130,7 @@ def open_config() -> None:
 def get_config() -> dict[str, Union[float, int, str]]:
     """Returns the current configuration as a dict."""
     ensure_config()
-    with open(CONFIG_FILE, "r") as file:
+    with CONFIG_FILE.open('r') as file:
         defaults = loads(file.read())
     return defaults
 
@@ -137,7 +143,7 @@ def update_config(table: str, key: str, value: Union[float, int, str]):
         value (Union[float, int, str]): the new value of `key`
     """
     ensure_config()
-    doc = loads(CONFIG_FILE.open().read())
+    doc = loads(CONFIG_FILE.open('r').read())
     if table in doc.keys() and key in doc[table].keys():
         doc[table][key] = value
         CONFIG_FILE.write_text(dumps(doc))
