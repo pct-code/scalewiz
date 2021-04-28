@@ -94,8 +94,8 @@ def init_config():
     params["reading_interval"] = 1.0
     params["reading_interval"].comment("seconds between readings, a float > 0.0")
 
-    params['test_temperature'] = 1.0
-    params['test_temperature'].comment('test temperature in °F, > 0.0')
+    params["test_temperature"] = 1.0
+    params["test_temperature"].comment("test temperature in °F, > 0.0")
 
     params["time_limit"] = 1.0
     params["time_limit"].comment("minutes, a float > 0.0")
