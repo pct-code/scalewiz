@@ -55,7 +55,7 @@ def generate_default() -> document:
     # make the toml
     doc = document()
     # orient the user
-    doc.add("This is the configuration file for ScaleWiz")
+    doc.add(comment("This is the configuration file for ScaleWiz"))
     doc.add(
         comment(
             "This is a TOML document, "
