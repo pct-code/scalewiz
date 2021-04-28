@@ -280,12 +280,12 @@ class TestHandlerView(ttk.Frame):
             self.trial_label_frame.grid_remove()
             self.trial_entry_frame.grid_remove()
             self.render(self.blank_label, self.blank_entry, 3)
-            LOGGER.info("%s: changed to Blank mode", self.handler.name)
+            LOGGER.debug("%s: changed to Blank mode", self.handler.name)
         else:
             self.blank_label.grid_remove()
             self.blank_entry.grid_remove()
             self.render(self.trial_label_frame, self.trial_entry_frame, 3)
-            LOGGER.info("%s: changed to Trial mode", self.handler.name)
+            LOGGER.debug("%s: changed to Trial mode", self.handler.name)
 
     def update_plot_visible(self) -> None:
         """Updates the details view across all TestHandlerViews."""
