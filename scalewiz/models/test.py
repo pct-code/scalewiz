@@ -7,7 +7,7 @@ import logging
 import tkinter as tk
 from typing import Any, Union
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class Test:

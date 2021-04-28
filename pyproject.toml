@@ -13,8 +13,9 @@ python = "^3.9"
 matplotlib = "^3.3.4"
 tkcalendar = "^1.6.1"
 pandas = "^1.2.2"
-Markdown = "^3.3.3"
 py-hplc = "^0.1.6"
+tomlkit = "^0.7.0"
+appdirs = "^1.4.4"
 
 [tool.poetry.scripts]
 scalewiz = "scalewiz.__main__:main"

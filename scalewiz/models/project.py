@@ -7,10 +7,11 @@ import logging
 import os
 import tkinter as tk
 
+from scalewiz.helpers.configuration import get_config, update_config
 from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.models.test import Test
 
-logger = logging.getLogger("scalewiz")
+LOGGER = logging.getLogger("scalewiz")
 
 
 class Project:
@@ -22,10 +23,10 @@ class Project:
         self.tests: list[Test] = []
         # experiment parameters that affect score
         self.baseline = tk.IntVar()
-        self.limit_minutes = tk.IntVar()
+        self.limit_minutes = tk.DoubleVar()
         self.limit_psi = tk.IntVar()
-        self.interval_seconds = tk.IntVar()
-        self.uptake_seconds = tk.IntVar()
+        self.interval_seconds = tk.DoubleVar()
+        self.uptake_seconds = tk.DoubleVar()
         # report stuff
         self.output_format = tk.StringVar()
         # metadata for reporting
@@ -42,20 +43,34 @@ class Project:
         self.numbers = tk.StringVar()
         self.path = tk.StringVar()  # path to the project's JSON file
         self.notes = tk.StringVar()
-        self.bicarbs = tk.IntVar()
+        self.bicarbs = tk.DoubleVar()
         self.bicarbs_increased = tk.BooleanVar()
-        self.chlorides = tk.IntVar()
-        self.temperature = tk.IntVar()  # the test temperature
+        self.chlorides = tk.DoubleVar()
+        self.temperature = tk.DoubleVar()  # the test temperature
         self.plot = tk.StringVar()  # path to plot local file
-        # set defaults
-        # todo #3 abstract these out into some TOML or something ?
-        self.baseline.set(75)
-        self.limit_psi.set(1500)
-        self.limit_minutes.set(90)
-        self.interval_seconds.set(3)
-        self.uptake_seconds.set(60)  # seconds
-        self.output_format.set("CSV")
+        self.set_defaults()  # get default values from the config
         self.add_traces()  # these need to be cleaned up later
+
+    def set_defaults(self) -> None:
+        """Sets project parameters to the defaults read from the config file."""
+        config = get_config()  # load from cofig toml
+        defaults = config["defaults"]
+        # make sure we are seeing reasonable values
+        for key, value in defaults.items():
+            if not isinstance(value, str) and value < 0:
+                defaults[key] = value * (-1)
+        # apply values
+        self.baseline.set(defaults.get("baseline"))
+        self.interval_seconds.set(defaults.get("reading_interval"))
+        self.limit_minutes.set(defaults.get("time_limit"))
+        self.limit_psi.set(defaults.get("pressure_limit"))
+        self.output_format.set(defaults.get("output_format"))
+        self.temperature.set(defaults.get("test_temperature"))
+        self.uptake_seconds.set(defaults.get("uptake_time"))
+        # this must never be <= 0
+        if self.interval_seconds.get() <= 0:
+            self.interval_seconds.set(1)
+        self.analyst.set(config["recents"].get("analyst"))
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
@@ -64,7 +79,7 @@ class Project:
         self.field.trace_add("write", self.make_name)
         self.sample.trace_add("write", self.make_name)
 
-    def dump_json(self, path=None) -> None:
+    def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
         if path is None:
             path = self.path.get()
@@ -122,19 +137,21 @@ class Project:
 
         with open(path, "w") as file:
             json.dump(this, file, indent=4)
-            logger.info("Saved %s to %s", self.name.get(), path)
+        LOGGER.info("Saved %s to %s", self.name.get(), path)
+        update_config("recents", "analyst", self.analyst.get())
+        update_config("recents", "project", self.path.get())
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
         path = os.path.abspath(path)
         if os.path.isfile(path):
-            logger.info("Loading from %s", path)
+            LOGGER.info("Loading from %s", path)
             with open(path, "r") as file:
                 obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
         if path != obj.get("info").get("path"):
-            logger.warning(
+            LOGGER.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )
             obj["info"]["path"] = path

@@ -1,5 +1,7 @@
 """Returns a path to the named resource file, if it exists."""
 
+# this is only really useful for trying to package the app in an exe
+
 import sys
 from os import path
 

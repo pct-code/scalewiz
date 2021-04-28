@@ -10,6 +10,7 @@ from tkinter import filedialog, ttk
 from scalewiz.components.project_info import ProjectInfo
 from scalewiz.components.project_params import ProjectParams
 from scalewiz.components.project_report import ProjectReport
+from scalewiz.helpers.configuration import open_config
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
@@ -70,6 +71,9 @@ class ProjectWindow(tk.Toplevel):
         ttk.Button(button_frame, text="New", width=7, command=self.new).grid(
             row=0, column=2, padx=5
         )
+        ttk.Button(
+            button_frame, text="Edit defaults", width=10, command=self.edit
+        ).grid(row=0, column=3, padx=5)
         button_frame.grid(row=1, column=0)
 
     def new(self) -> None:
@@ -101,3 +105,7 @@ class ProjectWindow(tk.Toplevel):
                 file_path = f"{file_path}.json"
             self.editor_project.path.set(file_path)
             self.save()
+
+    def edit(self) -> None:
+        """Open the program config file."""
+        open_config()

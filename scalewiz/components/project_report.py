@@ -23,8 +23,8 @@ class ProjectReport(ttk.Frame):
             self,
             values=["JSON", "CSV"],
             textvariable=project.output_format,
+            state="readonly",
         )
-
         render(lbl, ent, 0)
 
         # matplotlib stuff

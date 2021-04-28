@@ -55,7 +55,7 @@ class ProjectInfo(ttk.Frame):
         # row 6 -----------------------------------------------------------------------
         lbl = ttk.Label(self, text="Date sampled:")
         lbl.bind("<Button-1>", lambda _: project.sample_date.set(""))
-        # this is to refresh the entry later (it inits with today's date) 
+        # this is to refresh the entry later (it inits with today's date)
         current_value = project.sample_date.get()
         ent = tkcal.DateEntry(
             self, textvariable=project.sample_date, date_pattern="mm/dd/yyyy"

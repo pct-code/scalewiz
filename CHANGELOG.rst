@@ -8,6 +8,21 @@ Changelog <https://keepachangelog.com/en/1.0.0/>`__, and this project
 adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`__.
 
+[v0.5.0]
+--------
+
+Added
+~~~~~
+
+- support for a config file
+
+Changed
+~~~~~~~
+
+- improved entry validation for project experiment parameters
+- non-psi project experiment parameters now accept non-integer values
+
+
 [v0.4.0]
 --------
 

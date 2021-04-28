@@ -19,7 +19,7 @@ if typing.TYPE_CHECKING:
 
     from scalewiz.models.test_handler import TestHandler
 
-logger = getLogger("scalewiz")
+LOGGER = getLogger("scalewiz")
 
 
 class TestHandlerView(ttk.Frame):
@@ -251,7 +251,7 @@ class TestHandlerView(ttk.Frame):
                 self.device2_entry.current(1)
 
             if not "None found" in self.devices_list:
-                logger.debug(
+                LOGGER.debug(
                     "%s found devices: %s", self.handler.name, self.devices_list
                 )
 
@@ -280,12 +280,12 @@ class TestHandlerView(ttk.Frame):
             self.trial_label_frame.grid_remove()
             self.trial_entry_frame.grid_remove()
             self.render(self.blank_label, self.blank_entry, 3)
-            logger.info("%s: changed to Blank mode", self.handler.name)
+            LOGGER.debug("%s: changed to Blank mode", self.handler.name)
         else:
             self.blank_label.grid_remove()
             self.blank_entry.grid_remove()
             self.render(self.trial_label_frame, self.trial_entry_frame, 3)
-            logger.info("%s: changed to Trial mode", self.handler.name)
+            LOGGER.debug("%s: changed to Trial mode", self.handler.name)
 
     def update_plot_visible(self) -> None:
         """Updates the details view across all TestHandlerViews."""
@@ -297,11 +297,11 @@ class TestHandlerView(ttk.Frame):
         for tab in self.parent.tabs():
             this = self.parent.nametowidget(tab)
             if not is_visible:  # show the details view
-                logger.debug("%s: Showing details view", this.handler.name)
+                LOGGER.debug("%s: Showing details view", this.handler.name)
                 this.plot_frame.grid(row=0, column=1, rowspan=3)
                 this.log_frame.grid(row=2, column=0, sticky="ew")
             else:  # hide the details view
-                logger.debug("%s: Hiding details view", this.handler.name)
+                LOGGER.debug("%s: Hiding details view", this.handler.name)
                 this.plot_frame.grid_remove()
                 this.log_frame.grid_remove()
 
@@ -318,10 +318,7 @@ class TestHandlerView(ttk.Frame):
 
     def display(self, msg: str) -> None:
         """Displays a message in the log."""
-        
         self.log_text.configure(state="normal")
-        self.log_text.insert(
-            tk.END, msg + "\n"
-        )  # last arg is for the tag
+        self.log_text.insert(tk.END, msg + "\n")  # last arg is for the tag
         self.log_text.configure(state="disabled")
         self.log_text.yview(tk.END)  # scroll to bottom
