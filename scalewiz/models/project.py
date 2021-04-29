@@ -67,7 +67,7 @@ class Project:
         self.limit_psi.set(defaults.get("pressure_limit"))
         self.output_format.set(defaults.get("output_format"))
         self.temperature.set(defaults.get("test_temperature"))
-        self.flowrate.set(defaults.get('flowrate'))
+        self.flowrate.set(defaults.get("flowrate"))
         self.uptake_seconds.set(defaults.get("uptake_time"))
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:

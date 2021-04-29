@@ -255,7 +255,6 @@ class TestHandler:
             pump.flowrate = self.project.flowrate.get()
             self.logger.info("set flowrate to %s", pump.flowrate)
 
-
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""

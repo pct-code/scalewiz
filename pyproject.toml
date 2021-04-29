@@ -1,11 +1,12 @@
 [tool.poetry]
 name = "scalewiz"
-version = "0.5.1"
+version = "0.5.2"
 description = "A graphical user interface for chemical performance testing designed to work with Teledyne SSI MX-class HPLC pumps."
 authors = ["Alex Whittington <alex@southsun.tech>"]
 packages = [
     {include = "scalewiz/"},
-    {include = "scalewiz/**/*.py"}
+    {include = "scalewiz/**/*.py"},
+    {include = "scalewiz/components/*.ico"}
 ]
 
 [tool.poetry.dependencies]

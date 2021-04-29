@@ -8,6 +8,15 @@ Changelog <https://keepachangelog.com/en/1.0.0/>`__, and this project
 adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`__.
 
+
+[v0.5.2]
+--------
+
+Fixed
+~~~~~
+
+ - issue with packaging the app's icon file 
+
 [v0.5.1]
 --------
 

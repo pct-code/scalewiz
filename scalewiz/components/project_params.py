@@ -9,8 +9,9 @@ from scalewiz.helpers.render import render
 from scalewiz.helpers.validation import can_be_float, can_be_pos_float, can_be_pos_int
 
 if typing.TYPE_CHECKING:
-    from scalewiz.models.project import Project
     from typing import List
+
+    from scalewiz.models.project import Project
 
 
 class ProjectParams(ttk.Frame):
@@ -26,7 +27,7 @@ class ProjectParams(ttk.Frame):
         # see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/entry-validation.html
 
         self.grid_columnconfigure(1, weight=1)
-        # the int is the row to rener on 
+        # the int is the row to rener on
         entries: List[tuple[ttk.Label, ttk.Entry, int]] = []
 
         # row 0 ---------------------------------------------------------------
