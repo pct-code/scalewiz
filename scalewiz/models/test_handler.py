@@ -251,6 +251,10 @@ class TestHandler:
         for pump in (self.pump1, self.pump2):
             if pump is None or not pump.is_open:
                 issues.append(f"Couldn't connect to {pump.serial.name}")
+                continue
+            pump.flowrate = self.project.flowrate.get()
+            self.logger.info("set flowrate to %s", pump.flowrate)
+
 
     # logging stuff / methods that affect UI
     def new_test(self) -> None:

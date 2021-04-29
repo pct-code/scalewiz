@@ -92,25 +92,25 @@ def generate_default() -> document:
     params = table()
 
     params["baseline"] = 0
-    params["baseline"].comment("psi, an integer > 0")
+    params["baseline"].comment("psi, a positive integer")
 
-    params["flowrate"] = 1.0
-    params["flowrate"].comment("mL/min, a float > 0.0")
+    params["flowrate"] = 0.01
+    params["flowrate"].comment("mL/min, a float => 0.01")
 
     params["output_format"] = "CSV"
     params["output_format"].comment('choose from ("CSV", "JSON")')
 
     params["pressure_limit"] = 1
-    params["pressure_limit"].comment("psi, an integer > 0")
+    params["pressure_limit"].comment("psi, a positive integer")
 
     params["reading_interval"] = 1.0
-    params["reading_interval"].comment("seconds between readings, a float > 0.0")
+    params["reading_interval"].comment("seconds between readings, a positive float")
 
     params["test_temperature"] = 1.0
-    params["test_temperature"].comment("test temperature in °F, > 0.0")
+    params["test_temperature"].comment("test temperature in °F, a positive float")
 
     params["time_limit"] = 1.0
-    params["time_limit"].comment("minutes, a float > 0.0")
+    params["time_limit"].comment("minutes, a positive float")
 
     params["uptake_time"] = 1.0
     params["uptake_time"].comment(
