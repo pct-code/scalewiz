@@ -42,7 +42,6 @@ class MainFrame(ttk.Frame):
         if len(self.tab_control.tabs()) == 1:
             config = get_config()
             handler.load_project(config["recents"].get("project"))
-            print(handler.project.name.get())
 
     def close(self) -> None:
         """Closes the program if no tests are running."""
