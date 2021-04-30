@@ -3,7 +3,7 @@ this space is under construction!
 =================================
 
 ========================================================================
-scalewiz |license| |python| |pypi| |build-status| |style| 
+scalewiz |license| |python| |pypi| |build-status| |style| |code quality|
 ========================================================================
 
 A graphical user interface designed to work with Teledyne SSI MX-class
