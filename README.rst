@@ -42,7 +42,7 @@ Acknowledgements
   :alt: PyPI - Python Version
   
 .. |pypi| image:: https://img.shields.io/pypi/v/scalewiz   
-  :target: https://pypi.org/project/py-hplc/
+  :target: https://pypi.org/project/scalewiz/
   :alt: PyPI
 
 .. |build-status| image:: https://github.com/teauxfu/scalewiz/actions/workflows/build.yml/badge.svg
