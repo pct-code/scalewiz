@@ -9,6 +9,15 @@ adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`__.
 
 
+[v0.5.3]
+--------
+
+Fixed
+~~~~~
+
+ - a bug in the uptake cycle, plus come cleaning
+
+
 [v0.5.2]
 --------
 
