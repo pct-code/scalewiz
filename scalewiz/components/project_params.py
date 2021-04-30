@@ -62,10 +62,10 @@ class ProjectParams(ttk.Frame):
         entries.append((lbl, ent, 1))
 
         # row 2 ---------------------------------------------------------------
-        lbl = ttk.Label(self, text="Chlorides (mg/L):")
+        lbl = ttk.Label(self, text="Calcium (mg/L):")
         ent = ttk.Spinbox(
             self,
-            textvariable=project.chlorides,
+            textvariable=project.calcium,
             from_=0,
             to=999999,
             validate="key",

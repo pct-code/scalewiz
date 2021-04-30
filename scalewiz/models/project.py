@@ -46,6 +46,7 @@ class Project:
         self.notes = tk.StringVar()
         self.bicarbs = tk.DoubleVar()
         self.bicarbs_increased = tk.BooleanVar()
+        self.calcium = tk.DoubleVar()
         self.chlorides = tk.DoubleVar()
         self.temperature = tk.DoubleVar()  # the test temperature
         self.plot = tk.StringVar()  # path to plot local file
@@ -124,12 +125,14 @@ class Project:
             "params": {
                 "bicarbonates": self.bicarbs.get(),
                 "bicarbsIncreased": self.bicarbs_increased.get(),
+                "calcium": self.calcium.get(),
                 "chlorides": self.chlorides.get(),
                 "baseline": self.baseline.get(),
                 "temperature": self.temperature.get(),
                 "limitPSI": self.limit_psi.get(),
                 "limitMin": self.limit_minutes.get(),
                 "interval": self.interval_seconds.get(),
+                'flowrate': self.flowrate.get(),
                 "uptake": self.uptake_seconds.get(),
             },
             "tests": [test.to_dict() for test in self.tests],
@@ -176,12 +179,14 @@ class Project:
         params = obj.get("params")
         self.bicarbs.set(params.get("bicarbonates"))
         self.bicarbs_increased.set(params.get("bicarbsIncreased"))
+        self.calcium.set(params.get("calcium"))
         self.chlorides.set(params.get("chlorides"))
         self.baseline.set(params.get("baseline"))
         self.temperature.set(params.get("temperature"))
         self.limit_psi.set(params.get("limitPSI"))
         self.limit_minutes.set(params.get("limitMin"))
         self.interval_seconds.set(params.get("interval"))
+        self.flowrate.set(params.get('flowrate'))
         self.uptake_seconds.set(params.get("uptake"))
 
         self.plot.set(obj.get("plot"))

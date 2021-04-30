@@ -136,23 +136,27 @@ class TestHandler:
             self.is_done.set(False)
             self.is_running.set(True)
             self.update_log_handler()
+            self.logger.info('submitting')
             self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
+        # run the uptake cycle ---------------------------------------------------------
+        uptake = self.project.uptake_seconds.get()
+        step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
-        # run the uptake cycle
-        uptake = self.project.uptake_seconds.get()
-        for i in range(uptake):
+        rinse_start = monotonic()
+        sleep(step)
+        for i in range(100):
+            elapsed = monotonic() - rinse_start
             if self.can_run():
-                self.elapsed_str.set(f"{uptake - i} s")
-                self.progress.set(round(i / uptake * 100))
-                sleep(1)
+                self.elapsed_str.set(f"{uptake - elapsed:.1f} s")
+                self.progress.set(i)
+                sleep(step - ((monotonic() - rinse_start) % step))
             else:
                 self.stop_test()
                 break
-
         self.log_queue.put("")  # add newline for clarity
         # we use these in the loop
         interval = self.project.interval_seconds.get()
