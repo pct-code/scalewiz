@@ -9,6 +9,14 @@ adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`__.
 
 
+[v0.5.4]
+--------
+
+Changed
+~~~~~
+
+ - improvements to packaging
+
 [v0.5.3]
 --------
 

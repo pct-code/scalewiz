@@ -6,13 +6,15 @@ this space is under construction!
 scalewiz |license| |python| |pypi| |build-status| |style| |code quality|
 ========================================================================
 
-A graphical user interface designed to work with Teledyne SSI MX-class
-HPLC pumps for the purpose of calcite scale inhibitor chemical
+A graphical user interface designed to work with `Teledyne SSI MX-class
+HPLC pumps`_ for the purpose of calcite scale inhibitor chemical
 performance testing.
 
-|main menu|
+If you are working with Teledyne SSI Next Generation pumps generally, please check out `py-hplc`_!
 
-|evaluation window|
+.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/main_menu(details).PNG
+
+.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/evaluation(plot).PNG
 
 Installation
 ============
@@ -61,7 +63,7 @@ Acknowledgements
   :target: https://gitlab.com/pycqa/flake8
   :alt: Code quality
 
-.. |main menu| image:: img/main_menu(details).PNG
-.. |evaluation window| image:: img/evaluation(plot).PNG\
 .. _`Premier Chemical Technologies, LLC`: https://premierchemical.tech
 .. _`@balacla`: https://github.com/balacla
+.. _`Teledyne SSI MX-class HPLC pumps`: https://store.teledynessi.com/collections/mx-class
+.. _`py-hplc`: https://github.com/teauxfu/py-hplc
