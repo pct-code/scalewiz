@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tkinter import ttk
 
 from scalewiz.helpers.set_icon import set_icon
+from scalewiz.models.test_handler import TestHandler
 
 LOGGER = logging.getLogger("pct-scalewiz")
 
@@ -14,7 +15,7 @@ LOGGER = logging.getLogger("pct-scalewiz")
 class RinseWindow(tk.Toplevel):
     """Toplevel control that starts and stops the pumps on a timer."""
 
-    def __init__(self, handler) -> None:
+    def __init__(self, handler: TestHandler) -> None:
         tk.Toplevel.__init__(self)
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
         self.handler = handler
@@ -40,12 +41,12 @@ class RinseWindow(tk.Toplevel):
         )
         self.button.grid(row=2, column=0, columnspan=2)
 
-    def request_rinse(self):
+    def request_rinse(self) -> None:
         """Try to start a rinse cycle if a test isn't running."""
         if not self.handler.is_running.get() or self.handler.is_done.get():
             self.pool.submit(self.rinse)
 
-    def rinse(self):
+    def rinse(self) -> None:
         """Run the pumps and disable the button for the duration of a timer."""
         self.handler.setup_pumps()
         self.handler.pump1.run()

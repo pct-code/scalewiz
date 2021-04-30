@@ -15,7 +15,7 @@ Versioning <https://semver.org/spec/v2.0.0.html>`__.
 Fixed
 ~~~~~
 
- - issue with packaging the app's icon file 
+ - issue with packaging the app's icon file
 
 [v0.5.1]
 --------
@@ -120,4 +120,3 @@ Added
    resources with bundled executables later ### Changed
 -  reset versioning to 0.1.0
 -  moved project loading functionality to menu bar
-

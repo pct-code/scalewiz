@@ -15,7 +15,7 @@ LOGGER = logging.getLogger("scalewiz")
 class MainFrame(ttk.Frame):
     """Main Frame for the application."""
 
-    def __init__(self, parent):
+    def __init__(self, parent: ttk.Frame) -> None:
         ttk.Frame.__init__(self, parent)
         self.parent = parent
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)

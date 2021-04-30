@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Union
 
 from appdirs import user_config_dir
-from tomlkit import comment, document, dumps, loads, nl, table
+from tomlkit import comment, document, dumps, loads, table
 
 LOGGER = getLogger("scalewiz.config")
 
@@ -37,7 +37,7 @@ def ensure_config() -> None:
     # todo #19 make sure the config isn't missing keys
 
 
-def init_config():
+def init_config() -> None:
     """Ensures a user config dir and file."""
     doc = generate_default()
     # write to file
@@ -138,7 +138,7 @@ def get_config() -> dict[str, Union[float, int, str]]:
     return defaults
 
 
-def update_config(table: str, key: str, value: Union[float, int, str]):
+def update_config(table: str, key: str, value: Union[float, int, str]) -> None:
     """Update the config with the passed values.
 
     Args:

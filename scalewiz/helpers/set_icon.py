@@ -10,11 +10,11 @@ from scalewiz.helpers.get_resource import get_resource
 LOGGER = logging.getLogger("scalewiz")
 
 
-def set_icon(widget: tk.Widget):
+def set_icon(widget: tk.Widget) -> None:
     """Sets an icon on the current Toplevel."""
     # set the Toplevel's icon
     try:  # this makes me nervous, but whatever
-        icon_path = get_resource(r"../components/icon.ico") 
+        icon_path = get_resource(r"../components/icon.ico")
     except FileNotFoundError:
         LOGGER.error("Failed to set the icon")
 

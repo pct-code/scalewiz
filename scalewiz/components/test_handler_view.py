@@ -239,7 +239,7 @@ class TestHandlerView(ttk.Frame):
     def update_devices_list(self, *args) -> None:
         """Updates the devices list held by the TestHandler."""
         # extra unused args are passed in by tkinter
-        def update():
+        def update() -> None:
             self.devices_list = sorted([i.device for i in list_ports.comports()])
             if len(self.devices_list) < 1:
                 self.devices_list = ["None found"]
@@ -251,7 +251,7 @@ class TestHandlerView(ttk.Frame):
                 self.device1_entry.current(0)
                 self.device2_entry.current(1)
 
-            if not "None found" in self.devices_list:
+            if "None found" not in self.devices_list:
                 LOGGER.debug(
                     "%s found devices: %s", self.handler.name, self.devices_list
                 )
@@ -275,7 +275,7 @@ class TestHandlerView(ttk.Frame):
         else:
             self.start_button.configure(text="Start", command=self.handler.start_test)
 
-    def update_test_type(self, *args):
+    def update_test_type(self, *args) -> None:
         """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""
         if self.handler.test.is_blank.get():
             self.trial_label_frame.grid_remove()
