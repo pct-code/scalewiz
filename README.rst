@@ -26,6 +26,8 @@ Installation
 Usage
 =====
 
+::
+
     python -m scalewiz
 
 Further instructions can be viewed in the docs section of this repo or with the Help button in the main
