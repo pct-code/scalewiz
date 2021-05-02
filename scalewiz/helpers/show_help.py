@@ -3,8 +3,6 @@
 import logging
 import webbrowser
 
-from scalewiz.helpers.get_resource import get_resource
-
 LOGGER = logging.getLogger("scalewiz")
 
 

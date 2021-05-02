@@ -19,7 +19,6 @@ from scalewiz.models.project import Project
 from scalewiz.models.test import Test
 
 if typing.TYPE_CHECKING:
-    import tkinter as tk
     from tkinter import ttk
     from tkinter.scrolledtext import ScrolledText
     from typing import List
@@ -136,7 +135,7 @@ class TestHandler:
             self.is_done.set(False)
             self.is_running.set(True)
             self.update_log_handler()
-            self.logger.info('submitting')
+            self.logger.info("submitting")
             self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:

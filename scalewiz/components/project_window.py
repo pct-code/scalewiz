@@ -99,7 +99,7 @@ class ProjectWindow(tk.Toplevel):
         if file_path != "":
             # make sure it is JSON extension
             ext = file_path[-5:]
-            if not ext in (".json", ".JSON"):
+            if ext not in (".json", ".JSON"):
                 file_path = f"{file_path}.json"
             self.editor_project.path.set(file_path)
             self.save()

@@ -3,6 +3,7 @@ repos:
     rev: 5.8.0
     hooks:
       - id: isort
+        args: ["--profile", "black", "--filter-files"]
   - repo: https://github.com/ambv/black
     rev: 21.4b2
     hooks:
@@ -11,7 +12,7 @@ repos:
     rev: 3.9.1
     hooks:
       - id: flake8
-        args: ["--ignore=ANN001,ANN101,ANN002", --max-line-length=88]
+        args: ["--ignore=ANN001,ANN101,ANN002,W503", --max-line-length=88]
         additional_dependencies:
           - flake8-annotations
   - repo: https://github.com/pre-commit/pre-commit-hooks

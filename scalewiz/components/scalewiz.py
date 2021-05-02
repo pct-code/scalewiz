@@ -14,7 +14,7 @@ from scalewiz.models.logger import Logger
 class ScaleWiz(ttk.Frame):
     """Core object for the application."""
 
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         ttk.Frame.__init__(self, parent)
 
         # set UI

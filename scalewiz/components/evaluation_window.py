@@ -245,12 +245,9 @@ class EvaluationWindow(tk.Toplevel):
         start_time = time.time()
         log = []
         # scoring props
-        max_readings = round(
-            self.editor_project.limit_minutes.get()
-            * 60
-            / self.editor_project.interval_seconds.get()
-            + 1
-        )
+        limit_minutes = self.editor_project.limit_minutes.get()
+        interval_seconds = self.editor_project.interval_seconds.get()
+        max_readings = round(limit_minutes * 60 / interval_seconds)
         log.append("Max readings: limitMin * 60 / reading interval")
         log.append(f"Max readings: {max_readings}")
         baseline_area = round(self.editor_project.baseline.get() * max_readings)

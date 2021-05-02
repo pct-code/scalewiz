@@ -38,14 +38,14 @@ Acknowledgements
  - `Premier Chemical Technologies, LLC`_ for sponsoring development
  -  `@balacla`_ for support and invaluable help in brainstorming
 
-.. |license| image:: https://img.shields.io/github/license/teauxfu/py-hplc 
+.. |license| image:: https://img.shields.io/github/license/teauxfu/py-hplc
   :target: https://github.com/teauxfu/py-hplc/blob/main/LICENSE.txt
   :alt: GitHub
 
 .. |python| image:: https://img.shields.io/pypi/pyversions/scalewiz
   :alt: PyPI - Python Version
-  
-.. |pypi| image:: https://img.shields.io/pypi/v/scalewiz   
+
+.. |pypi| image:: https://img.shields.io/pypi/v/scalewiz
   :target: https://pypi.org/project/scalewiz/
   :alt: PyPI
 

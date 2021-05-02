@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 class ProjectReport(ttk.Frame):
     """Editor for Project reporting settings."""
 
-    def __init__(self, parent: ttk.Frame, project: Project):
+    def __init__(self, parent: ttk.Frame, project: Project) -> None:
         ttk.Frame.__init__(self, parent)
         self.grid_columnconfigure(1, weight=1)
 
