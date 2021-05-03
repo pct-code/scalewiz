@@ -77,10 +77,10 @@ class Project:
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
-        self.customer.trace_add("write", self.make_name)
-        self.client.trace_add("write", self.make_name)
-        self.field.trace_add("write", self.make_name)
-        self.sample.trace_add("write", self.make_name)
+        self.customer.trace_add("write", self.update_proj_name)
+        self.client.trace_add("write", self.update_proj_name)
+        self.field.trace_add("write", self.update_proj_name)
+        self.sample.trace_add("write", self.update_proj_name)
 
     def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
@@ -206,7 +206,7 @@ class Project:
             except IndexError:  # sometimes this spaghets when loading empty projects...
                 pass
 
-    def make_name(self, *args) -> None:
+    def update_proj_name(self, *args) -> None:
         """Constructs a default name for the Project."""
         # extra unused args are passed in by tkinter
         name = ""

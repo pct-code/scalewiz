@@ -8,6 +8,9 @@ performance testing.
 
 If you are working with Teledyne SSI Next Generation pumps generally, please check out `py-hplc`_!
 
+This project is stable and usable in a production environment, but listed as in beta due to the lack of a test suite.
+If you notice something weird, fragile, or otherwise encounter a bug, please open an `issue`_. 
+
 .. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/main_menu(details).PNG
 
 .. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/evaluation(plot).PNG
@@ -66,3 +69,4 @@ Acknowledgements
 .. _`Teledyne SSI MX-class HPLC pumps`: https://store.teledynessi.com/collections/mx-class
 .. _`py-hplc`: https://github.com/teauxfu/py-hplc
 .. _`docs`: https://github.com/teauxfu/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
+.. _`issue`: https://github.com/teauxfu/scalewiz/issues

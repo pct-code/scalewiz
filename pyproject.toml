@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scalewiz"
-version = "0.5.5"
+version = "0.5.6"
 description = "A graphical user interface for chemical performance testing designed to work with Teledyne SSI MX-class HPLC pumps."
 readme = "README.rst"
 license = "GPL-3.0-or-later"
@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     "Topic :: Terminals :: Serial",
     "Framework :: Matplotlib",
-    "License :: OSI Approved :: GNU General Public License (GPL)"
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
 ]
 
 [tool.poetry.dependencies]
@@ -35,11 +35,7 @@ scalewiz = "scalewiz.__main__:main"
 
 [tool.poetry.dev-dependencies]
 rope = "^0.18.0"
-mypy = "^0.812"
 readme-renderer = "^29.0"
-
-[tool.black]
-line-length = 88
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

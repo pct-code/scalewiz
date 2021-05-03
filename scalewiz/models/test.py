@@ -36,12 +36,12 @@ class Test:
 
     def add_traces(self) -> None:
         """Adds tkVar traces. Need to be removed with remove_traces."""
-        self.chemical.trace_add("write", self.make_name)
-        self.rate.trace_add("write", self.make_name)
-        self.name.trace_add("write", self.make_label)
-        self.pump_to_score.trace_add("write", self.set_observed_baseline)
+        self.chemical.trace_add("write", self.update_test_name)
+        self.rate.trace_add("write", self.update_test_name)
+        self.name.trace_add("write", self.update_label)
+        self.pump_to_score.trace_add("write", self.update_obs_baseline)
 
-    def to_dict(self) -> dict[str, Union[bool, int, str]]:
+    def to_dict(self) -> dict[str, Union[bool, float, int, str]]:
         """Returns a dict representation of a Test."""
         return {
             "name": self.name.get(),
@@ -58,7 +58,7 @@ class Test:
             "readings": self.readings,
         }
 
-    def load_json(self, obj: dict[str, Any]) -> None:
+    def load_json(self, obj: dict[str, Union[bool, float, int, str]]) -> None:
         """Load a Test with values from a JSON object."""
         self.name.set(obj.get("name"))
         self.is_blank.set(obj.get("isBlank"))
@@ -71,13 +71,14 @@ class Test:
         self.include_on_report.set(obj.get("includeOnRep"))
         self.result.set(obj.get("result"))
         self.readings = obj.get("readings")
-        self.set_observed_baseline()
+        self.update_obs_baseline()
 
     def get_readings(self) -> list[int]:
         """Returns a list of the pump_to_score's pressure readings."""
-        return [reading[self.pump_to_score.get()] for reading in self.readings]
+        pump = self.pump_to_score.get()
+        return [reading[pump] for reading in self.readings]
 
-    def make_name(self, *args) -> None:
+    def update_test_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""
         if not (self.chemical.get() == "" or self.rate.get() == 0):
             if float(self.rate.get()) == int(self.rate.get()):
@@ -88,14 +89,14 @@ class Test:
         if self.chemical.get().strip() != self.chemical.get():
             self.chemical.set(self.chemical.get().strip())
 
-    def make_label(self, *args) -> None:
+    def update_label(self, *args) -> None:
         """Sets the label to the current name as a default value."""
         self.label.set(self.name.get().strip())
 
-    def set_observed_baseline(self, *args) -> None:
+    def update_obs_baseline(self, *args) -> None:
         """Sets the observed baseline psi."""
-        pressures = [reading[self.pump_to_score.get()] for reading in self.readings]
-        if len(pressures) > 0:
+        if len(self.readings) > 0:
+            pressures = self.get_readings()
             self.max_psi.set(max(pressures))
             baselines = pressures[0:4]
             self.observed_baseline.set(round(sum(baselines) / 4))
