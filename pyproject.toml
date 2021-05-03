@@ -17,7 +17,8 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
     "Topic :: System :: Hardware :: Universal Serial Bus (USB)",
     "Topic :: Terminals :: Serial",
-    "Framework :: Matplotlib"
+    "Framework :: Matplotlib",
+    "License :: OSI Approved :: GNU General Public License (GPL)"
 ]
 
 [tool.poetry.dependencies]
