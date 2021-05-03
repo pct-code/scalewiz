@@ -14,14 +14,14 @@ Versioning <https://semver.org/spec/v2.0.0.html>`__.
 Added
 ~~~~~
 
- - added "About" dialog with license info to main menu
+- added "About" dialog with license info to main menu
 
 Changed
 ~~~~~~~
 
- - minor performance improvement to Test object model
- - improved packaging metadata
- - some code cleanup
+- minor performance improvement to Test object model
+- improved packaging metadata
+- some code cleanup
 
 
 [v0.5.5]
@@ -38,7 +38,7 @@ Changed
 Changed
 ~~~~~~~
 
- - improvements to packaging
+- improvements to packaging
 
 [v0.5.3]
 --------
@@ -46,7 +46,7 @@ Changed
 Fixed
 ~~~~~
 
- - a bug in the uptake cycle, plus come cleaning
+- a bug in the uptake cycle, plus come cleaning
 
 
 [v0.5.2]
@@ -55,7 +55,7 @@ Fixed
 Fixed
 ~~~~~
 
- - issue with packaging the app's icon file
+- issue with packaging the app's icon file
 
 [v0.5.1]
 --------
@@ -94,11 +94,11 @@ Changed
 Changed
 ~~~~~~~
 
--  major performance / accuracy improvement to readings collection
--  updated pump interface to use py-hplc v0.1.6
--  improved logging implementation
--  improved documentation ### Removed
--  some smelly / unused code
+- major performance / accuracy improvement to readings collection
+- updated pump interface to use py-hplc v0.1.6
+- improved logging implementation
+- improved documentation ### Removed
+- some smelly / unused code
 
 [v0.3.0]
 --------
@@ -106,8 +106,8 @@ Changed
 Changed
 ~~~~~~~
 
--  moved code for pump interfacing to its own package: py-hplc ### Added
--  dependency on py-hplc
+- moved code for pump interfacing to its own package: py-hplc ### Added
+- dependency on py-hplc
 
 [v0.2.1]
 --------
@@ -115,9 +115,9 @@ Changed
 Added
 ~~~~~
 
--  entry validation ensuring only numeric inputs are obtained when
+- entry validation ensuring only numeric inputs are obtained when
    necessary ### Changed
--  refactored some UI rendering
+- refactored some UI rendering
 
 [v0.2.0]
 --------
@@ -125,38 +125,40 @@ Added
 Added
 ~~~~~
 
--  clicking a date entry label in the 'Project info' view will clear its
-   contents
--  report export as CSV (default)
--  report export as flattened JSON (not human readable)
--  more descriptive window titles, all windows get the app icon ###
-   Changed
--  performance improvement to evaluation window
--  time resolution improvement to data collection loop
--  rinse windows will be titled after the system they control
--  requests for rinse cycles will be ignored if a test is already
-   running
--  the Live Plot scales the limits of its axes to the data collected
--  evaluation windows will title themselves after their test handler and
-   project
--  refactored project editor window / evaluation window
--  general linting and cleanup ### Fixed
--  bug in observed baseline pressure reporting
--  the Live Plot stops updating (clearing itself) at the end of a test
-   ### Removed
--  dependency on openpyxl
--  ability to export report as .xlsx directly
--  redundant tabs from EvaluationFrame
+- clicking a date entry label in the 'Project info' view will clear its contents
+- report export as CSV (default)
+- report export as flattened JSON (not human readable)
+- more descriptive window titles, all windows get the app icon ###
+ 
+Changed
+~~~~~~~
 
-`v0.1.0 <https://github.com/teauxfu/pct-scalewiz/releases/tag/v0.1.0>`__
+- performance improvement to evaluation window
+- time resolution improvement to data collection loop
+- rinse windows will be titled after the system they control
+- requests for rinse cycles will be ignored if a test is already running
+- the Live Plot scales the limits of its axes to the data collected
+- evaluation windows will title themselves after their test handler and project
+- refactored project editor window / evaluation window
+- general linting and cleanup ### Fixed
+- bug in observed baseline pressure reporting
+- the Live Plot stops updating (clearing itself) at the end of a test
+ 
+Removed
+~~~~~~~
+
+- dependency on openpyxl
+- ability to export report as .xlsx directly
+- redundant tabs from EvaluationFrame
+
+[v0.1.0]
 ------------------------------------------------------------------------
 
 Added
 ~~~~~
 
--  rinse dialog, accessible from the menu bar
--  help text, accessible from the menu bar
--  get\_resource function for getting resource files. can be used for
-   resources with bundled executables later ### Changed
--  reset versioning to 0.1.0
--  moved project loading functionality to menu bar
+- rinse dialog, accessible from the menu bar
+- help text, accessible from the menu bar
+- get\_resource function for getting resource files. can be used for resources with bundled executables later ### Changed
+- reset versioning to v0.1.0
+- moved project loading functionality to menu bar
