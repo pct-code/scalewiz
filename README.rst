@@ -34,8 +34,8 @@ menu.
 
 Acknowledgements
 ================
- - `Premier Chemical Technologies, LLC`_ for sponsoring development
- -  `@balacla`_ for support and invaluable help in brainstorming
+- `Premier Chemical Technologies, LLC`_ for sponsoring development
+-  `@balacla`_ for support and invaluable help in brainstorming
 
 .. |license| image:: https://img.shields.io/github/license/teauxfu/scalewiz
   :target: https://github.com/teauxfu/py-hplc/blob/main/COPYING
