@@ -30,7 +30,7 @@ Usage
 
     python -m scalewiz
 
-Further instructions can be viewed in the docs section of this repo or with the Help button in the main
+Further instructions can be viewed in the `docs`_ section of this repo or with the Help button in the main
 menu.
 
 Acknowledgements
@@ -69,3 +69,4 @@ Acknowledgements
 .. _`@balacla`: https://github.com/balacla
 .. _`Teledyne SSI MX-class HPLC pumps`: https://store.teledynessi.com/collections/mx-class
 .. _`py-hplc`: https://github.com/teauxfu/py-hplc
+.. _`docs`: https://github.com/teauxfu/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
