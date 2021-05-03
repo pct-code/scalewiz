@@ -22,7 +22,7 @@ class ScaleWiz(ttk.Frame):
         set_icon(parent)
         parent.title(f"ScaleWiz {version('scalewiz')}")
         parent.resizable(0, 0)  # apparently this is a bad practice...
-
+        # but it needs to stay locked for the TestHandlerView's "Toggle details" to work
         # font 🔠
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Arial")

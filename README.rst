@@ -1,7 +1,3 @@
-==================================
-[this space is under construction]
-==================================
-
 ========================================================================
 scalewiz |license| |python| |pypi| |build-status| |style| |code quality|
 ========================================================================
@@ -38,8 +34,8 @@ Acknowledgements
  - `Premier Chemical Technologies, LLC`_ for sponsoring development
  -  `@balacla`_ for support and invaluable help in brainstorming
 
-.. |license| image:: https://img.shields.io/github/license/teauxfu/py-hplc
-  :target: https://github.com/teauxfu/py-hplc/blob/main/LICENSE.txt
+.. |license| image:: https://img.shields.io/github/license/teauxfu/scalewiz
+  :target: https://github.com/teauxfu/py-hplc/blob/main/COPYING
   :alt: GitHub
 
 .. |python| image:: https://img.shields.io/pypi/pyversions/scalewiz
