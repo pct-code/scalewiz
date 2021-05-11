@@ -2,6 +2,6 @@
 #9 port over the old chlorides / ppm calculators
 #1 refactor TestHandlerView
 
-??? remove last three tabs of evaluation window?
-
 'add system' -> 'system' > 'add new', 'remove current'
+
+refactor scoring out of eval window

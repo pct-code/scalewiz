@@ -5,9 +5,18 @@ from __future__ import annotations
 # util
 import logging
 import tkinter as tk
-from typing import Any, Union
+from dataclasses import dataclass
+from typing import Union
 
 LOGGER = logging.getLogger("scalewiz")
+
+
+@dataclass
+class Reading:
+    elapsedMin: float
+    pump1: int
+    pump2: int
+    average: int
 
 
 class Test:
@@ -77,6 +86,7 @@ class Test:
         """Returns a list of the pump_to_score's pressure readings."""
         pump = self.pump_to_score.get()
         return [reading[pump] for reading in self.readings]
+        # return [getattr(reading, pump) for reading in self.readings]
 
     def update_test_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""

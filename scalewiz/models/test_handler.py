@@ -16,7 +16,7 @@ from tkinter import filedialog, messagebox
 from py_hplc import NextGenPump
 
 from scalewiz.models.project import Project
-from scalewiz.models.test import Test
+from scalewiz.models.test import Reading, Test
 
 if typing.TYPE_CHECKING:
     from tkinter import ttk
@@ -168,12 +168,10 @@ class TestHandler:
             psi1 = self.pump1.pressure
             psi2 = self.pump2.pressure
             average = round(((psi1 + psi2) / 2))
-            reading = {
-                "elapsedMin": minutes_elapsed,
-                "pump 1": psi1,
-                "pump 2": psi2,
-                "average": average,
-            }
+
+            reading = Reading(
+                elapsedMin=minutes_elapsed, pump1=psi1, pump2=psi2, average=average
+            )
 
             # make a message for the log in the test handler view
             msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(

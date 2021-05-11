@@ -212,11 +212,10 @@ class TestHandlerView(ttk.Frame):
 
         # rows 0-1 ---------------------------------------------------------------------
         # close all pyplots to prevent memory leak
-        plt.close("all")
-        self.plot_frame = LivePlot(self, self.handler)
         self.grid_columnconfigure(1, weight=1)  # let it grow
         self.grid_rowconfigure(1, weight=1)
-
+        plt.close("all")
+        self.plot_frame = LivePlot(self, self.handler)
         # row 2 ------------------------------------------------------------------------
         self.log_frame = ttk.Frame(self)
         self.log_text = ScrolledText(
@@ -292,11 +291,14 @@ class TestHandlerView(ttk.Frame):
         """Updates the details view across all TestHandlerViews."""
         is_visible = bool()
         # check if the plot is gridded
+        print(type(self.plot_frame))
+
         if self.plot_frame.grid_info() != {}:
             is_visible = True
 
         for tab in self.parent.tabs():
-            this = self.parent.nametowidget(tab)
+            this = self.nametowidget(tab)
+            print(type(this))
             if not is_visible:  # show the details view
                 LOGGER.debug("%s: Showing details view", this.handler.name)
                 this.plot_frame.grid(row=0, column=1, rowspan=3)

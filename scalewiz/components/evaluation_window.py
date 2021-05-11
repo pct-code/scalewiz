@@ -46,7 +46,7 @@ class EvaluationWindow(tk.Toplevel):
             self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
-        self.plot_frame = tk.Frame(self)  # this gets destroyed in plot()
+        self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
         self.build()
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
@@ -157,7 +157,8 @@ class EvaluationWindow(tk.Toplevel):
         # close all pyplots to prevent memory leak
         plt.close("all")
         # get rid of our old plot tab
-        self.plot_frame.destroy()
+        if isinstance(self.plot_frame, ttk.Frame):
+            self.plot_frame.destroy()
         self.plot_frame = ttk.Frame(self)
         self.fig, self.axis = plt.subplots(figsize=(7.5, 4), dpi=100)
         self.fig.patch.set_facecolor("#FAFAFA")
@@ -340,9 +341,10 @@ class EvaluationWindow(tk.Toplevel):
 
     def to_log(self, log: list[str]) -> None:
         """Adds the passed log message to the Text widget in the Calculations frame."""
-        self.log_text.configure(state="normal")
-        self.log_text.delete(1.0, "end")
-        for i in log:
-            self.log_text.insert("end", i)
-            self.log_text.insert("end", "\n")
-        self.log_text.configure(state="disabled")
+        if self.log_text.grid_info() != {}:
+            self.log_text.configure(state="normal")
+            self.log_text.delete(1.0, "end")
+            for msg in log:
+                self.log_text.insert("end", msg)
+                self.log_text.insert("end", "\n")
+            self.log_text.configure(state="disabled")

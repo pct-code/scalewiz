@@ -24,7 +24,7 @@ class LivePlot(ttk.Frame):
 
     def __init__(self, parent: ttk.Frame, handler: TestHandler) -> None:
         """Initialize a LivePlot."""
-        ttk.Frame.__init__(self, parent)
+        super().__init__(parent)
         self.handler = handler
 
         # matplotlib objects
