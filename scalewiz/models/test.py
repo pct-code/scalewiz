@@ -61,7 +61,7 @@ class Test:
                     "pump 1": reading.pump1,
                     "pump 2": reading.pump2,
                     "average": reading.average,
-                    "elapsedMin:": reading.elapsedMin,
+                    "elapsedMin": reading.elapsedMin,
                 }
             )
 
