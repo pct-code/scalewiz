@@ -6,6 +6,7 @@ import os
 import time
 import tkinter as tk
 import typing
+from pathlib import Path
 from tkinter import font, ttk
 
 import matplotlib as mpl
@@ -19,7 +20,9 @@ from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
+    from scalewiz.models.test import Test
     from scalewiz.models.test_handler import TestHandler
+
 
 COLORS = [
     "orange",
@@ -42,11 +45,13 @@ class EvaluationWindow(tk.Toplevel):
         tk.Toplevel.__init__(self)
         self.handler = handler
         self.editor_project = Project()
-        if os.path.isfile(self.handler.project.path.get()):
+        if Path(self.handler.project.path.get()).is_file:
             self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
         self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
+        self.trials: list[Test] = []
+        self.blanks: list[Test] = []
         self.build()
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
@@ -57,7 +62,7 @@ class EvaluationWindow(tk.Toplevel):
 
     def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
-        if reload and os.path.isfile(self.handler.project.path.get()):
+        if reload and Path(self.handler.project.path.get()).is_file:
             # cleanup for the GC
             for test in self.editor_project.tests:
                 test.remove_traces()
@@ -96,15 +101,13 @@ class EvaluationWindow(tk.Toplevel):
 
         self.grid_columnconfigure(0, weight=1)
 
-        self.blanks = []
+        self.blanks.clear()
+        self.trials.clear()
+        #  filter through blanks and trials
         for test in self.editor_project.tests:
             if test.is_blank.get():
                 self.blanks.append(test)
-
-        # select the trials
-        self.trials = []
-        for test in self.editor_project.tests:
-            if not test.is_blank.get():
+            else:
                 self.trials.append(test)
 
         tk.Label(tests_frame, text="Blanks:", font=bold_font).grid(
@@ -176,7 +179,7 @@ class EvaluationWindow(tk.Toplevel):
                 if blank.include_on_report.get():
                     elapsed = []
                     for reading in blank.readings:
-                        elapsed.append(reading["elapsedMin"])
+                        elapsed.append(reading.elapsedMin)
                     self.axis.plot(
                         elapsed,
                         blank.get_readings(),
@@ -187,8 +190,8 @@ class EvaluationWindow(tk.Toplevel):
             for trial in self.trials:
                 if trial.include_on_report.get():
                     elapsed = []
-                    for i, reading in enumerate(trial.readings):
-                        elapsed.append(trial.readings[i]["elapsedMin"])
+                    for reading in trial.readings:
+                        elapsed.append(reading.elapsedMin)
                     self.axis.plot(
                         elapsed, trial.get_readings(), label=trial.label.get()
                     )
@@ -213,24 +216,24 @@ class EvaluationWindow(tk.Toplevel):
             f"{self.editor_project.numbers.get().replace(' ', '')} "
             f"{self.editor_project.name.get()} "
             "Scale Block Analysis (Graph).png"
-        )
+        ).strip()
         output_path = os.path.join(
-            os.path.dirname(self.editor_project.path.get()), output_path.strip()
+            os.path.dirname(self.editor_project.path.get()), output_path
         )
         self.fig.savefig(output_path)
-        self.editor_project.plot.set(
-            output_path
-        )  # store this path so we can find it later
+        # store this path so we can find it later
+        self.editor_project.plot.set(output_path)
         # update log
         output_path = (
             f"{self.editor_project.numbers.get().replace(' ', '')} "
             f"{self.editor_project.name.get()} "
             "Scale Block Analysis (Log).txt"
-        )
+        ).strip()
         output_path = os.path.join(
-            os.path.dirname(self.editor_project.path.get()), output_path.strip()
+            os.path.dirname(self.editor_project.path.get()), output_path
         )
-        with open(output_path, "w") as file:
+
+        with Path(output_path).open("w") as file:
             file.write(self.log_text.get("1.0", "end-1c"))
 
         self.editor_project.dump_json()

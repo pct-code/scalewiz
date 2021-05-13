@@ -47,13 +47,14 @@ class TestHandlerView(ttk.Frame):
         self.log_text: ScrolledText = None
         # we don't have to worry about cleaning up these traces
         # the same handler instance will persist across projects
-        self.handler.is_running.trace_add("write", self.update_input_frame)
-        self.handler.is_done.trace_add("write", self.update_start_button)
+        self.handler.is_running.trace_add("write", self.build)
+        self.handler.is_done.trace_add("write", self.build)
         self.build()
         self.poll_log_queue()
 
-    def build(self) -> None:
+    def build(self, *args) -> None:
         """Builds the UI, destroying any currently existing widgets."""
+        LOGGER.info("%s: rebuilding", self.handler.name)
         for child in self.winfo_children():
             child.destroy()
 
@@ -195,7 +196,7 @@ class TestHandlerView(ttk.Frame):
         )
         stop_button = ttk.Button(ent, text="Stop", command=self.handler.request_stop)
         details_button = ttk.Button(
-            ent, text="Toggle Details", command=self.update_plot_visible
+            ent, text="Toggle Details", command=self.update_details_view
         )
 
         self.start_button.grid(row=0, column=0)
@@ -226,6 +227,7 @@ class TestHandlerView(ttk.Frame):
         self.update_test_type()
         self.update_start_button()
         self.update_devices_list()
+        self.update_input_frame()
 
     # methods to update local state ----------------------------------------------------
 
@@ -258,7 +260,7 @@ class TestHandlerView(ttk.Frame):
         # after here to prevent race conditions
         self.after(1, update)
 
-    def update_input_frame(self, *args) -> None:
+    def update_input_frame(self) -> None:
         """Disables widgets in the input frame if a Test is running."""
         if self.handler.is_running.get():
             for widget in self.inputs:
@@ -267,14 +269,14 @@ class TestHandlerView(ttk.Frame):
             for widget in self.inputs:
                 widget.configure(state="normal")
 
-    def update_start_button(self, *args) -> None:
+    def update_start_button(self) -> None:
         """Changes the "Start" button to a "New" button when the Test finishes."""
         if self.handler.is_done.get():
             self.start_button.configure(text="New", command=self.handler.new_test)
         else:
             self.start_button.configure(text="Start", command=self.handler.start_test)
 
-    def update_test_type(self, *args) -> None:
+    def update_test_type(self) -> None:
         """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""
         if self.handler.test.is_blank.get():
             self.trial_label_frame.grid_remove()
@@ -287,7 +289,7 @@ class TestHandlerView(ttk.Frame):
             self.render(self.trial_label_frame, self.trial_entry_frame, 3)
             LOGGER.debug("%s: changed to Trial mode", self.handler.name)
 
-    def update_plot_visible(self) -> None:
+    def update_details_view(self) -> None:
         """Updates the details view across all TestHandlerViews."""
         is_visible = bool()
         # check if the plot is gridded
@@ -295,10 +297,9 @@ class TestHandlerView(ttk.Frame):
 
         if self.plot_frame.grid_info() != {}:
             is_visible = True
-
+        # we do this operation on ever tab so the window size makes sense
         for tab in self.parent.tabs():
             this = self.nametowidget(tab)
-            print(type(this))
             if not is_visible:  # show the details view
                 LOGGER.debug("%s: Showing details view", this.handler.name)
                 this.plot_frame.grid(row=0, column=1, rowspan=3)
@@ -309,7 +310,7 @@ class TestHandlerView(ttk.Frame):
                 this.log_frame.grid_remove()
 
     def poll_log_queue(self) -> None:
-        """Checks every 100ms if there is a new message in the queue to display."""
+        """Checks on an interval if there is a new message in the queue to display."""
         while True:
             try:
                 record = self.handler.log_queue.get(block=False)
@@ -317,11 +318,12 @@ class TestHandlerView(ttk.Frame):
                 break
             else:
                 self.display(record)
-        self.after(100, self.poll_log_queue)
+        interval = round(self.handler.project.interval_seconds.get() * 1000)
+        self.after(interval, self.poll_log_queue)
 
     def display(self, msg: str) -> None:
         """Displays a message in the log."""
         self.log_text.configure(state="normal")
-        self.log_text.insert(tk.END, msg + "\n")  # last arg is for the tag
+        self.log_text.insert(tk.END, msg + "\n")
         self.log_text.configure(state="disabled")
         self.log_text.yview(tk.END)  # scroll to bottom

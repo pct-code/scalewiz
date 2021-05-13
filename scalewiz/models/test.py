@@ -35,7 +35,7 @@ class Test:
         self.pump_to_score = tk.StringVar()  # which series of PSIs to use
         self.result = tk.DoubleVar()  # represents the test's performance vs the blank
         self.include_on_report = tk.BooleanVar()  # condition for scoring
-        self.readings: list[dict] = []  # list of flat reading dicts
+        self.readings: list[Reading] = []  # list of flat reading dicts
         self.max_psi = tk.IntVar()  # the highest psi of the test
         self.observed_baseline = tk.IntVar()  # a guess at the baseline for the test
         # set defaults
@@ -52,6 +52,19 @@ class Test:
 
     def to_dict(self) -> dict[str, Union[bool, float, int, str]]:
         """Returns a dict representation of a Test."""
+        self.clean_test()  # strip whitespaces from relevant fields
+        # cast all readings from dataclasses to dicts
+        readings = []
+        for reading in self.readings:
+            readings.append(
+                {
+                    "pump 1": reading.pump1,
+                    "pump 2": reading.pump2,
+                    "average": reading.average,
+                    "elapsedMin:": reading.elapsedMin,
+                }
+            )
+
         return {
             "name": self.name.get(),
             "isBlank": self.is_blank.get(),
@@ -64,7 +77,7 @@ class Test:
             "includeOnRep": self.include_on_report.get(),
             "result": self.result.get(),
             "obsBaseline": self.observed_baseline.get(),
-            "readings": self.readings,
+            "readings": readings,
         }
 
     def load_json(self, obj: dict[str, Union[bool, float, int, str]]) -> None:
@@ -79,14 +92,23 @@ class Test:
         self.pump_to_score.set(obj.get("toConsider"))
         self.include_on_report.set(obj.get("includeOnRep"))
         self.result.set(obj.get("result"))
-        self.readings = obj.get("readings")
+        readings = obj.get("readings")
+        for reading in readings:
+            self.readings.append(
+                Reading(
+                    pump1=reading.get("pump 1"),
+                    pump2=reading.get("pump 2"),
+                    average=reading.get("average"),
+                    elapsedMin=reading.get("elapsedMin"),
+                )
+            )
         self.update_obs_baseline()
 
     def get_readings(self) -> list[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         pump = self.pump_to_score.get()
-        return [reading[pump] for reading in self.readings]
-        # return [getattr(reading, pump) for reading in self.readings]
+        pump = pump.replace(" ", "")  # legacy accomodation for spaces in keys
+        return [getattr(reading, pump) for reading in self.readings]
 
     def update_test_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""
@@ -96,8 +118,12 @@ class Test:
             else:
                 self.name.set(f"{self.chemical.get()} {self.rate.get():.2f} ppm")
 
-        if self.chemical.get().strip() != self.chemical.get():
-            self.chemical.set(self.chemical.get().strip())
+    def clean_test(self) -> None:
+        """Do some formatting on the test to clean it up for storing."""
+        strippables = (self.chemical, self.name, self.label, self.clarity, self.notes)
+        for attr in strippables:
+            if attr.get().strip() != attr.get():
+                attr.set(attr.get().strip())
 
     def update_label(self, *args) -> None:
         """Sets the label to the current name as a default value."""
@@ -117,5 +143,5 @@ class Test:
         for var in variables:
             try:
                 var.trace_remove("write", var.trace_info()[0][1])
-            except IndexError:  # sometimes this spaghets when loading empty projects...
-                pass
+            except IndexError as err:  # sometimes this spaghets on empty projects...
+                LOGGER.exception(err)  # just pass and move on

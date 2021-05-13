@@ -134,8 +134,8 @@ def get_config() -> dict[str, Union[float, int, str]]:
     """Returns the current configuration as a dict."""
     ensure_config()
     with CONFIG_FILE.open("r") as file:
-        defaults = loads(file.read())
-    return defaults
+        config = loads(file.read())
+    return config
 
 
 def update_config(table: str, key: str, value: Union[float, int, str]) -> None:

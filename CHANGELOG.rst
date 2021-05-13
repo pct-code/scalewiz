@@ -8,6 +8,21 @@ Changelog <https://keepachangelog.com/en/1.0.0/>`__, and this project
 adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`__.
 
+
+[v0.5.7]
+--------
+
+Changed
+~~~~~~~
+
+- updated some path operations in :code:`EvaluationFrame` to use the :code:`pathlib.Path` API
+- updated :code:`EvaluationFrame` to handle the :code:`Reading` class
+- updated the :code:`Test` object model to handle the :code:`Reading` class
+- minor performance buff to the :code:`LivePlot` component
+- refactoring the :code:`TestHandlerView` to be less tempermental
+- misc. code cleanup
+
+
 [v0.5.6]
 --------
 
@@ -129,7 +144,7 @@ Added
 - report export as CSV (default)
 - report export as flattened JSON (not human readable)
 - more descriptive window titles, all windows get the app icon ###
- 
+
 Changed
 ~~~~~~~
 
@@ -143,7 +158,7 @@ Changed
 - general linting and cleanup ### Fixed
 - bug in observed baseline pressure reporting
 - the Live Plot stops updating (clearing itself) at the end of a test
- 
+
 Removed
 ~~~~~~~
 
