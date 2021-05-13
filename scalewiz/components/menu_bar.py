@@ -34,17 +34,14 @@ class MenuBar:
         menubar.add_cascade(label="Project", menu=project_menu)
         # resume making buttons
         menubar.add_command(label="Evaluation", command=self.spawn_evaluator)
+        menubar.add_command(label="Rinse", command=self.spawn_rinse)
         menubar.add_command(
             label="Log", command=self.main_frame.parent.log_window.deiconify
         )
-        menubar.add_command(label="Rinse", command=self.spawn_rinse)
-        # add info cascade
-        info_menu = tk.Menu(tearoff=0)
-        info_menu.add_command(label="Help", command=show_help)
-        info_menu.add_command(label="About", command=self.about)
-        menubar.add_cascade(label="Info", menu=info_menu)
+        menubar.add_command(label="Help", command=show_help)
+        menubar.add_command(label="About", command=self.about)
 
-        # menubar.add_command(label="Debug", command=self._debug)
+        menubar.add_command(label="Debug", command=self._debug)
 
         self.main_frame.winfo_toplevel().configure(menu=menubar)
 
@@ -87,22 +84,17 @@ class MenuBar:
     def about(self) -> None:
         showinfo(
             "About",
-            ("Copyright  (C) 2021  Alex Whittington\n\n"
+            (
+                "Copyright  (C) 2021  Alex Whittington\n\n"
+                "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n"  # noqa: E501
+                "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n"  # noqa: E501
+                "You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>."  # noqa: E501
+            ),
+        )
 
-    "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n"
-
-    "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n"
-
-    "You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>."
-    ))
-    
     def _debug(self) -> None:
         """Used for debugging."""
-        pass
-        # from scalewiz.helpers.configuration import init_config
-
-        # init_config()
-        # current_tab = self.main_frame.tab_control.select()
-        # widget = self.main_frame.nametowidget(current_tab)
-        # widget.handler.rebuild_views()
-        # widget.bell()
+        current_tab = self.main_frame.tab_control.select()
+        widget = self.main_frame.nametowidget(current_tab)
+        widget.handler.rebuild_views()
+        widget.bell()

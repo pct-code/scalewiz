@@ -15,6 +15,7 @@ from tkinter import filedialog, messagebox
 
 from py_hplc import NextGenPump
 
+from scalewiz.components.test_handler_view import TestHandlerView
 from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
 
@@ -22,8 +23,6 @@ if typing.TYPE_CHECKING:
     from tkinter import ttk
     from tkinter.scrolledtext import ScrolledText
     from typing import List
-
-    from scalewiz.components.test_handler_view import TestHandlerView
 
 
 class TestHandler:
@@ -39,7 +38,7 @@ class TestHandler:
         self.test: Test = None
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.readings: Queue[dict] = Queue()
-        self.editors: list[tk.Widget] = []  # list of views displaying the project
+        self.editors: List[tk.Widget] = []  # list of views displaying the project
         self.max_readings: int = None  # max # of readings to collect
         self.max_psi_1: int = None
         self.max_psi_2: int = None
@@ -53,7 +52,6 @@ class TestHandler:
         self.stop_requested: Event = Event()
         self.progress = tk.IntVar()
         self.elapsed_min = tk.DoubleVar()  # used for evaluations
-        self.elapsed_str = tk.StringVar()  # used in widgets where formatting is awkward
 
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
@@ -75,7 +73,7 @@ class TestHandler:
             and not self.stop_requested.is_set()
         )
 
-    def load_project(self, path: str = None, loaded: list[str] = []) -> None:
+    def load_project(self, path: str = None, loaded: List[str] = []) -> None:
         """Opens a file dialog then loads the selected Project file."""
         # traces are set in Project and Test __init__ methods
         # we need to explicitly clean them up here
@@ -134,6 +132,7 @@ class TestHandler:
             self.stop_requested.clear()
             self.is_done.set(False)
             self.is_running.set(True)
+            self.rebuild_views()
             self.update_log_handler()
             self.logger.info("submitting")
             self.pool.submit(self.take_readings)
@@ -148,9 +147,7 @@ class TestHandler:
         rinse_start = monotonic()
         sleep(step)
         for i in range(100):
-            elapsed = monotonic() - rinse_start
             if self.can_run():
-                self.elapsed_str.set(f"{uptake - elapsed:.1f} s")
                 self.progress.set(i)
                 sleep(step - ((monotonic() - rinse_start) % step))
             else:
@@ -182,7 +179,6 @@ class TestHandler:
 
             self.readings.put(reading)
             self.elapsed_min.set(minutes_elapsed)
-            self.elapsed_str.set(f"{minutes_elapsed:.2f} min.")
             self.progress.set(round(len(self.readings.queue) / self.max_readings * 100))
 
             if psi1 > self.max_psi_1:
@@ -267,14 +263,11 @@ class TestHandler:
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)
-        self.elapsed_str.set("")
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
         )
 
-        # rebuild the TestHandlerView
-        if self.view is not None:
-            self.view.build()
+        self.rebuild_views()
 
     def rebuild_views(self) -> None:
         """Rebuild all open Widgets that could modify the Project file."""
@@ -284,7 +277,8 @@ class TestHandler:
                 widget.build(reload=True)
             else:  # clean up as we go
                 self.editors.remove(widget)
-        self.view.build()
+        if isinstance(self.view, TestHandlerView):
+            self.view.build()
         self.logger.info("Rebuilt all view widgets")
 
     def update_log_handler(self) -> None:

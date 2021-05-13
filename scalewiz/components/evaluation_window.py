@@ -20,6 +20,8 @@ from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
+    from typing import List
+
     from scalewiz.models.test import Test
     from scalewiz.models.test_handler import TestHandler
 
@@ -50,8 +52,8 @@ class EvaluationWindow(tk.Toplevel):
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
         self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
-        self.trials: list[Test] = []
-        self.blanks: list[Test] = []
+        self.trials: List[Test] = []
+        self.blanks: List[Test] = []
         self.build()
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:

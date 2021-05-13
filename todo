@@ -21,6 +21,8 @@ updates / new features
 
 - menubar:
     - 'add system' -> 'system' > 'add new', 'remove current'
+    - this will be a little awkward since we'd have to update/rebuild the menubar
+    each time a system is added / removed
 - refactor scoring out of eval window -- deserves its own helper func
 
 low prio

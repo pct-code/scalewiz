@@ -42,13 +42,13 @@ class TestHandlerView(ttk.Frame):
         self.start_button: ttk.Button = None
         self.new_button: ttk.Button = None
         self.elapsed_label: ttk.Label = None
-        self.plot_frame: ttk.Frame = None
+        self.plot_frame: LivePlot = None
         self.log_frame: ttk.Frame = None
         self.log_text: ScrolledText = None
         # we don't have to worry about cleaning up these traces
         # the same handler instance will persist across projects
-        self.handler.is_running.trace_add("write", self.build)
-        self.handler.is_done.trace_add("write", self.build)
+        # self.handler.is_running.trace_add("write", self.build)
+        # self.handler.is_done.trace_add("write", self.build)
         self.build()
         self.poll_log_queue()
 
@@ -191,38 +191,36 @@ class TestHandlerView(ttk.Frame):
 
         # row 1 ------------------------------------------------------------------------
         ent = ttk.Frame(self)
+        ent.grid_columnconfigure(0, weight=1)
+        ent.grid_columnconfigure(1, weight=1)
+        ent.grid_columnconfigure(2, weight=1)
         self.start_button = ttk.Button(
             ent, text="Start", command=self.handler.start_test
         )
         stop_button = ttk.Button(ent, text="Stop", command=self.handler.request_stop)
-        details_button = ttk.Button(
-            ent, text="Toggle Details", command=self.update_details_view
-        )
 
-        self.start_button.grid(row=0, column=0)
-        stop_button.grid(row=0, column=1)
-        details_button.grid(row=0, column=2)
+        self.start_button.grid(row=0, column=0, sticky="ew")
+        stop_button.grid(row=0, column=2, sticky="ew")
 
-        ttk.Progressbar(ent, variable=self.handler.progress).grid(
-            row=1, columnspan=3, sticky="nwe"
-        )
-        self.elapsed_label = ttk.Label(ent, textvariable=self.handler.elapsed_str)
-        self.elapsed_label.grid(row=1, column=1)
-        ent.grid(row=1, column=0, padx=1, pady=1, sticky="n")
-        self.new_button = ttk.Button(ent, text="New", command=self.handler.new_test)
+        progressbar = ttk.Progressbar(ent, variable=self.handler.progress)
+        progressbar.grid(row=1, columnspan=3, sticky="nwe")
+
+        ent.grid(row=1, column=0, padx=5, pady=1, sticky="nwe")
 
         # rows 0-1 ---------------------------------------------------------------------
         # close all pyplots to prevent memory leak
+        plt.close("all")
         self.grid_columnconfigure(1, weight=1)  # let it grow
         self.grid_rowconfigure(1, weight=1)
-        plt.close("all")
         self.plot_frame = LivePlot(self, self.handler)
+        self.plot_frame.grid(row=0, column=1, rowspan=3)
         # row 2 ------------------------------------------------------------------------
         self.log_frame = ttk.Frame(self)
         self.log_text = ScrolledText(
             self.log_frame, background="white", height=5, width=44, state="disabled"
         )
         self.log_text.grid(sticky="ew")
+        self.log_frame.grid(row=2, column=0, sticky="ew")
 
         self.update_test_type()
         self.update_start_button()
@@ -234,31 +232,25 @@ class TestHandlerView(ttk.Frame):
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
         """Renders a row on the UI. As method for convenience."""
         # pylint: disable=no-self-use
-        label.grid(row=row, column=0, sticky=tk.N + tk.E)
-        entry.grid(row=row, column=1, sticky=tk.N + tk.E + tk.W, pady=1, padx=1)
+        label.grid(row=row, column=0, sticky="ne")
+        entry.grid(row=row, column=1, sticky="new", pady=1, padx=1)
 
     def update_devices_list(self, *args) -> None:
         """Updates the devices list held by the TestHandler."""
         # extra unused args are passed in by tkinter
-        def update() -> None:
-            self.devices_list = sorted([i.device for i in list_ports.comports()])
-            if len(self.devices_list) < 1:
-                self.devices_list = ["None found"]
+        self.devices_list = sorted([i.device for i in list_ports.comports()])
+        if len(self.devices_list) < 1:
+            self.devices_list = ["None found"]
 
-            self.device1_entry.configure(values=self.devices_list)
-            self.device2_entry.configure(values=self.devices_list)
+        self.device1_entry.configure(values=self.devices_list)
+        self.device2_entry.configure(values=self.devices_list)
 
-            if len(self.devices_list) > 1:
-                self.device1_entry.current(0)
-                self.device2_entry.current(1)
+        if len(self.devices_list) > 1:
+            self.device1_entry.current(0)
+            self.device2_entry.current(1)
 
-            if "None found" not in self.devices_list:
-                LOGGER.debug(
-                    "%s found devices: %s", self.handler.name, self.devices_list
-                )
-
-        # after here to prevent race conditions
-        self.after(1, update)
+        if "None found" not in self.devices_list:
+            LOGGER.debug("%s found devices: %s", self.handler.name, self.devices_list)
 
     def update_input_frame(self) -> None:
         """Disables widgets in the input frame if a Test is running."""
@@ -288,26 +280,6 @@ class TestHandlerView(ttk.Frame):
             self.blank_entry.grid_remove()
             self.render(self.trial_label_frame, self.trial_entry_frame, 3)
             LOGGER.debug("%s: changed to Trial mode", self.handler.name)
-
-    def update_details_view(self) -> None:
-        """Updates the details view across all TestHandlerViews."""
-        is_visible = bool()
-        # check if the plot is gridded
-        print(type(self.plot_frame))
-
-        if self.plot_frame.grid_info() != {}:
-            is_visible = True
-        # we do this operation on ever tab so the window size makes sense
-        for tab in self.parent.tabs():
-            this = self.nametowidget(tab)
-            if not is_visible:  # show the details view
-                LOGGER.debug("%s: Showing details view", this.handler.name)
-                this.plot_frame.grid(row=0, column=1, rowspan=3)
-                this.log_frame.grid(row=2, column=0, sticky="ew")
-            else:  # hide the details view
-                LOGGER.debug("%s: Hiding details view", this.handler.name)
-                this.plot_frame.grid_remove()
-                this.log_frame.grid_remove()
 
     def poll_log_queue(self) -> None:
         """Checks on an interval if there is a new message in the queue to display."""

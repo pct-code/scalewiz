@@ -6,10 +6,14 @@ import json
 import logging
 import os
 import tkinter as tk
+from typing import TYPE_CHECKING
 
 from scalewiz.helpers.configuration import get_config, update_config
 from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.models.test import Test
+
+if TYPE_CHECKING:
+    from typing import List
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -20,7 +24,7 @@ class Project:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
-        self.tests: list[Test] = []
+        self.tests: List[Test] = []
         # experiment parameters that affect score
         self.baseline = tk.IntVar()
         self.limit_minutes = tk.DoubleVar()
@@ -73,7 +77,7 @@ class Project:
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:
             self.interval_seconds.set(1)
-        self.analyst.set(config["recents"].get("analyst"))
+        self.analyst.set(config.get("recents").get("analyst"))
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""

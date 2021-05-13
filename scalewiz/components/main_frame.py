@@ -23,7 +23,7 @@ class MainFrame(ttk.Frame):
 
     def build(self) -> None:
         """Build the UI."""
-        MenuBar(self)  # this will apply itself to the current Toplevel
+        MenuBar(self)
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(sticky="nsew")
         self.add_handler()

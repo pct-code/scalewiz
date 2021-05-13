@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import tkinter as tk
-import typing
 from tkinter import messagebox, ttk
+from typing import TYPE_CHECKING
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
+    from typing import List
+
     from scalewiz.models.project import Project
     from scalewiz.models.test import Test
 
@@ -27,7 +29,7 @@ class TestResultRow(ttk.Frame):
 
     def build(self) -> None:
         """Make the UI."""
-        cols: list[tk.Widget] = []
+        cols: List[tk.Widget] = []
         # col 0 - name
         cols.append(ttk.Label(self.parent, textvariable=self.test.name))
         # col 1 - label

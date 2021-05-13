@@ -6,7 +6,10 @@ from __future__ import annotations
 import logging
 import tkinter as tk
 from dataclasses import dataclass
-from typing import Union
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List, Union
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -35,7 +38,7 @@ class Test:
         self.pump_to_score = tk.StringVar()  # which series of PSIs to use
         self.result = tk.DoubleVar()  # represents the test's performance vs the blank
         self.include_on_report = tk.BooleanVar()  # condition for scoring
-        self.readings: list[Reading] = []  # list of flat reading dicts
+        self.readings: List[Reading] = []  # list of flat reading dicts
         self.max_psi = tk.IntVar()  # the highest psi of the test
         self.observed_baseline = tk.IntVar()  # a guess at the baseline for the test
         # set defaults
@@ -104,7 +107,7 @@ class Test:
             )
         self.update_obs_baseline()
 
-    def get_readings(self) -> list[int]:
+    def get_readings(self) -> List[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         pump = self.pump_to_score.get()
         pump = pump.replace(" ", "")  # legacy accomodation for spaces in keys
