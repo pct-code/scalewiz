@@ -209,10 +209,11 @@ class TestHandlerView(ttk.Frame):
 
         # rows 0-1 ---------------------------------------------------------------------
         # close all pyplots to prevent memory leak
-        plt.close("all")
+      
         self.grid_columnconfigure(1, weight=1)  # let it grow
         self.grid_rowconfigure(1, weight=1)
         self.plot_frame = LivePlot(self, self.handler)
+        print(self.winfo_children())
         self.plot_frame.grid(row=0, column=1, rowspan=3)
         # row 2 ------------------------------------------------------------------------
         self.log_frame = ttk.Frame(self)

@@ -27,6 +27,7 @@ class LivePlot(ttk.Frame):
         self.handler = handler
 
         # matplotlib objects
+        plt.close("all")
         fig, self.axis = plt.subplots(figsize=(5, 3), dpi=100)
         fig.patch.set_facecolor("#FAFAFA")
         self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
