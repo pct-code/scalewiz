@@ -189,6 +189,7 @@ class Project:
         self.temperature.set(params.get("temperature"))
         self.limit_psi.set(params.get("limitPSI"))
         self.limit_minutes.set(params.get("limitMin"))
+        LOGGER.warning("set limit min to %s", self.limit_minutes.get())
         self.interval_seconds.set(params.get("interval"))
         self.flowrate.set(params.get("flowrate"))
         self.uptake_seconds.set(params.get("uptake"))

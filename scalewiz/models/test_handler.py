@@ -8,6 +8,7 @@ import tkinter as tk
 import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
+from pathlib import Path
 from queue import Queue
 from threading import Event
 from time import monotonic, sleep, time
@@ -21,7 +22,6 @@ from scalewiz.models.test import Reading, Test
 
 if typing.TYPE_CHECKING:
     from tkinter import ttk
-    from tkinter.scrolledtext import ScrolledText
     from typing import List
 
 
@@ -44,7 +44,6 @@ class TestHandler:
         self.max_psi_2: int = None
         self.log_handler: logging.FileHandler = None  # handles logging to log window
         # test handler view overwrites this attribute in the view's build()
-        self.log_text: ScrolledText = None
         self.log_queue: Queue[str] = Queue()  # view pulls from this queue
 
         self.dev1 = tk.StringVar()
@@ -69,7 +68,7 @@ class TestHandler:
                 or self.max_psi_2 <= self.project.limit_psi.get()
             )
             and self.elapsed_min.get() <= self.project.limit_minutes.get()
-            and len(self.readings.queue) < self.max_readings
+            and self.readings.qsize() < self.max_readings
             and not self.stop_requested.is_set()
         )
 
@@ -100,6 +99,7 @@ class TestHandler:
             else:
                 self.project = Project()
                 self.project.load_json(path)
+                self.new_test()
                 self.rebuild_views()
                 self.logger.info("Loaded %s", self.project.name.get())
 
@@ -110,12 +110,16 @@ class TestHandler:
             return
 
         issues = []
-        if not os.path.isfile(self.project.path.get()):
+        if not Path(self.project.path.get()).is_file:
             msg = "Select an existing project file first"
             issues.append(msg)
 
         if self.test.name.get() == "":
             msg = "Name the experiment before starting"
+            issues.append(msg)
+
+        if self.test.name.get() in {test.name.get() for test in self.project.tests}:
+            msg = "A test with this name already exists in the project"
             issues.append(msg)
 
         if self.test.clarity.get() == "" and not self.test.is_blank.get():
@@ -179,7 +183,14 @@ class TestHandler:
 
             self.readings.put(reading)
             self.elapsed_min.set(minutes_elapsed)
-            self.progress.set(round(len(self.readings.queue) / self.max_readings * 100))
+            prog = round((self.readings.qsize() / self.max_readings) * 100)
+            self.logger.warning(
+                "qsize is %s max is %s prog is %s",
+                self.readings.qsize(),
+                self.max_readings,
+                prog,
+            )
+            self.progress.set(prog)
 
             if psi1 > self.max_psi_1:
                 self.max_psi_1 = psi1
@@ -263,9 +274,20 @@ class TestHandler:
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)
+        self.logger.warning(
+            "currently loaded %s with lim min",
+            self.project.name.get(),
+            self.project.limit_minutes.get(),
+        )
+        self.logger.warning(
+            "lim_min is %s and interval is %s",
+            self.project.limit_minutes.get(),
+            self.project.interval_seconds.get(),
+        )
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
         )
+        self.logger.warning("max readings is %s", self.max_readings)
 
         self.rebuild_views()
 
@@ -307,4 +329,3 @@ class TestHandler:
     def set_view(self, view: ttk.Frame) -> None:
         """Stores a ref to the view displaying the handler."""
         self.view = view
-        self.log_text = view.log_text

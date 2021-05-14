@@ -239,8 +239,8 @@ class EvaluationWindow(tk.Toplevel):
             file.write(self.log_text.get("1.0", "end-1c"))
 
         self.editor_project.dump_json()
-
-        self.build(reload=True)
+        self.handler.rebuild_views()
+        self.handler.load_project(self.editor_project.path.get())
 
     def score(self, *args) -> None:
         """Updates the result for every Test in the Project.

@@ -27,15 +27,14 @@ class LivePlot(ttk.Frame):
         self.handler = handler
 
         # matplotlib objects
-        plt.close("all")
+        # plt.close("all")
         fig, self.axis = plt.subplots(figsize=(5, 3), dpi=100)
         fig.patch.set_facecolor("#FAFAFA")
-        self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-        self.axis.set_facecolor("w")  # white
+
         # self.axis.set_ylim(top=self.handler.project.limit_psi.get())
         # self.axis.yaxis.set_major_locator(MultipleLocator(100))
         # self.axis.set_xlim((0, None), auto=True)
-        self.axis.margins(0)
+
         plt.tight_layout()
         plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
         self.canvas = FigureCanvasTkAgg(fig, master=self)
@@ -52,12 +51,17 @@ class LivePlot(ttk.Frame):
         if self.handler.is_running.get() and not self.handler.is_done.get():
             # data access here 😳
             readings = list(self.handler.readings.queue)
-            if len(readings) > 0:
+            if self.handler.readings.qsize() > 0:
                 LOGGER.debug("%s: Drawing a new plot ...", self.handler.name)
                 with plt.style.context("bmh"):
                     self.axis.clear()
+                    self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
+                    self.axis.set_facecolor("w")  # white
                     self.axis.set_xlabel("Time (min)")
                     self.axis.set_ylabel("Pressure (psi)")
+                    # self.axis.set_ylim((0, None), auto=True)
+                    self.axis.set_ylim((0, None), auto=True)
+                    self.axis.margins(0)
                     pump1 = []
                     pump2 = []
                     elapsed = []  # we will share this series as an axis

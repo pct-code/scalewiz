@@ -2,21 +2,16 @@
 
 from __future__ import annotations
 
-import queue
-import tkinter as tk
 import typing
 from logging import getLogger
 from tkinter import ttk
-from tkinter.scrolledtext import ScrolledText
 
-import matplotlib.pyplot as plt
-import serial.tools.list_ports as list_ports
-
+from scalewiz.components.devices_comboboxes import DeviceBoxes
 from scalewiz.components.live_plot import LivePlot
-from scalewiz.helpers.validation import can_be_pos_float
+from scalewiz.components.test_controls import TestControls
+from scalewiz.components.test_info_widget import TestInfo
 
 if typing.TYPE_CHECKING:
-    from typing import List
 
     from scalewiz.models.test_handler import TestHandler
 
@@ -30,228 +25,41 @@ class TestHandlerView(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.parent = parent
         self.handler = handler
-        self.handler.parent = self
-        self.devices_list: List[str] = []
-        self.inputs: List[tk.Widget] = []
-        self.inputs_frame: ttk.Frame = None
-        self.device1_entry: ttk.Combobox = None
-        self.device2_entry: ttk.Combobox = None
-        self.trial_entry_frame: ttk.Frame = None
-        self.blank_entry: ttk.Label = None
-        self.blank_entry: ttk.Label = None
-        self.start_button: ttk.Button = None
-        self.new_button: ttk.Button = None
-        self.elapsed_label: ttk.Label = None
-        self.plot_frame: LivePlot = None
-        self.log_frame: ttk.Frame = None
-        self.log_text: ScrolledText = None
-        # we don't have to worry about cleaning up these traces
-        # the same handler instance will persist across projects
-        # self.handler.is_running.trace_add("write", self.build)
-        # self.handler.is_done.trace_add("write", self.build)
+        self.handler.is_done.trace_add("write", self.build)
         self.build()
-        self.poll_log_queue()
 
     def build(self, *args) -> None:
         """Builds the UI, destroying any currently existing widgets."""
         LOGGER.info("%s: rebuilding", self.handler.name)
         for child in self.winfo_children():
             child.destroy()
-
-        # use this list to hold refs so we can easily disable later
-        self.inputs.clear()
-        self.inputs_frame = ttk.Frame(self)
-        self.inputs_frame.grid(row=0, column=0, sticky="new")
-
+        self.grid_columnconfigure(0, weight=1)
         # row 0 ------------------------------------------------------------------------
-        lbl = ttk.Label(self.inputs_frame, text="      Devices:")
-        lbl.bind("<Button-1>", self.update_devices_list)
-
-        # put the boxes in a frame to make life easier
-        ent = ttk.Frame(self.inputs_frame)  # this frame will set the width for the col
-        self.device1_entry = ttk.Combobox(
-            ent,
-            width=15,
-            textvariable=self.handler.dev1,
-            values=self.devices_list,
-            validate="all",
-            validatecommand=self.update_devices_list,
-        )
-        self.device2_entry = ttk.Combobox(
-            ent,
-            width=15,
-            textvariable=self.handler.dev2,
-            values=self.devices_list,
-            validate="all",
-            validatecommand=self.update_devices_list,
-        )
-        self.device1_entry.grid(row=0, column=0, sticky=tk.W)
-        self.device2_entry.grid(row=0, column=1, sticky=tk.E, padx=(4, 0))
-        self.inputs.append(self.device1_entry)
-        self.inputs.append(self.device2_entry)
-        self.render(lbl, ent, 0)
+        dev_ent = DeviceBoxes(self, self.handler.dev1, self.handler.dev2)
+        dev_ent.grid(row=0, column=0, sticky="new")
 
         # row 1 ------------------------------------------------------------------------
-        lbl = ttk.Label(self.inputs_frame, text="Project:")
-        btn = ttk.Label(
-            self.inputs_frame, textvariable=self.handler.project.name, anchor="center"
-        )
-        self.inputs.append(btn)
-        self.render(lbl, btn, 1)
+        frm = ttk.Frame(self)
+        frm.grid_columnconfigure(1, weight=1)
+        lbl = ttk.Label(frm, text="        Project:")
+        lbl.grid(row=0, column=0, sticky="nw")
+        proj = ttk.Label(frm, textvariable=self.handler.project.name, anchor="center")
+        proj.grid(row=0, column=1, sticky="ew")
+        frm.grid(row=1, column=0, sticky="new")
 
         # row 2 ------------------------------------------------------------------------
-        lbl = ttk.Label(self.inputs_frame, text="Test Type:")
-        ent = ttk.Frame(self.inputs_frame)
-        ent.grid_columnconfigure(0, weight=1)
-        ent.grid_columnconfigure(1, weight=1)
-        blank_radio = ttk.Radiobutton(
-            ent,
-            text="Blank",
-            variable=self.handler.test.is_blank,
-            value=True,
-            command=self.update_test_type,
-        )
-        trial_radio = ttk.Radiobutton(
-            ent,
-            text="Trial",
-            variable=self.handler.test.is_blank,
-            value=False,
-            command=self.update_test_type,
-        )
-        blank_radio.grid(row=0, column=0)
-        trial_radio.grid(row=0, column=1)
-        self.inputs.append(blank_radio)
-        self.inputs.append(trial_radio)
-        self.render(lbl, ent, 2)
+        test_info = TestInfo(self, self.handler.test)
+        test_info.grid(row=2, column=0, sticky="new")
 
-        # row 3 ------------------------------------------------------------------------
-        self.grid_rowconfigure(3, weight=1)
-        # row 3a is used when the TestHandlerView is in "Blank" mode
-        # row 3a -----------------------------------------------------------------------
-        self.trial_label_frame = ttk.Frame(self.inputs_frame)
+        # row 3-------------------------------------------------------------------------
+        test_controls = TestControls(self, self.handler)
+        test_controls.grid(row=3, column=0, sticky="nsew")
 
-        ttk.Label(self.trial_label_frame, text="Chemical:").grid(
-            row=0, column=0, sticky=tk.E, pady=1
-        )
-        ttk.Label(self.trial_label_frame, text="Rate (ppm):").grid(
-            row=1,
-            column=0,
-            sticky=tk.E,
-            pady=1,
-        )
-        ttk.Label(self.trial_label_frame, text="Clarity:").grid(
-            row=2, column=0, sticky=tk.E, pady=1
-        )
-
-        self.trial_entry_frame = ttk.Frame(self.inputs_frame)
-        self.trial_entry_frame.grid_columnconfigure(0, weight=1)
-        chemical_entry = ttk.Entry(
-            self.trial_entry_frame, textvariable=self.handler.test.chemical
-        )
-        chemical_entry.grid(row=0, column=0, sticky="ew", pady=1)
-
-        # validation command to ensure numeric inputs
-        vcmd = self.register(lambda s: can_be_pos_float(s))
-        rate_entry = ttk.Spinbox(
-            self.trial_entry_frame,
-            textvariable=self.handler.test.rate,
-            from_=1,
-            to=999999,
-            validate="key",
-            validatecommand=(vcmd, "%P"),
-        )
-        rate_entry.grid(row=1, column=0, sticky="ew", pady=1)
-        clarity_entry = ttk.Combobox(
-            self.trial_entry_frame,
-            values=["Clear", "Slightly hazy", "Hazy"],
-            textvariable=self.handler.test.clarity,
-        )
-        clarity_entry.grid(row=2, column=0, sticky="ew", pady=1)
-        clarity_entry.current(0)
-
-        self.inputs.append(chemical_entry)
-        self.inputs.append(rate_entry)
-        self.inputs.append(clarity_entry)
-
-        # row 3b is used when the TestHandlerView is in "Trial" mode
-        # row 3b -----------------------------------------------------------------------
-        self.blank_label = ttk.Label(self.inputs_frame, text="Name:")
-        self.blank_entry = ttk.Entry(
-            self.inputs_frame, textvariable=self.handler.test.name
-        )
-        self.inputs.append(self.blank_entry)
-
-        # row 4 ------------------------------------------------------------------------
-        lbl = ttk.Label(self.inputs_frame, text="Notes:")
-        ent = ttk.Entry(self.inputs_frame, textvariable=self.handler.test.notes)
-        self.inputs.append(ent)
-        self.render(lbl, ent, 4)
-
-        # inputs_frame end -------------------------------------------------------------
-
-        # row 1 ------------------------------------------------------------------------
-        ent = ttk.Frame(self)
-        ent.grid_columnconfigure(0, weight=1)
-        ent.grid_columnconfigure(1, weight=1)
-        ent.grid_columnconfigure(2, weight=1)
-        self.start_button = ttk.Button(
-            ent, text="Start", command=self.handler.start_test
-        )
-        stop_button = ttk.Button(ent, text="Stop", command=self.handler.request_stop)
-
-        self.start_button.grid(row=0, column=0, sticky="ew")
-        stop_button.grid(row=0, column=2, sticky="ew")
-
-        progressbar = ttk.Progressbar(ent, variable=self.handler.progress)
-        progressbar.grid(row=1, columnspan=3, sticky="nwe")
-
-        ent.grid(row=1, column=0, padx=5, pady=1, sticky="nwe")
-
-        # rows 0-1 ---------------------------------------------------------------------
-        # close all pyplots to prevent memory leak
-      
-        self.grid_columnconfigure(1, weight=1)  # let it grow
-        self.grid_rowconfigure(1, weight=1)
-        self.plot_frame = LivePlot(self, self.handler)
-        print(self.winfo_children())
-        self.plot_frame.grid(row=0, column=1, rowspan=3)
-        # row 2 ------------------------------------------------------------------------
-        self.log_frame = ttk.Frame(self)
-        self.log_text = ScrolledText(
-            self.log_frame, background="white", height=5, width=44, state="disabled"
-        )
-        self.log_text.grid(sticky="ew")
-        self.log_frame.grid(row=2, column=0, sticky="ew")
-
-        self.update_test_type()
-        self.update_start_button()
-        self.update_devices_list()
-        self.update_input_frame()
-
-    # methods to update local state ----------------------------------------------------
-
-    def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
-        """Renders a row on the UI. As method for convenience."""
-        # pylint: disable=no-self-use
-        label.grid(row=row, column=0, sticky="ne")
-        entry.grid(row=row, column=1, sticky="new", pady=1, padx=1)
-
-    def update_devices_list(self, *args) -> None:
-        """Updates the devices list held by the TestHandler."""
-        # extra unused args are passed in by tkinter
-        self.devices_list = sorted([i.device for i in list_ports.comports()])
-        if len(self.devices_list) < 1:
-            self.devices_list = ["None found"]
-
-        self.device1_entry.configure(values=self.devices_list)
-        self.device2_entry.configure(values=self.devices_list)
-
-        if len(self.devices_list) > 1:
-            self.device1_entry.current(0)
-            self.device2_entry.current(1)
-
-        if "None found" not in self.devices_list:
-            LOGGER.debug("%s found devices: %s", self.handler.name, self.devices_list)
+        # row 0 col 1 ------------------------------------------------------------------
+        plt_frm = ttk.Frame(self)
+        plot = LivePlot(plt_frm, self.handler)
+        plot.grid(row=0, column=0, sticky="nsew")
+        plt_frm.grid(row=0, column=1, rowspan=4)
 
     def update_input_frame(self) -> None:
         """Disables widgets in the input frame if a Test is running."""
@@ -261,42 +69,3 @@ class TestHandlerView(ttk.Frame):
         else:
             for widget in self.inputs:
                 widget.configure(state="normal")
-
-    def update_start_button(self) -> None:
-        """Changes the "Start" button to a "New" button when the Test finishes."""
-        if self.handler.is_done.get():
-            self.start_button.configure(text="New", command=self.handler.new_test)
-        else:
-            self.start_button.configure(text="Start", command=self.handler.start_test)
-
-    def update_test_type(self) -> None:
-        """Rebuilds part of the UI to change the entries wrt Test type (blank/trial)."""
-        if self.handler.test.is_blank.get():
-            self.trial_label_frame.grid_remove()
-            self.trial_entry_frame.grid_remove()
-            self.render(self.blank_label, self.blank_entry, 3)
-            LOGGER.debug("%s: changed to Blank mode", self.handler.name)
-        else:
-            self.blank_label.grid_remove()
-            self.blank_entry.grid_remove()
-            self.render(self.trial_label_frame, self.trial_entry_frame, 3)
-            LOGGER.debug("%s: changed to Trial mode", self.handler.name)
-
-    def poll_log_queue(self) -> None:
-        """Checks on an interval if there is a new message in the queue to display."""
-        while True:
-            try:
-                record = self.handler.log_queue.get(block=False)
-            except queue.Empty:
-                break
-            else:
-                self.display(record)
-        interval = round(self.handler.project.interval_seconds.get() * 1000)
-        self.after(interval, self.poll_log_queue)
-
-    def display(self, msg: str) -> None:
-        """Displays a message in the log."""
-        self.log_text.configure(state="normal")
-        self.log_text.insert(tk.END, msg + "\n")
-        self.log_text.configure(state="disabled")
-        self.log_text.yview(tk.END)  # scroll to bottom

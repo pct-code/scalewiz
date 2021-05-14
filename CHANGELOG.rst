@@ -19,7 +19,7 @@ Changed
 - updated :code:`EvaluationFrame` to handle the :code:`Reading` class
 - updated the :code:`Test` object model to handle the :code:`Reading` class
 - minor performance buff to the :code:`LivePlot` component
-- refactoring the :code:`TestHandlerView` to be less tempermental
+- overhaul the :code:`TestHandlerView` to be less tempermental
 - misc. code cleanup
 
 
