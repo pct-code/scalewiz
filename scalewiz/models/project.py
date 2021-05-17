@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import tkinter as tk
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from scalewiz.helpers.configuration import get_config, update_config
@@ -123,7 +123,7 @@ class Project:
                 "name": self.name.get(),
                 "analyst": self.analyst.get(),
                 "numbers": self.numbers.get(),
-                "path": os.path.abspath(self.path.get()),
+                "path": str(Path(self.path.get()).resolve()),
                 "notes": self.notes.get(),
             },
             "params": {
@@ -141,7 +141,7 @@ class Project:
             },
             "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
-            "plot": os.path.abspath(self.plot.get()),
+            "plot": str(Path(self.plot.get()).resolve()),
         }
 
         with open(path, "w") as file:
@@ -152,10 +152,10 @@ class Project:
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
-        path = os.path.abspath(path)
-        if os.path.isfile(path):
+        path = Path(path).resolve()
+        if path.is_file:
             LOGGER.info("Loading from %s", path)
-            with open(path, "r") as file:
+            with path.open("r") as file:
                 obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
@@ -163,7 +163,7 @@ class Project:
             LOGGER.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )
-            obj["info"]["path"] = path
+            obj["info"]["path"] = str(path)
 
         info = obj.get("info")
         self.customer.set(info.get("customer"))
@@ -189,7 +189,6 @@ class Project:
         self.temperature.set(params.get("temperature"))
         self.limit_psi.set(params.get("limitPSI"))
         self.limit_minutes.set(params.get("limitMin"))
-        LOGGER.warning("set limit min to %s", self.limit_minutes.get())
         self.interval_seconds.set(params.get("interval"))
         self.flowrate.set(params.get("flowrate"))
         self.uptake_seconds.set(params.get("uptake"))
@@ -197,6 +196,7 @@ class Project:
         self.plot.set(obj.get("plot"))
         self.output_format.set(obj.get("outputFormat"))
 
+        self.tests.clear()
         for entry in obj.get("tests"):
             test = Test()
             test.load_json(entry)
@@ -214,13 +214,12 @@ class Project:
     def update_proj_name(self, *args) -> None:
         """Constructs a default name for the Project."""
         # extra unused args are passed in by tkinter
-        name = ""
         if self.client.get() != "":
             name = self.client.get().strip()
         else:
             name = self.customer.get().strip()
         if self.field.get() != "":
-            name = f"{name} - {self.field.get()}".strip()
+            name = f"{name} - {self.field.get().strip()}"
         if self.sample.get() != "":
-            name = f"{name} ({self.sample.get()})".strip()
+            name = f"{name} ({self.sample.get().strip()})"
         self.name.set(name)

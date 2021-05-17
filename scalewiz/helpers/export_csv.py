@@ -2,8 +2,8 @@
 
 import json
 import logging
-import os
 import time
+from pathlib import Path
 
 from pandas import DataFrame
 
@@ -45,18 +45,18 @@ def export_csv(project: Project) -> None:
         "plotPath": project.plot.get(),
     }
     # filter the blanks and trials to sort them
-    blanks = [
+    blanks = {
         test
         for test in project.tests
         if test.include_on_report.get() and test.is_blank.get()
-    ]
-    trials = [
+    }
+    trials = {
         test
         for test in project.tests
         if test.include_on_report.get() and not test.is_blank.get()
-    ]
+    }
     tests = blanks + trials
-
+    # we use lists here instead of sets since sets aren't JSON serializable
     output_dict["name"] = [test.name.get() for test in tests]
     output_dict["isBlank"] = [test.is_blank.get() for test in tests]
     output_dict["chemical"] = [test.chemical.get() for test in tests]
@@ -69,15 +69,16 @@ def export_csv(project: Project) -> None:
     output_dict["result"] = [test.result.get() for test in tests]
     output_dict["clarity"] = [test.clarity.get() for test in tests]
 
-    pre = f"{project.numbers.get().replace(' ', '')} {project.name.get()}"
-    out = f"{pre} - CaCO3 Scale Block Analysis.{project.output_format.get()}"
-    out = os.path.join(os.path.dirname(project.path.get()), out.strip())
+    fmt = project.output_format.get()
+    out = f"{project.numbers.get().replace(' ', '')} {project.name.get()}"
+    out = f"{out} - CaCO3 Scale Block Analysis.{fmt}".strip()
+    out = Path(Path(project.path.get()).parent).joinpath(out)
 
-    with open(out, "w") as output:
-        if project.output_format.get() == "CSV":
+    with out.open("w") as output:
+        if fmt == "CSV":
             data = DataFrame.from_dict(output_dict)
             data.to_csv(out, encoding="utf-8")
-        elif project.output_format.get() == "JSON":
+        elif fmt == "JSON":
             json.dump(output_dict, output, indent=4)
 
     LOGGER.info(

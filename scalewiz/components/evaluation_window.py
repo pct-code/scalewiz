@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import os
+import logging
 import time
 import tkinter as tk
 import typing
+from logging import getLogger
 from pathlib import Path
 from tkinter import font, ttk
 
@@ -20,13 +21,13 @@ from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
 if typing.TYPE_CHECKING:
-    from typing import List
+    from typing import Set
 
     from scalewiz.models.test import Test
     from scalewiz.models.test_handler import TestHandler
 
 
-COLORS = [
+COLORS = (
     "orange",
     "blue",
     "red",
@@ -37,7 +38,9 @@ COLORS = [
     "darkcyan",
     "maroon",
     "darkslategrey",
-]
+)
+
+LOGGER = getLogger("scalewiz")
 
 
 class EvaluationWindow(tk.Toplevel):
@@ -52,8 +55,8 @@ class EvaluationWindow(tk.Toplevel):
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
         self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
-        self.trials: List[Test] = []
-        self.blanks: List[Test] = []
+        self.trials: Set[Test] = set()
+        self.blanks: Set[Test] = set()
         self.build()
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
@@ -108,9 +111,9 @@ class EvaluationWindow(tk.Toplevel):
         #  filter through blanks and trials
         for test in self.editor_project.tests:
             if test.is_blank.get():
-                self.blanks.append(test)
+                self.blanks.add(test)
             else:
-                self.trials.append(test)
+                self.trials.add(test)
 
         tk.Label(tests_frame, text="Blanks:", font=bold_font).grid(
             row=1, column=0, sticky="w", padx=3, pady=1
@@ -214,28 +217,24 @@ class EvaluationWindow(tk.Toplevel):
     def save(self) -> None:
         """Saves to file the project, most recent plot, and calculations log."""
         # update image
-        output_path = (
+        plot_output = (
             f"{self.editor_project.numbers.get().replace(' ', '')} "
             f"{self.editor_project.name.get()} "
             "Scale Block Analysis (Graph).png"
-        ).strip()
-        output_path = os.path.join(
-            os.path.dirname(self.editor_project.path.get()), output_path
         )
-        self.fig.savefig(output_path)
-        # store this path so we can find it later
-        self.editor_project.plot.set(output_path)
+        parent_dir = Path(self.editor_project.path.get()).parent
+        plot_output = Path(parent_dir, plot_output).resolve()
+        self.fig.savefig(plot_output)
+        self.editor_project.plot.set(str(plot_output))
         # update log
-        output_path = (
+        log_output = (
             f"{self.editor_project.numbers.get().replace(' ', '')} "
             f"{self.editor_project.name.get()} "
             "Scale Block Analysis (Log).txt"
         ).strip()
-        output_path = os.path.join(
-            os.path.dirname(self.editor_project.path.get()), output_path
-        )
+        log_output = Path(parent_dir, log_output).resolve()
 
-        with Path(output_path).open("w") as file:
+        with log_output.open("w") as file:
             file.write(self.log_text.get("1.0", "end-1c"))
 
         self.editor_project.dump_json()
@@ -291,7 +290,7 @@ class EvaluationWindow(tk.Toplevel):
             log.append("")
             areas_over_blanks.append(area)
 
-        if len(areas_over_blanks) == 0:
+        if len(areas_over_blanks) < 1:
             return
         # get protectable area
         avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
@@ -350,6 +349,5 @@ class EvaluationWindow(tk.Toplevel):
             self.log_text.configure(state="normal")
             self.log_text.delete(1.0, "end")
             for msg in log:
-                self.log_text.insert("end", msg)
-                self.log_text.insert("end", "\n")
+                self.log_text.insert("end", "".join((msg, "/n")))
             self.log_text.configure(state="disabled")

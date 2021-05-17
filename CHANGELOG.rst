@@ -15,11 +15,12 @@ Versioning <https://semver.org/spec/v2.0.0.html>`__.
 Changed
 ~~~~~~~
 
-- updated some path operations in :code:`EvaluationFrame` to use the :code:`pathlib.Path` API
 - updated :code:`EvaluationFrame` to handle the :code:`Reading` class
 - updated the :code:`Test` object model to handle the :code:`Reading` class
+- overhaul the :code:`TestHandlerView` to be better oragnized and less bad
+- replace all :code:`os.path` operations with fancy :code:`pathlib.Path` operations
 - minor performance buff to the :code:`LivePlot` component
-- overhaul the :code:`TestHandlerView` to be less tempermental
+- minor performance buffs; using sets/tuples over lists where appropriate/able
 - misc. code cleanup
 
 

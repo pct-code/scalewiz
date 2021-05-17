@@ -23,7 +23,7 @@ class MainFrame(ttk.Frame):
 
     def build(self) -> None:
         """Build the UI."""
-        MenuBar(self)
+        self.winfo_toplevel().configure(menu=MenuBar(self).menubar)
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(sticky="nsew")
         self.add_handler()
@@ -41,17 +41,16 @@ class MainFrame(ttk.Frame):
         # if this is the first handler, open the most recent project
         if len(self.tab_control.tabs()) == 1:
             config = get_config()
-            handler.load_project(config["recents"].get("project"))
+            handler.load_project(config.get("recents").get("project"))
 
     def close(self) -> None:
         """Closes the program if no tests are running."""
         for tab in self.tab_control.tabs():
             widget = self.nametowidget(tab)
-            if widget.handler.is_running.get():
-                if not widget.handler.is_done.get():
-                    LOGGER.warning(
-                        "Attempted to close while a test was running on %s",
-                        widget.handler.name,
-                    )
-                    return
+            if widget.handler.is_running.get() and not widget.handler.is_done.get():
+                LOGGER.warning(
+                    "Attempted to close while a test was running on %s",
+                    widget.handler.name,
+                )
+                return
         self.quit()

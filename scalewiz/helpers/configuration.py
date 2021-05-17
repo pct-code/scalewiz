@@ -15,7 +15,7 @@ from tomlkit import comment, document, dumps, loads, table
 LOGGER = getLogger("scalewiz.config")
 
 CONFIG_DIR = Path(user_config_dir("ScaleWiz", "teauxfu"))
-CONFIG_FILE = Path(os.path.join(CONFIG_DIR, "config.toml"))
+CONFIG_FILE = Path(CONFIG_DIR, "config.toml")
 
 
 def ensure_config() -> None:

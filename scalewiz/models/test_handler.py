@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import logging
-import os
 import tkinter as tk
 import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
+from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
 from queue import Queue
 from threading import Event
@@ -22,7 +21,7 @@ from scalewiz.models.test import Reading, Test
 
 if typing.TYPE_CHECKING:
     from tkinter import ttk
-    from typing import List
+    from typing import List, Tuple
 
 
 class TestHandler:
@@ -32,7 +31,7 @@ class TestHandler:
 
     def __init__(self, name: str = "Nemo") -> None:
         self.name = name
-        self.logger = logging.getLogger(f"scalewiz.{name}")
+        self.logger = getLogger(f"scalewiz.{name}")
         self.view: TestHandlerView = None
         self.project = Project()
         self.test: Test = None
@@ -42,7 +41,7 @@ class TestHandler:
         self.max_readings: int = None  # max # of readings to collect
         self.max_psi_1: int = None
         self.max_psi_2: int = None
-        self.log_handler: logging.FileHandler = None  # handles logging to log window
+        self.log_handler: FileHandler = None  # handles logging to log window
         # test handler view overwrites this attribute in the view's build()
         self.log_queue: Queue[str] = Queue()  # view pulls from this queue
 
@@ -72,31 +71,35 @@ class TestHandler:
             and not self.stop_requested.is_set()
         )
 
-    def load_project(self, path: str = None, loaded: List[str] = []) -> None:
-        """Opens a file dialog then loads the selected Project file."""
-        # traces are set in Project and Test __init__ methods
-        # we need to explicitly clean them up here
-        if self.project is not None:
-            for test in self.project.tests:
-                test.remove_traces()
-            self.project.remove_traces()
+    def load_project(self, path: str = None, loaded: Tuple[Path] = []) -> None:
+        """Opens a file dialog then loads the selected Project file.
 
+        `loaded` gets built from scratch every time it is passed in -- no need to update
+        """
         if path is None:
-            path = os.path.abspath(
+            path = Path(
                 filedialog.askopenfilename(
                     initialdir='C:"',
                     title="Select project file:",
                     filetypes=[("JSON files", "*.json")],
                 )
-            )
+            ).resolve()
+        else:
+            path = Path(path)
 
         # check that the dialog succeeded, the file exists, and isn't already loaded
-        if path != "" and os.path.isfile(path):
+        if path != "" and path.is_file:
             if path in loaded:
                 msg = "Attempted to load an already-loaded project"
                 self.logger.warning(msg)
                 messagebox.showwarning("Project already loaded", msg)
             else:
+                # traces are set in Project and Test __init__ methods
+                # we need to explicitly clean them up here
+                if self.project is not None:
+                    for test in self.project.tests:
+                        test.remove_traces()
+                self.project.remove_traces()
                 self.project = Project()
                 self.project.load_json(path)
                 self.new_test()
@@ -184,12 +187,6 @@ class TestHandler:
             self.readings.put(reading)
             self.elapsed_min.set(minutes_elapsed)
             prog = round((self.readings.qsize() / self.max_readings) * 100)
-            self.logger.warning(
-                "qsize is %s max is %s prog is %s",
-                self.readings.qsize(),
-                self.max_readings,
-                prog,
-            )
             self.progress.set(prog)
 
             if psi1 > self.max_psi_1:
@@ -226,6 +223,8 @@ class TestHandler:
 
         self.is_done.set(True)
         self.logger.info("Test for %s has been stopped", self.test.name.get())
+        for _ in range(3):
+            self.view.bell()
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
@@ -274,21 +273,9 @@ class TestHandler:
         self.is_running.set(False)
         self.is_done.set(False)
         self.progress.set(0)
-        self.logger.warning(
-            "currently loaded %s with lim min",
-            self.project.name.get(),
-            self.project.limit_minutes.get(),
-        )
-        self.logger.warning(
-            "lim_min is %s and interval is %s",
-            self.project.limit_minutes.get(),
-            self.project.interval_seconds.get(),
-        )
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
         )
-        self.logger.warning("max readings is %s", self.max_readings)
-
         self.rebuild_views()
 
     def rebuild_views(self) -> None:
@@ -306,22 +293,22 @@ class TestHandler:
     def update_log_handler(self) -> None:
         """Sets up the logging FileHandler to the passed path."""
         log_file = f"{round(time())}_{self.test.name.get()}_{date.today()}.txt"
-        parent_dir = os.path.dirname(self.project.path.get())
-        logs_dir = os.path.join(parent_dir, "logs")
-        if not os.path.isdir(logs_dir):
-            os.mkdir(logs_dir)
-        log_path = os.path.join(logs_dir, log_file)
+        parent_dir = Path(self.project.path.get()).resolve().parent
+        logs_dir = Path(parent_dir, "/logs")
+        if not logs_dir.is_dir:
+            logs_dir.mkdir()
+        log_path = Path(logs_dir, log_file)
 
         if self.log_handler in self.logger.handlers:
             self.logger.removeHandler(self.log_handler)
-        self.log_handler = logging.FileHandler(log_path)
+        self.log_handler = FileHandler(log_path)
 
-        formatter = logging.Formatter(
+        formatter = Formatter(
             "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
             "%Y-%m-%d %H:%M:%S",
         )
         self.log_handler.setFormatter(formatter)
-        self.log_handler.setLevel(logging.DEBUG)
+        self.log_handler.setLevel(DEBUG)
         self.logger.addHandler(self.log_handler)
         self.logger.info("Set up a log file at %s", log_file)
         self.logger.info("Starting a test for %s", self.project.name.get())

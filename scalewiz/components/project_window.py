@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import os.path
 import tkinter as tk
 import typing
+from pathlib import Path
 from tkinter import filedialog, ttk
 
 from scalewiz.components.project_info import ProjectInfo
@@ -28,7 +28,7 @@ class ProjectWindow(tk.Toplevel):
         tk.Toplevel.__init__(self)
         self.handler = handler
         self.editor_project = Project()
-        if os.path.isfile(handler.project.path.get()):
+        if Path(handler.project.path.get()).is_file:
             self.editor_project.load_json(handler.project.path.get())
         self.build()
 

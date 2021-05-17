@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import tkinter as tk
+from pathlib import Path
 from tkinter.messagebox import showinfo
 
 from scalewiz.components.evaluation_window import EvaluationWindow
@@ -42,8 +43,8 @@ class MenuBar:
         menubar.add_command(label="About", command=self.about)
 
         menubar.add_command(label="Debug", command=self._debug)
-
-        self.main_frame.winfo_toplevel().configure(menu=menubar)
+        self.menubar = menubar
+        # self.main_frame.winfo_toplevel().configure(menu=menubar)
 
     def spawn_editor(self) -> None:
         """Spawn a Toplevel for editing Projects."""
@@ -64,14 +65,14 @@ class MenuBar:
     def request_project_load(self) -> None:
         """Request that the currently selected TestHandler load a Project."""
         # build a list of currently loaded projects, and pass to the handler
-        currently_loaded = []
+        currently_loaded = set()
         for tab in self.main_frame.tab_control.tabs():
             widget = self.main_frame.nametowidget(tab)
-            currently_loaded.append(widget.handler.project.path.get())
+            currently_loaded.add(Path(widget.handler.project.path.get()))
         # the handler will check to make sure we don't load a project in duplicate
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        widget.handler.load_project(loaded=currently_loaded)  # this will log about it
+        widget.handler.load_project(loaded=tuple(currently_loaded))
         widget.build()
 
     def spawn_rinse(self) -> None:
