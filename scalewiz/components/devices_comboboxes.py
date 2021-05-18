@@ -10,20 +10,21 @@ from serial.tools import list_ports
 if TYPE_CHECKING:
     from typing import List
 
+    from scalewiz.models.test_handler import TestHandler
+
 LOGGER: Logger = getLogger("scalewiz")
 
 
 class DeviceBoxes(ttk.Frame):
     """A widget for selecting devices."""
 
-    def __init__(
-        self, parent: ttk.Frame, dev1: tk.StringVar, dev2: tk.StringVar
-    ) -> None:
+    def __init__(self, parent: ttk.Frame, handler: TestHandler) -> None:
         super().__init__(parent)
         self.parent: ttk.Frame = parent
+        self.handler: TestHandler = handler
         self.devices_list: List[str] = []
-        self.dev1: tk.StringVar = dev1
-        self.dev2: tk.StringVar = dev2
+        self.dev1: tk.StringVar = handler.dev1
+        self.dev2: tk.StringVar = handler.dev2
         self.build()
 
     def build(self) -> None:
@@ -33,6 +34,10 @@ class DeviceBoxes(ttk.Frame):
         self.grid_columnconfigure(1, weight=1)
         # make the widgets
         label = ttk.Label(self, text="     Devices:", anchor="e")
+        if self.handler.is_running and not self.handler.is_done:
+            state = "disabled"
+        else:
+            state = "normal"
         self.device1_entry = ttk.Combobox(
             self,
             width=15,
@@ -40,6 +45,7 @@ class DeviceBoxes(ttk.Frame):
             values=self.devices_list,
             validate="all",
             validatecommand=self.update_devices_list,
+            state=state,
         )
         self.device2_entry = ttk.Combobox(
             self,
@@ -48,6 +54,7 @@ class DeviceBoxes(ttk.Frame):
             values=self.devices_list,
             validate="all",
             validatecommand=self.update_devices_list,
+            state=state,
         )
         # grid the widgets
         label.grid(row=0, column=0, sticky="ne")

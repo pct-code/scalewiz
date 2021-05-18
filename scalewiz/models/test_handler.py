@@ -20,6 +20,7 @@ from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
 
 if TYPE_CHECKING:
+    from logging import Logger
     from tkinter import ttk
     from typing import List, Tuple
 
@@ -31,9 +32,9 @@ class TestHandler:
 
     def __init__(self, name: str = "Nemo") -> None:
         self.name = name
-        self.logger = getLogger(f"scalewiz.{name}")
+        self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.view: TestHandlerView = None
-        self.project = Project()
+        self.project: Project = Project()
         self.test: Test = None
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.readings: Queue[dict] = Queue()
@@ -48,16 +49,17 @@ class TestHandler:
         self.dev2 = tk.StringVar()
         self.stop_requested: Event = Event()
         self.progress = tk.IntVar()
-        self.elapsed_min: float = None  # used for evaluations
+        self.elapsed_min: float = float()  # used for evaluations
 
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
 
         # UI concerns
-        self.is_running = bool()
-        self.is_done = bool()
+        self.is_running: bool = bool()
+        self.is_done: bool = bool()
         self.new_test()
 
+    @property
     def can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
         return (
@@ -128,6 +130,8 @@ class TestHandler:
             msg = "Water clarity cannot be blank"
             issues.append(msg)
 
+        self.update_log_handler(issues)
+
         # this method will append issue msgs if any occur
         self.setup_pumps(issues)  # hooray for pointers
         if len(issues) > 0:
@@ -139,7 +143,7 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.update_log_handler()
+
             self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:
@@ -152,7 +156,7 @@ class TestHandler:
         rinse_start = monotonic()
         sleep(step)
         for i in range(100):
-            if self.can_run():
+            if self.can_run:
                 self.progress.set(i)
                 sleep(step - ((monotonic() - rinse_start) % step))
             else:
@@ -164,7 +168,10 @@ class TestHandler:
         test_start_time = monotonic()
         sleep(interval)
         # readings loop ----------------------------------------------------------------
-        while self.can_run():
+        self.logger.warning("starting loop")
+        while self.can_run:
+            self.logger.warning("starting reading")
+
             minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
 
             psi1 = self.pump1.pressure
@@ -195,8 +202,11 @@ class TestHandler:
             # TYSM https://stackoverflow.com/a/25251804
             sleep(interval - ((monotonic() - test_start_time) % interval))
         # end of readings loop ---------------------------------------------------------
+        self.logger.warning("exited loop")
         self.stop_test()
+        self.logger.warning("stopped test")
         self.save_test()
+        self.logger.warning("saved test -- end of take_readigs")
 
     # because the readings loop is blocking, it is handled on a separate thread
     # beacuse of this, we have to interact with it in a somewhat backhanded way
@@ -220,6 +230,7 @@ class TestHandler:
                 )
 
         self.is_done = True
+        self.is_running = False
         self.logger.info("Test for %s has been stopped", self.test.name.get())
         for _ in range(3):
             self.view.bell()
@@ -268,7 +279,8 @@ class TestHandler:
         self.test = Test()
         with self.readings.mutex:
             self.readings.queue.clear()
-        self.max_psi_1 = self.max_psi_2 = 0
+        self.max_psi_1 = 0
+        self.max_psi_2 = 0
         self.is_running = False
         self.is_done = False
         self.progress.set(0)
@@ -289,27 +301,32 @@ class TestHandler:
             self.view.build()
         self.logger.info("Rebuilt all view widgets")
 
-    def update_log_handler(self) -> None:
+    def update_log_handler(self, issues: List[str]) -> None:
         """Sets up the logging FileHandler to the passed path."""
-        log_file = f"{round(time())}_{self.test.name.get()}_{date.today()}.txt"
-        parent_dir = Path(self.project.path.get()).parent.resolve()
-        logs_dir = parent_dir.joinpath('logs').resolve()
-        if not logs_dir.is_dir:
-            logs_dir.mkdir()
-        log_path = Path(logs_dir).joinpath(log_file).resolve()
-        if self.log_handler in self.logger.handlers:
-            self.logger.removeHandler(self.log_handler)
-        self.log_handler = FileHandler(log_path)
-
-        formatter = Formatter(
-            "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
-            "%Y-%m-%d %H:%M:%S",
-        )
-        self.log_handler.setFormatter(formatter)
-        self.log_handler.setLevel(DEBUG)
-        self.logger.addHandler(self.log_handler)
-        self.logger.info("Set up a log file at %s", log_file)
-        self.logger.info("Starting a test for %s", self.project.name.get())
+        try:
+            log_file = f"{round(time())}_{self.test.name.get()}_{date.today()}.txt"
+            parent_dir = Path(self.project.path.get()).parent.resolve()
+            logs_dir = parent_dir.joinpath("logs").resolve()
+            if not logs_dir.is_dir:
+                logs_dir.mkdir()
+            log_path = Path(logs_dir).joinpath(log_file).resolve()
+            self.log_handler = FileHandler(log_path)
+        except Exception as err:  # bad path chars from user can bug here
+            issues.append("Bad log file")
+            issues.append(str(err))
+            return
+        else:
+            formatter = Formatter(
+                "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
+                "%Y-%m-%d %H:%M:%S",
+            )
+            if self.log_handler in self.logger.handlers:  # remove the old one
+                self.logger.removeHandler(self.log_handler)
+            self.log_handler.setFormatter(formatter)
+            self.log_handler.setLevel(DEBUG)
+            self.logger.addHandler(self.log_handler)
+            self.logger.info("Set up a log file at %s", log_file)
+            self.logger.info("Starting a test for %s", self.project.name.get())
 
     def set_view(self, view: ttk.Frame) -> None:
         """Stores a ref to the view displaying the handler."""
