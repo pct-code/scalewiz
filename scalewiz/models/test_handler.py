@@ -292,12 +292,11 @@ class TestHandler:
     def update_log_handler(self) -> None:
         """Sets up the logging FileHandler to the passed path."""
         log_file = f"{round(time())}_{self.test.name.get()}_{date.today()}.txt"
-        parent_dir = Path(self.project.path.get()).resolve().parent
-        logs_dir = Path(parent_dir, "/logs")
+        parent_dir = Path(self.project.path.get()).parent.resolve()
+        logs_dir = parent_dir.joinpath('logs').resolve()
         if not logs_dir.is_dir:
             logs_dir.mkdir()
-        log_path = Path(logs_dir, log_file)
-
+        log_path = Path(logs_dir).joinpath(log_file).resolve()
         if self.log_handler in self.logger.handlers:
             self.logger.removeHandler(self.log_handler)
         self.log_handler = FileHandler(log_path)

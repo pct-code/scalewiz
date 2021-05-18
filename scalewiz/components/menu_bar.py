@@ -97,5 +97,6 @@ class MenuBar:
         """Used for debugging."""
         current_tab = self.main_frame.tab_control.select()
         widget = self.main_frame.nametowidget(current_tab)
-        widget.handler.rebuild_views()
+        # widget.handler.rebuild_views()
+        widget.handler.update_log_handler()
         widget.bell()
