@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
-import typing
 from tkinter import ttk
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -12,7 +12,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # from matplotlib.ticker import MultipleLocator
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from scalewiz.models.test_handler import TestHandler
 
 LOGGER = logging.getLogger("scalewiz")
@@ -48,7 +48,7 @@ class LivePlot(ttk.Frame):
         # the interval argument is used by matplotlib internally
 
         # we can just skip this if the test isn't running
-        if self.handler.is_running.get() and not self.handler.is_done.get():
+        if self.handler.is_running and not self.handler.is_done:
             # data access here 😳
             readings = list(self.handler.readings.queue)
             if self.handler.readings.qsize() > 0:

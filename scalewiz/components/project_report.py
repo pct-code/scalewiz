@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import typing
 from tkinter import ttk
+from typing import TYPE_CHECKING
 
 from scalewiz.helpers.render import render
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from scalewiz.models.project import Project
 
 
@@ -15,7 +15,7 @@ class ProjectReport(ttk.Frame):
     """Editor for Project reporting settings."""
 
     def __init__(self, parent: ttk.Frame, project: Project) -> None:
-        ttk.Frame.__init__(self, parent)
+        super().__init__(parent)
         self.grid_columnconfigure(1, weight=1)
 
         lbl = ttk.Label(self, text="Export format:")

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import tkinter as tk
-import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
@@ -12,6 +11,7 @@ from queue import Queue
 from threading import Event
 from time import monotonic, sleep, time
 from tkinter import filedialog, messagebox
+from typing import TYPE_CHECKING
 
 from py_hplc import NextGenPump
 
@@ -19,7 +19,7 @@ from scalewiz.components.test_handler_view import TestHandlerView
 from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from tkinter import ttk
     from typing import List, Tuple
 
@@ -44,19 +44,18 @@ class TestHandler:
         self.log_handler: FileHandler = None  # handles logging to log window
         # test handler view overwrites this attribute in the view's build()
         self.log_queue: Queue[str] = Queue()  # view pulls from this queue
-
         self.dev1 = tk.StringVar()
         self.dev2 = tk.StringVar()
         self.stop_requested: Event = Event()
         self.progress = tk.IntVar()
-        self.elapsed_min = tk.DoubleVar()  # used for evaluations
+        self.elapsed_min: float = None  # used for evaluations
 
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
 
         # UI concerns
-        self.is_running = tk.BooleanVar()
-        self.is_done = tk.BooleanVar()
+        self.is_running = bool()
+        self.is_done = bool()
         self.new_test()
 
     def can_run(self) -> bool:
@@ -66,7 +65,7 @@ class TestHandler:
                 self.max_psi_1 <= self.project.limit_psi.get()
                 or self.max_psi_2 <= self.project.limit_psi.get()
             )
-            and self.elapsed_min.get() <= self.project.limit_minutes.get()
+            and self.elapsed_min <= self.project.limit_minutes.get()
             and self.readings.qsize() < self.max_readings
             and not self.stop_requested.is_set()
         )
@@ -109,7 +108,7 @@ class TestHandler:
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
         # todo disable the start button instead of this
-        if self.is_running.get():
+        if self.is_running:
             return
 
         issues = []
@@ -137,11 +136,10 @@ class TestHandler:
                 pump.close()
         else:
             self.stop_requested.clear()
-            self.is_done.set(False)
-            self.is_running.set(True)
+            self.is_done = False
+            self.is_running = True
             self.rebuild_views()
             self.update_log_handler()
-            self.logger.info("submitting")
             self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:
@@ -185,7 +183,7 @@ class TestHandler:
             self.logger.info(msg)
 
             self.readings.put(reading)
-            self.elapsed_min.set(minutes_elapsed)
+            self.elapsed_min = minutes_elapsed
             prog = round((self.readings.qsize() / self.max_readings) * 100)
             self.progress.set(prog)
 
@@ -205,7 +203,7 @@ class TestHandler:
     # this method is intended to be called from the test handler view
     def request_stop(self) -> None:
         """Requests that the Test stop."""
-        if self.is_running.get():
+        if self.is_running:
             # the readings loop thread checks this flag on each iteration
             self.stop_requested.set()
             self.logger.info("Received a stop request")
@@ -221,10 +219,11 @@ class TestHandler:
                     pump.serial.name,
                 )
 
-        self.is_done.set(True)
+        self.is_done = True
         self.logger.info("Test for %s has been stopped", self.test.name.get())
         for _ in range(3):
             self.view.bell()
+        self.rebuild_views()
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
@@ -270,8 +269,8 @@ class TestHandler:
         with self.readings.mutex:
             self.readings.queue.clear()
         self.max_psi_1 = self.max_psi_2 = 0
-        self.is_running.set(False)
-        self.is_done.set(False)
+        self.is_running = False
+        self.is_done = False
         self.progress.set(0)
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()

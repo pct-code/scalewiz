@@ -29,7 +29,7 @@ class TestControls(ttk.Frame):
         self.grid_columnconfigure(1, weight=1)
         # row 0 col 0
         start_btn = ttk.Button(self)
-        if self.handler.is_done.get():
+        if self.handler.is_done:
             start_btn.configure(text="New", command=self.handler.new_test)
         else:
             start_btn.configure(text="Start", command=self.handler.start_test)
@@ -49,13 +49,12 @@ class TestControls(ttk.Frame):
 
     def poll_log_queue(self) -> None:
         """Checks on an interval if there is a new message in the queue to display."""
-        while True:
-            try:
-                record = self.handler.log_queue.get(block=False)
-            except Empty:
-                break
-            else:
-                self.display(record)
+        try:
+            record = self.handler.log_queue.get(block=False)
+        except Empty:
+            pass
+        else:
+            self.display(record)
         interval = round(self.handler.project.interval_seconds.get() * 1000)
         self.after(interval, self.poll_log_queue)
 

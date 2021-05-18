@@ -47,7 +47,7 @@ class MainFrame(ttk.Frame):
         """Closes the program if no tests are running."""
         for tab in self.tab_control.tabs():
             widget = self.nametowidget(tab)
-            if widget.handler.is_running.get() and not widget.handler.is_done.get():
+            if widget.handler.is_running and not widget.handler.is_done:
                 LOGGER.warning(
                     "Attempted to close while a test was running on %s",
                     widget.handler.name,

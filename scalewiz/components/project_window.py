@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import tkinter as tk
-import typing
 from pathlib import Path
 from tkinter import filedialog, ttk
+from typing import TYPE_CHECKING
 
 from scalewiz.components.project_info import ProjectInfo
 from scalewiz.components.project_params import ProjectParams
@@ -14,7 +14,7 @@ from scalewiz.helpers.configuration import open_config
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from scalewiz.models.test_handler import TestHandler
 
 
@@ -25,11 +25,14 @@ class ProjectWindow(tk.Toplevel):
     """
 
     def __init__(self, handler: TestHandler) -> None:
-        tk.Toplevel.__init__(self)
-        self.handler = handler
-        self.editor_project = Project()
+        super().__init__()
+        self.handler: TestHandler = handler
+        self.editor_project: Project = Project()
         if Path(handler.project.path.get()).is_file:
             self.editor_project.load_json(handler.project.path.get())
+
+        self.title(f"{self.handler.name}")
+        set_icon(self)
         self.build()
 
     def build(self, reload: bool = False) -> None:
@@ -42,8 +45,6 @@ class ProjectWindow(tk.Toplevel):
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
-        self.winfo_toplevel().title(f"{self.handler.name}")
-        set_icon(self)
         for child in self.winfo_children():
             child.destroy()
 

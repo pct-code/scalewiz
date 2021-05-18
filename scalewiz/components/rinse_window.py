@@ -43,7 +43,7 @@ class RinseWindow(tk.Toplevel):
 
     def request_rinse(self) -> None:
         """Try to start a rinse cycle if a test isn't running."""
-        if not self.handler.is_running.get() or self.handler.is_done.get():
+        if not self.handler.is_running or self.handler.is_done:
             self.pool.submit(self.rinse)
 
     def rinse(self) -> None:

@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import queue
 import tkinter as tk
-import typing
+from queue import Empty
 from tkinter.scrolledtext import ScrolledText
+from typing import TYPE_CHECKING
 
 from scalewiz.helpers.set_icon import set_icon
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from logging import LogRecord
 
     from scalewiz.components.scalewiz import ScaleWiz
@@ -26,9 +26,7 @@ class LogWindow(tk.Toplevel):
         self.log_queue = core.log_queue
         self.title("Log Window")
         # replace the window closing behavior with withdrawing instead 🐱‍👤
-        self.protocol(
-            "WM_DELETE_WINDOW", lambda: self.winfo_toplevel().withdraw()
-        )
+        self.protocol("WM_DELETE_WINDOW", lambda: self.winfo_toplevel().withdraw())
         self.build()
 
     def build(self) -> None:
@@ -48,13 +46,12 @@ class LogWindow(tk.Toplevel):
 
     def poll_log_queue(self) -> None:
         """Checks every 100ms if there is a new message in the queue to display."""
-        while True:
-            try:
-                record = self.log_queue.get(block=False)
-            except queue.Empty:
-                break
-            else:
-                self.display(record)
+        try:
+            record = self.log_queue.get(block=False)
+        except Empty:
+            pass
+        else:
+            self.display(record)
         self.after(100, self.poll_log_queue)
 
     def display(self, record: LogRecord) -> None:

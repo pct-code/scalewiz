@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-import typing
 from logging import getLogger
 from tkinter import ttk
+from typing import TYPE_CHECKING
 
 from scalewiz.components.devices_comboboxes import DeviceBoxes
 from scalewiz.components.live_plot import LivePlot
 from scalewiz.components.test_controls import TestControls
 from scalewiz.components.test_info_widget import TestInfo
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
 
     from scalewiz.models.test_handler import TestHandler
 
@@ -22,10 +22,9 @@ class TestHandlerView(ttk.Frame):
     """A form for setting up / running Tests."""
 
     def __init__(self, parent: ttk.Frame, handler: TestHandler) -> None:
-        ttk.Frame.__init__(self, parent)
-        self.parent = parent
-        self.handler = handler
-        self.handler.is_done.trace_add("write", self.build)
+        super().__init__(parent)
+        self.parent: ttk.Frame = parent
+        self.handler: TestHandler = handler
         self.build()
 
     def build(self, *args) -> None:
@@ -63,7 +62,7 @@ class TestHandlerView(ttk.Frame):
 
     def update_input_frame(self) -> None:
         """Disables widgets in the input frame if a Test is running."""
-        if self.handler.is_running.get():
+        if self.handler.is_running:
             for widget in self.inputs:
                 widget.configure(state="disabled")
         else:

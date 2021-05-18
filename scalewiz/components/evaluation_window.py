@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 import time
 import tkinter as tk
-import typing
 from logging import getLogger
 from pathlib import Path
 from tkinter import font, ttk
+from typing import TYPE_CHECKING
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -20,7 +19,7 @@ from scalewiz.helpers.export_csv import export_csv
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from typing import Set
 
     from scalewiz.models.test import Test

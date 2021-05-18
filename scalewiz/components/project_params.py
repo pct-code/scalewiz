@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import typing
 from tkinter import ttk
+from typing import TYPE_CHECKING
 
 from scalewiz.helpers.render import render
 from scalewiz.helpers.validation import can_be_float, can_be_pos_float, can_be_pos_int
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from scalewiz.models.project import Project
 
 
@@ -16,7 +16,7 @@ class ProjectParams(ttk.Frame):
     """A form for mutating experiment-relevant attributes of the Project."""
 
     def __init__(self, parent: ttk.Frame, project: Project) -> None:
-        ttk.Frame.__init__(self, parent)
+        super().__init__(parent)
         # validation commands to ensure numeric inputs
 
         is_pos_int = self.register(lambda s: can_be_pos_int(s))

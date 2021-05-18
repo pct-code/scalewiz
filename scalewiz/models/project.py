@@ -144,7 +144,7 @@ class Project:
             "plot": str(Path(self.plot.get()).resolve()),
         }
 
-        with open(path, "w") as file:
+        with Path(path).open("w") as file:
             json.dump(this, file, indent=4)
         LOGGER.info("Saved %s to %s", self.name.get(), path)
         update_config("recents", "analyst", self.analyst.get())

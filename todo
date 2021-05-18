@@ -10,10 +10,10 @@ bugs
 refactoring
 -----------
 
-- refactor state management in the test handler (is_running, is_done....)
-- refactor TestHandlerView
-    - see above -- probably better to just brute force with calls to build than to do all
-    the current tkVar tracing sillyness
+- TestHandlerView refactor is pretty much done
+    - the LivePlot seems to not get rebuilt after a test ends
+    - we still need to disable all the entries while a test is running
+
 - we have a dep. on Pandas for one little call in export_csv -- could be worked around
 
 updates / new features
