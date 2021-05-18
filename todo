@@ -5,10 +5,13 @@ bugs
     - this may be a recently introduced bug from matplotlib itself
     - may need to open an issue upstream if it isn't my fault
     related:
-        - current calls to matplotlib api (LivePlot, EvaluationFrame.plot) are messy
+        - current calls to matplotlib api (LivePlot.plot, EvaluationFrame.plot) are messy
 
 refactoring
 -----------
+
+- the way the EvaluationWindow is rendered makes my itchy and must change
+
 
 - TestHandlerView refactor is pretty much done
     - the LivePlot seems to not get rebuilt after a test ends

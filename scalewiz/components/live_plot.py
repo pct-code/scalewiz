@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from tkinter import ttk
 from typing import TYPE_CHECKING
+from matplotlib.figure import SubplotParams
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -28,47 +29,47 @@ class LivePlot(ttk.Frame):
 
         # matplotlib objects
         # plt.close("all")
-        fig, self.axis = plt.subplots(figsize=(5, 3), dpi=100)
-        fig.patch.set_facecolor("#FAFAFA")
 
+
+        self.fig, self.axis = plt.subplots(figsize=(5, 3), dpi=100, constrained_layout=True,
+        subplotpars=SubplotParams(left=0.15, bottom=0.15, right=0.97, top=0.95))
+        self.fig.patch.set_facecolor("#FAFAFA")
         # self.axis.set_ylim(top=self.handler.project.limit_psi.get())
         # self.axis.yaxis.set_major_locator(MultipleLocator(100))
         # self.axis.set_xlim((0, None), auto=True)
-
-        plt.tight_layout()
-        plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
-        self.canvas = FigureCanvasTkAgg(fig, master=self)
+        # plt.tight_layout()
+        # plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
-        interval = round(handler.project.interval_seconds.get() * 1000)  # ms
-        self.ani = FuncAnimation(fig, self.animate, interval=interval)
+        interval = round(handler.project.interval_seconds.get() * 1000)  # -> ms
+        self.ani = FuncAnimation(self.fig, self.animate, interval=interval)
 
     # could probably rewrite this with some tk.Widget.after calls
     def animate(self, interval: float) -> None:
-        """Animates the live plot if a test isn't running."""
-        # the interval argument is used by matplotlib internally
-
+        """Animates the live plot if a test isn't running.
+        
+        The interval argument is used by matplotlib internally
+        """
         # we can just skip this if the test isn't running
         if self.handler.is_running and not self.handler.is_done:
-            # data access here 😳
-            readings = list(self.handler.readings.queue)
             if self.handler.readings.qsize() > 0:
                 LOGGER.debug("%s: Drawing a new plot ...", self.handler.name)
+                pump1 = []
+                pump2 = []
+                elapsed = []  # we will share this series as an axis
+                readings = tuple(self.handler.readings.queue)
+                for reading in readings:
+                    pump1.append(reading.pump1)
+                    pump2.append(reading.pump2)
+                    elapsed.append(reading.elapsedMin)
+                self.axis.clear()
                 with plt.style.context("bmh"):
-                    self.axis.clear()
                     self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
                     self.axis.set_facecolor("w")  # white
                     self.axis.set_xlabel("Time (min)")
                     self.axis.set_ylabel("Pressure (psi)")
-                    # self.axis.set_ylim((0, None), auto=True)
-                    self.axis.set_ylim((0, None), auto=True)
-                    self.axis.margins(0)
-                    pump1 = []
-                    pump2 = []
-                    elapsed = []  # we will share this series as an axis
-                    for reading in readings:
-                        pump1.append(reading.pump1)
-                        pump2.append(reading.pump2)
-                        elapsed.append(reading.elapsedMin)
+                    self.axis.set_ylim((0, None), auto=True) # this doesn't work ?
+                    self.axis.margins(0, tight=True)
                     self.axis.plot(elapsed, pump1, label="Pump 1")
                     self.axis.plot(elapsed, pump2, label="Pump 2")
-                    self.axis.legend(loc=0)
+                    self.axis.legend(loc='best')

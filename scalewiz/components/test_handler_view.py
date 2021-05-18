@@ -6,6 +6,8 @@ from logging import getLogger
 from tkinter import ttk
 from typing import TYPE_CHECKING
 
+from matplotlib import pyplot as plt
+
 from scalewiz.components.devices_comboboxes import DeviceBoxes
 from scalewiz.components.live_plot import LivePlot
 from scalewiz.components.test_controls import TestControls
@@ -30,6 +32,8 @@ class TestHandlerView(ttk.Frame):
     def build(self, *args) -> None:
         """Builds the UI, destroying any currently existing widgets."""
         LOGGER.info("%s: rebuilding", self.handler.name)
+        if hasattr(self, 'plot'): # explicityly close to prevent memory leak
+            plt.close(self.plot.fig)
         for child in self.winfo_children():
             child.destroy()
         self.grid_columnconfigure(0, weight=1)
@@ -56,8 +60,8 @@ class TestHandlerView(ttk.Frame):
 
         # row 0 col 1 ------------------------------------------------------------------
         plt_frm = ttk.Frame(self)
-        plot = LivePlot(plt_frm, self.handler)
-        plot.grid(row=0, column=0, sticky="nsew")
+        self.plot = LivePlot(plt_frm, self.handler)
+        self.plot.grid(row=0, column=0, sticky="nsew")
         plt_frm.grid(row=0, column=1, rowspan=4)
 
     def update_input_frame(self) -> None:
