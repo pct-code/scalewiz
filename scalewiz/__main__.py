@@ -8,7 +8,7 @@ from scalewiz.components.scalewiz import ScaleWiz
 def main() -> None:
     """The Tkinter entry point of the program; enters mainloop."""
     root = tk.Tk()
-    ScaleWiz(root).grid()
+    ScaleWiz(root).grid(sticky="nsew")
     root.mainloop()
 
 

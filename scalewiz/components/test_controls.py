@@ -41,9 +41,15 @@ class TestControls(ttk.Frame):
             start_btn.configure(text="Start", command=self.handler.start_test)
         start_btn.grid(row=0, column=0, sticky="ew")
         # row 0 col 1
-        stop_btn = ttk.Button(self, text="Stop", command=self.handler.request_stop)
+        if self.handler.is_running:
+            state = "normal"
+        else:
+            state = "disabled"
+        stop_btn = ttk.Button(
+            self, text="Stop", command=self.handler.request_stop, state=state
+        )
         stop_btn.grid(row=0, column=1, sticky="ew")
-        progressbar = ttk.Progressbar(self, variable=self.handler.progress)
+        progressbar = ttk.Progressbar(self, variable=self.handler.progress, maximum=100)
         progressbar.grid(row=1, column=0, columnspan=2, sticky="ew")
         # row 1 col 0:1
         self.log_text = ScrolledText(

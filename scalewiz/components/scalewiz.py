@@ -24,7 +24,7 @@ class ScaleWiz(ttk.Frame):
         # icon / version
         set_icon(parent)
         parent.title(f"ScaleWiz {version('scalewiz')}")
-        # parent.resizable(0, 0)  # apparently this is a bad practice...
+        parent.resizable(0, 0)  # apparently this is a bad practice...
         # font 🔠
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Arial")
@@ -52,7 +52,7 @@ class ScaleWiz(ttk.Frame):
         logging.basicConfig(level=logging.DEBUG)  # applies to the root logger instance
         queue_handler.setFormatter(formatter)
         queue_handler.setLevel(logging.INFO)
-        logger = logging.getLogger('scalewiz')
+        logger = logging.getLogger("scalewiz")
         logger.addHandler(queue_handler)
         # holding a ref to the toplevel for the menubar to find
         self.log_window = LogWindow(self)

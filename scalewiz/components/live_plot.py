@@ -11,8 +11,6 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import SubplotParams
 
-# from matplotlib.ticker import MultipleLocator
-
 if TYPE_CHECKING:
     from scalewiz.models.test_handler import TestHandler
 
@@ -26,22 +24,17 @@ class LivePlot(ttk.Frame):
         """Initialize a LivePlot."""
         super().__init__(parent)
         self.handler = handler
-
-        # matplotlib objects
-        # plt.close("all")
-
         self.fig, self.axis = plt.subplots(
             figsize=(5, 3),
             dpi=100,
             constrained_layout=True,
-            subplotpars=SubplotParams(left=0.15, bottom=0.15, right=0.97, top=0.95),
+            subplotpars=SubplotParams(left=0.15, bottom=0.15, right=0.95, top=0.95),
         )
+        self.axis.set_xlabel("Time (min)")
+        self.axis.set_ylabel("Pressure (psi)")
+        self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
+        self.axis.set_facecolor("w")  # white
         self.fig.patch.set_facecolor("#FAFAFA")
-        # self.axis.set_ylim(top=self.handler.project.limit_psi.get())
-        # self.axis.yaxis.set_major_locator(MultipleLocator(100))
-        # self.axis.set_xlim((0, None), auto=True)
-        # plt.tight_layout()
-        # plt.subplots_adjust(left=0.15, bottom=0.15, right=0.97, top=0.95)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
         interval = round(handler.project.interval_seconds.get() * 1000)  # -> ms
@@ -65,7 +58,7 @@ class LivePlot(ttk.Frame):
                     pump1.append(reading.pump1)
                     pump2.append(reading.pump2)
                     elapsed.append(reading.elapsedMin)
-                max_psi = max(pump1) if max(pump1) > max(pump2) else max(pump2)
+                max_psi = max((self.handler.max_psi_1, self.handler.max_psi_2))
                 self.axis.clear()
                 with plt.style.context("bmh"):
                     self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")

@@ -27,7 +27,7 @@ class TestInfo(ttk.Frame):
         """Builds the widget."""
         self.grid_columnconfigure(1, weight=1)
 
-        if self.handler.is_running and not self.handler.is_done:
+        if self.handler.is_done or self.handler.is_running:
             state = "disabled"
         else:
             state = "normal"

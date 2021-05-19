@@ -1,6 +1,10 @@
 bugs
 ----
 
+
+done
+~~~~
+
 - the LivePlot currently seems rather unreliable
     - this may be a recently introduced bug from matplotlib itself
     - may need to open an issue upstream if it isn't my fault
@@ -10,7 +14,10 @@ bugs
 refactoring
 -----------
 
-- the way the EvaluationWindow is rendered makes my itchy and must change
+done
+~~~~
+
+- (mostly done) the way the EvaluationWindow is rendered makes my itchy and must change
 
 
 - TestHandlerView refactor is pretty much done

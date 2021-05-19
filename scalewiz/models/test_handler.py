@@ -72,7 +72,9 @@ class TestHandler:
             and not self.stop_requested.is_set()
         )
 
-    def load_project(self, path: str = None, loaded: Tuple[Path] = []) -> None:
+    def load_project(
+        self, path: str = None, loaded: Tuple[Path] = [], new_test: bool = True
+    ) -> None:
         """Opens a file dialog then loads the selected Project file.
 
         `loaded` gets built from scratch every time it is passed in -- no need to update
@@ -103,8 +105,8 @@ class TestHandler:
                 self.project.remove_traces()
                 self.project = Project()
                 self.project.load_json(path)
-                self.new_test()
-                self.rebuild_views()
+                if new_test:
+                    self.new_test()
                 self.logger.info("Loaded %s", self.project.name.get())
 
     def start_test(self) -> None:
@@ -143,7 +145,6 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-
             self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:
@@ -168,10 +169,7 @@ class TestHandler:
         test_start_time = monotonic()
         sleep(interval)
         # readings loop ----------------------------------------------------------------
-        self.logger.warning("starting loop")
         while self.can_run:
-            self.logger.warning("starting reading")
-
             minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
 
             psi1 = self.pump1.pressure
@@ -202,11 +200,8 @@ class TestHandler:
             # TYSM https://stackoverflow.com/a/25251804
             sleep(interval - ((monotonic() - test_start_time) % interval))
         # end of readings loop ---------------------------------------------------------
-        self.logger.warning("exited loop")
         self.stop_test()
-        self.logger.warning("stopped test")
         self.save_test()
-        self.logger.warning("saved test -- end of take_readigs")
 
     # because the readings loop is blocking, it is handled on a separate thread
     # beacuse of this, we have to interact with it in a somewhat backhanded way
@@ -238,12 +233,15 @@ class TestHandler:
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
-        for reading in list(self.readings.queue):
+        for reading in tuple(self.readings.queue):
             self.test.readings.append(reading)
+        self.logger.info(
+            "saved %s readings to %s", len(self.test.readings), self.test.name.get()
+        )
         self.project.tests.append(self.test)
         self.project.dump_json()
         # refresh data / UI
-        self.load_project(path=self.project.path.get())
+        self.load_project(path=self.project.path.get(), new_test=False)
         self.rebuild_views()
 
     def setup_pumps(self, issues: List[str] = None) -> None:
@@ -270,19 +268,20 @@ class TestHandler:
                 issues.append(f"Couldn't connect to {pump.serial.name}")
                 continue
             pump.flowrate = self.project.flowrate.get()
-            self.logger.info("set flowrate to %s", pump.flowrate)
+            self.logger.info("Set flowrates to %s", pump.flowrate)
 
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
         """Initialize a new test."""
-        self.logger.info("Initialized a new test")
+        self.logger.info("Initializing a new test")
+        if isinstance(self.test, Test):
+            self.test.remove_traces()
+            del self.test
         self.test = Test()
         with self.readings.mutex:
             self.readings.queue.clear()
-        self.max_psi_1 = 0
-        self.max_psi_2 = 0
-        self.is_running = False
-        self.is_done = False
+        self.max_psi_1, self.max_psi_2 = 0, 0
+        self.is_running, self.is_done = False, False
         self.progress.set(0)
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
@@ -298,7 +297,7 @@ class TestHandler:
             else:  # clean up as we go
                 self.editors.remove(widget)
         if isinstance(self.view, TestHandlerView):
-            self.view.build()
+            self.view.after(0, self.view.build)
         self.logger.info("Rebuilt all view widgets")
 
     def update_log_handler(self, issues: List[str]) -> None:

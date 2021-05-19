@@ -14,13 +14,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.ticker import MultipleLocator
 
-from scalewiz.components.test_evaluation_row import TestResultRow
+from scalewiz.components.evaluation_tests_frame import EvaluationTestsFrame
 from scalewiz.helpers.export_csv import export_csv
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
 if TYPE_CHECKING:
-    from typing import Set
+    from typing import List
 
     from scalewiz.models.test import Test
     from scalewiz.models.test_handler import TestHandler
@@ -46,7 +46,7 @@ class EvaluationWindow(tk.Toplevel):
     """Frame for analyzing data."""
 
     def __init__(self, handler: TestHandler) -> None:
-        tk.Toplevel.__init__(self)
+        super().__init__()
         self.handler = handler
         self.editor_project = Project()
         if Path(self.handler.project.path.get()).is_file:
@@ -54,8 +54,13 @@ class EvaluationWindow(tk.Toplevel):
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None
         self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
-        self.trials: Set[Test] = set()
-        self.blanks: Set[Test] = set()
+        self.trials: List[Test] = set()
+        self.blanks: List[Test] = set()
+        self.winfo_toplevel().title(
+            f"{self.handler.name} {self.handler.project.name.get()}"
+        )
+        self.resizable(0, 0)
+        set_icon(self)
         self.build()
 
     def render(self, label: tk.Widget, entry: tk.Widget, row: int) -> None:
@@ -74,64 +79,60 @@ class EvaluationWindow(tk.Toplevel):
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
-        self.winfo_toplevel().title(
-            f"{self.handler.name} {self.handler.project.name.get()}"
-        )
-        set_icon(self)
-
         for child in self.winfo_children():
             child.destroy()
 
+        self.grid_columnconfigure(0, weight=1)
+        # we will build a few tabs in this
         self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(row=0, column=0)
 
-        tests_frame = ttk.Frame(self)
-
+        container = ttk.Frame(
+            self.tab_control
+        )  # container to be added to the tab_control
+        # build the header row
+        header_row = ttk.Frame(container)
         bold_font = font.Font(family="Arial", weight="bold", size=10)
-        # header row
-        labels = []
-        labels.append(tk.Label(tests_frame, text="Name", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Label", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Minutes", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Pump", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Baseline", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Max", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Clarity", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Notes", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Result", font=bold_font))
-        labels.append(tk.Label(tests_frame, text="Report", font=bold_font))
-        for i, label in enumerate(labels):
-            label.grid(row=0, column=i, padx=3, sticky="w")
 
-        self.grid_columnconfigure(0, weight=1)
+        # grid into tests_frame
+        header_row.grid(row=0, column=0, sticky="ew")
 
-        self.blanks.clear()
-        self.trials.clear()
-        #  filter through blanks and trials
-        for test in self.editor_project.tests:
-            if test.is_blank.get():
-                self.blanks.add(test)
-            else:
-                self.trials.add(test)
-
-        tk.Label(tests_frame, text="Blanks:", font=bold_font).grid(
-            row=1, column=0, sticky="w", padx=3, pady=1
+        # max
+        blanks = EvaluationTestsFrame(
+            container,
+            self.editor_project,
+            mode="blanks",
+            font=bold_font,
+            col_labels=True,
         )
-        tk.Label(tests_frame, text="Trials:", font=bold_font).grid(
-            row=2 + len(self.blanks), column=0, sticky="w", padx=3, pady=1
+        blanks.grid(row=1, column=0, sticky="ew")
+        trials = EvaluationTestsFrame(
+            container,
+            self.editor_project,
+            mode="trials",
+            font=bold_font,
+            col_labels=False,
         )
+        trials.grid(row=2, column=0, sticky="ew")
 
-        for i, blank in enumerate(self.blanks):
-            TestResultRow(tests_frame, blank, self.editor_project, i + 2).grid(
-                row=i + 1, column=0, sticky="w", padx=3, pady=1
-            )
-        count = len(self.blanks)
-        for i, trial in enumerate(self.trials):
-            TestResultRow(tests_frame, trial, self.editor_project, i + count + 3).grid(
-                row=i + count + 3, column=0, sticky="w", padx=3, pady=1
-            )
+        # tk.Label(header_row, text="Blanks:", font=bold_font).grid(
+        #     row=1, column=0, sticky="w", padx=3, pady=1
+        # )
+        # tk.Label(header_row, text="Trials:", font=bold_font).grid(
+        #     row=2 + len(self.blanks), column=0, sticky="w", padx=3, pady=1
+        # )
 
-        self.tab_control.add(tests_frame, text="   Data   ")
+        # for i, blank in enumerate(self.blanks):
+        #     TestResultRow(header_row, blank, self.editor_project, i + 2).grid(
+        #         row=i + 1, column=0, sticky="w", padx=3, pady=1
+        #     )
+        # count = len(self.blanks)
+        # for i, trial in enumerate(self.trials):
+        #     TestResultRow(header_row, trial, self.editor_project, i + count + 3).grid(
+        #         row=i + count + 3, column=0, sticky="w", padx=3, pady=1
+        #     )
+
+        self.tab_control.add(container, text="   Data   ")
 
         # plot stuff ----------------------------------------------------------
         self.plot()
@@ -334,7 +335,7 @@ class EvaluationWindow(tk.Toplevel):
                 f"Result: 1 - ({int_psi} - {baseline_area}) / {avg_protectable_area}"
             )
             log.append(f"Result: {result} \n")
-            trial.result.set(result)
+            trial.result.set(f"{result:.2f}")
 
         self.plot()
 
@@ -348,5 +349,5 @@ class EvaluationWindow(tk.Toplevel):
             self.log_text.configure(state="normal")
             self.log_text.delete(1.0, "end")
             for msg in log:
-                self.log_text.insert("end", "".join((msg, "/n")))
+                self.log_text.insert("end", "".join((msg, "\n")))
             self.log_text.configure(state="disabled")

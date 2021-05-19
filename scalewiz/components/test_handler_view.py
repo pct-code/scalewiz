@@ -31,13 +31,9 @@ class TestHandlerView(ttk.Frame):
 
     def build(self, *args) -> None:
         """Builds the UI, destroying any currently existing widgets."""
-        LOGGER.info("%s: rebuilding", self)
         if hasattr(self, "plot"):  # explicityly close to prevent memory leak
-            LOGGER.info("closing plot")
-            plt.close(self.plot.fig)
+            self.after(0, plt.close, self.plot.fig)
         for child in self.winfo_children():
-            LOGGER.info("%s", child)
-            LOGGER.info("destroying %s", child)
             child.destroy()
         self.grid_columnconfigure(0, weight=1)
         # row 0 ------------------------------------------------------------------------

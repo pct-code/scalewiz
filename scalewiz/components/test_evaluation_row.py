@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List
 
+    from scalewiz.components.evaluation_tests_frame import EvaluationTestsFrame
     from scalewiz.models.project import Project
     from scalewiz.models.test import Test
 
@@ -16,26 +17,25 @@ class TestResultRow(ttk.Frame):
     """Component for displaying a Test in a gridlike fashion."""
 
     def __init__(
-        self, parent: tk.Frame, test: Test, project: Project, row: int
+        self,
+        parent: EvaluationTestsFrame,
+        test: Test,
+        project: Project,
+        test_name_len: int = 0,
     ) -> None:
-        ttk.Frame.__init__(self, parent)
+        super().__init__(parent)
         self.test = test
         # the immediate parent will be a frame "tests_frame" in the EvaluationFrame
-        # self.parent.master refers to the EvaluationFrame itself
-        self.parent = parent
+        # self.master refers to the EvaluationFrame itself
         self.project = project
-        self.row = row
-        self.build()
 
-    def build(self) -> None:
-        """Make the UI."""
         cols: List[tk.Widget] = []
         # col 0 - name
-        cols.append(ttk.Label(self.parent, textvariable=self.test.name))
+        cols.append(ttk.Label(self, textvariable=self.test.name, width=parent.name_len))
         # col 1 - label
         cols.append(
             ttk.Entry(
-                self.parent,
+                self,
                 textvariable=self.test.label,
                 width=25,
                 validate="focusout",
@@ -48,14 +48,15 @@ class TestResultRow(ttk.Frame):
         )
         cols.append(
             ttk.Label(
-                self.parent,
-                text=f"{duration:.2f}, ({len(self.test.readings)})",
+                self,
+                text=f"{duration:.2f}",
+                width=parent.minutes_len,
                 anchor="center",
             )
         )
         # col 3 - pump to score
         to_score = ttk.Combobox(
-            self.parent,
+            self,
             textvariable=self.test.pump_to_score,
             values=["pump 1", "pump 2", "average"],
             state="readonly",
@@ -68,27 +69,40 @@ class TestResultRow(ttk.Frame):
         # col 4 - obs baseline
         cols.append(
             ttk.Label(
-                self.parent, textvariable=self.test.observed_baseline, anchor="center"
+                self,
+                textvariable=self.test.observed_baseline,
+                width=parent.baseline_len,
+                anchor="center",
             )
         )
         # col 5 - max psi
         cols.append(
-            ttk.Label(self.parent, textvariable=self.test.max_psi, anchor="center")
+            ttk.Label(
+                self,
+                textvariable=self.test.max_psi,
+                width=parent.max_psi_len,
+                anchor="center",
+            )
         )
         # col 6 - clarity
         cols.append(
-            ttk.Label(self.parent, textvariable=self.test.clarity, anchor="center")
+            ttk.Label(
+                self,
+                textvariable=self.test.clarity,
+                width=parent.clarity_len,
+                anchor="center",
+            )
         )
         # col 7 - notes
-        cols.append(ttk.Entry(self.parent, textvariable=self.test.notes))
+        cols.append(ttk.Entry(self, textvariable=self.test.notes))
         # col 8 - result
         cols.append(
-            ttk.Label(self.parent, textvariable=self.test.result, anchor="center")
+            ttk.Label(self, textvariable=self.test.result, width=5, anchor="center")
         )
         # col 9 - include on report
         cols.append(
             ttk.Checkbutton(
-                self.parent,
+                self,
                 variable=self.test.include_on_report,
                 command=self.update_score,
             )
@@ -96,7 +110,7 @@ class TestResultRow(ttk.Frame):
         # col 10 - delete
         cols.append(
             ttk.Button(
-                self.parent,
+                self,
                 command=self.remove_from_project,
                 text="Delete",
                 width=7,
@@ -105,13 +119,13 @@ class TestResultRow(ttk.Frame):
 
         for i, col in enumerate(cols):
             if i == 0:  # left align the name col
-                col.grid(row=self.row, column=i, padx=1, pady=1, sticky="w")
+                col.grid(row=0, column=i, padx=(3, 1), pady=1, sticky="w")
             if i == 7:  # make the notes col stretch
-                self.parent.grid_columnconfigure(7, weight=1)
-                col.grid(row=self.row, column=i, padx=1, pady=1, sticky="ew")
+                # self.grid_columnconfigure(7, weight=1)
+                col.grid(row=0, column=i, padx=1, pady=1, sticky="ew")
             else:  # defaults for the rest
                 col.grid(
-                    row=self.row,
+                    row=0,
                     column=i,
                     padx=1,
                     pady=1,
@@ -127,10 +141,10 @@ class TestResultRow(ttk.Frame):
         remove = messagebox.askyesno("Delete test", msg)
         if remove and self.test in self.project.tests:
             self.project.tests.remove(self.test)
-            self.parent.master.build()
+            self.master.build()
 
     def update_score(self, *args) -> True:
         """Method to call score from a validation callback. Doesn't check anything."""
         # prevents a race condition when setting the score
-        self.after(1, self.parent.master.score)
+        self.after(1, self.master.score)
         return True
