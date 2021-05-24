@@ -28,7 +28,6 @@ class ProjectReport(ttk.Frame):
         render(lbl, ent, 0)
 
         # matplotlib stuff
-        # todo implement color selection
         # colorsLbl = ttk.Label(self, text="Plot color cycle:")
         # colorsEnt = ttk.Entry(self)
         # parent.render(colorsLbl, colorsEnt, 1)

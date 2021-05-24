@@ -1,7 +1,5 @@
 """This module defines functions that deal with program configuration."""
 
-# todo color cycle for reports
-
 from __future__ import annotations
 
 import os
@@ -34,7 +32,6 @@ def ensure_config() -> None:
             "No config file found in %s. Making one now at %s", CONFIG_DIR, CONFIG_FILE
         )
         init_config()
-    # todo #19 make sure the config isn't missing keys
 
 
 def init_config() -> None:

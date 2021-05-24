@@ -1,14 +1,12 @@
 """Evaluation window for a Project."""
 
 from __future__ import annotations
-from scalewiz.helpers.score import score
 
-import time
 import tkinter as tk
 from logging import getLogger
 from pathlib import Path
 from tkinter import ttk
-from tkinter.scrolledtext  import ScrolledText
+from tkinter.scrolledtext import ScrolledText
 from typing import TYPE_CHECKING
 
 import matplotlib as mpl
@@ -18,6 +16,7 @@ from matplotlib.ticker import MultipleLocator
 
 from scalewiz.components.evaluation_data_view import EvaluationDataView
 from scalewiz.helpers.export_csv import export_csv
+from scalewiz.helpers.score import score
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
@@ -98,9 +97,7 @@ class EvaluationWindow(tk.Toplevel):
         # evaluation stuff ----------------------------------------------------
         log_frame = ttk.Frame(self)
         log_frame.grid_columnconfigure(0, weight=1)
-        self.log_text = ScrolledText(
-            log_frame, background="white", state="disabled"
-        )
+        self.log_text = ScrolledText(log_frame, background="white", state="disabled")
         self.log_text.grid(sticky="ew")
         self.tab_control.add(log_frame, text="   Calculations   ")
 
@@ -120,9 +117,9 @@ class EvaluationWindow(tk.Toplevel):
 
     def plot(self) -> None:
         """Destroys the old plot frame if it exists, then makes a new one."""
-        
+
         # todo update to OOP-style matplotlib calls
-        
+
         # close all pyplots to prevent memory leak
         plt.close("all")
         # get rid of our old plot tab
@@ -133,7 +130,7 @@ class EvaluationWindow(tk.Toplevel):
         self.fig.patch.set_facecolor("#FAFAFA")
         plt.subplots_adjust(wspace=0, hspace=0)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
-        self.canvas.get_tk_widget().pack(fill='none', expand=False)
+        self.canvas.get_tk_widget().pack(fill="none", expand=False)
         with plt.style.context("bmh"):
             mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLORS)
             self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
@@ -167,7 +164,7 @@ class EvaluationWindow(tk.Toplevel):
             self.axis.set_ylim(top=self.editor_project.limit_psi.get())
             self.axis.yaxis.set_major_locator(MultipleLocator(100))
             self.axis.set_xlim((0, self.editor_project.limit_minutes.get()))
-            self.axis.legend(loc='best')
+            self.axis.legend(loc="best")
             self.axis.margins(0)
             plt.tight_layout()
 
@@ -201,5 +198,3 @@ class EvaluationWindow(tk.Toplevel):
         self.editor_project.dump_json()
         self.handler.rebuild_views()
         self.handler.load_project(self.editor_project.path.get())
-
-

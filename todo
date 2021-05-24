@@ -14,15 +14,15 @@ done
 refactoring
 -----------
 
+- eval window only needs plot calls fixed to OOP style now
+
 done
 ~~~~
 
-- (mostly done) the way the EvaluationWindow is rendered makes my itchy and must change
-
 
 - TestHandlerView refactor is pretty much done
-    - the LivePlot seems to not get rebuilt after a test ends
-    - we still need to disable all the entries while a test is running
+    - [fixed?] the LivePlot seems to not get rebuilt after a test ends
+    - [fixed?] we still need to disable all the entries while a test is running
 
 - we have a dep. on Pandas for one little call in export_csv -- could be worked around
 
@@ -33,9 +33,11 @@ updates / new features
     - 'add system' -> 'system' > 'add new', 'remove current'
     - this will be a little awkward since we'd have to update/rebuild the menubar
     each time a system is added / removed
-- refactor scoring out of eval window -- deserves its own helper func
 
 low prio
 --------
 
 - port over the old chlorides / ppm calculators
+- check for config missing keys ?
+- check the start button disabling
+- color cycle for config / projects

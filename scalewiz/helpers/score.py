@@ -1,14 +1,15 @@
-"""Functions for scoring Tests within a Project. 
+"""Functions for scoring Tests within a Project.
 """
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from time import time
 
 if TYPE_CHECKING:
-    from scalewiz.models.project import Project
     from tkinter.scrolledtext import ScrolledText
     from typing import List
+
+    from scalewiz.models.project import Project
+
 
 def score(project: Project, log_widget: ScrolledText, *args) -> None:
     """Updates the result for every Test in the Project.
@@ -16,7 +17,6 @@ def score(project: Project, log_widget: ScrolledText, *args) -> None:
     Accepts event args passed from the tkVar trace.
     """
     # extra unused args are passed in by tkinter
-    start_time = time()
     log: List[str] = []
     # scoring props
     limit_minutes = project.limit_minutes.get()
@@ -26,9 +26,7 @@ def score(project: Project, log_widget: ScrolledText, *args) -> None:
     log.append(f"Max readings: {max_readings}")
     baseline_area = round(project.baseline.get() * max_readings)
     log.append("Baseline area: baseline PSI * max readings")
-    log.append(
-        f"Baseline area: {project.baseline.get()} * {max_readings}"
-    )
+    log.append(f"Baseline area: {project.baseline.get()} * {max_readings}")
     log.append(f"Baseline area: {baseline_area}")
     log.append("-" * 80)
     log.append("")
@@ -64,9 +62,7 @@ def score(project: Project, log_widget: ScrolledText, *args) -> None:
     # get protectable area
     avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
     log.append(f"Avg. area over blanks: {avg_blank_area}")
-    avg_protectable_area = (
-        project.limit_psi.get() * max_readings - avg_blank_area
-    )
+    avg_protectable_area = project.limit_psi.get() * max_readings - avg_blank_area
     log.append(
         "Avg. protectable area: limit_psi * max_readings - avg. area over blanks"
     )
@@ -97,19 +93,16 @@ def score(project: Project, log_widget: ScrolledText, *args) -> None:
         log.append("Integral PSI: sum of all pressure readings")
         log.append(f"Integral PSI: {int_psi}")
         result = round(1 - (int_psi - baseline_area) / avg_protectable_area, 3)
-        log.append(
-            "Result: 1 - (integral PSI - baseline area) / avg protectable area"
-        )
+        log.append("Result: 1 - (integral PSI - baseline area) / avg protectable area")
         log.append(
             f"Result: 1 - ({int_psi} - {baseline_area}) / {avg_protectable_area}"
         )
         log.append(f"Result: {result} \n")
         trial.result.set(f"{result:.2f}")
 
-    # todo something about this
-    # self.plot() 
     log.insert(0, f"Evaluating results for {project.name.get()}...")
     to_log(log, log_widget)
+
 
 def to_log(log: list[str], log_widget: ScrolledText) -> None:
     """Adds the passed log message to the Text widget in the Calculations frame."""

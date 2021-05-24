@@ -12,8 +12,6 @@ from scalewiz.components.project_window import ProjectWindow
 from scalewiz.components.rinse_window import RinseWindow
 from scalewiz.helpers.show_help import show_help
 
-# todo #9 port over the old chlorides / ppm calculators
-
 LOGGER = logging.getLogger("scalewiz")
 
 

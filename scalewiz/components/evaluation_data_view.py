@@ -1,20 +1,20 @@
 """A table view to be displayed in the Evaluation Window."""
 
 from __future__ import annotations
-from scalewiz.helpers.score import score
 
 import tkinter as tk
 from logging import Logger, getLogger
-from tkinter import ttk, messagebox
+from tkinter import messagebox, ttk
 from tkinter.font import Font
 from typing import TYPE_CHECKING
 
-from scalewiz.components.test_evaluation_row import TestResultRow
+from scalewiz.helpers.score import score
 
 if TYPE_CHECKING:
+    from typing import List
+
     from scalewiz.models.project import Project
     from scalewiz.models.test import Test
-    from typing import List
 
 
 LOGGER: Logger = getLogger("scalewiz")
@@ -29,7 +29,7 @@ class EvaluationDataView(ttk.Frame):
         project: Project,
     ) -> None:
         super().__init__(parent)
-        
+
         self.eval_window = parent.master
         self.project = project
         self.trials: List[Test] = []
@@ -37,24 +37,23 @@ class EvaluationDataView(ttk.Frame):
         self.bold_font: Font = Font(family="Arial", weight="bold", size=10)
         self.build()
 
-    
     def build(self) -> None:
         for child in self.winfo_children():
             child.destroy()
         self.sort_tests()
-        
-        self.apply_col_headers() # row 0
+
+        self.apply_col_headers()  # row 0
         # add blanks block
-        blanks_lbl = ttk.Label(self, text='Blanks:', font=self.bold_font)
-        blanks_lbl.grid(row=1, column=0, sticky='w') 
+        blanks_lbl = ttk.Label(self, text="Blanks:", font=self.bold_font)
+        blanks_lbl.grid(row=1, column=0, sticky="w")
         for i, blank in enumerate(self.blanks):
-            self.apply_test_row(blank, i+2) # skips rows for headers
+            self.apply_test_row(blank, i + 2)  # skips rows for headers
         # add trials block
         len_blanks = len(self.blanks)
-        trials_lbl = ttk.Label(self, text='Trials:', font=self.bold_font)
-        trials_lbl.grid(row=len_blanks + 3, sticky='w') # skips rows for headers
+        trials_lbl = ttk.Label(self, text="Trials:", font=self.bold_font)
+        trials_lbl.grid(row=len_blanks + 3, sticky="w")  # skips rows for headers
         for i, trial in enumerate(self.trials):
-            self.apply_test_row(trial, i+len_blanks+4)# skips rows for headers
+            self.apply_test_row(trial, i + len_blanks + 4)  # skips rows for headers
 
     def apply_col_headers(self) -> None:
         labels = []
@@ -63,46 +62,41 @@ class EvaluationDataView(ttk.Frame):
                 self,
                 text="Name",
                 font=self.bold_font,
-                anchor='w',
+                anchor="w",
             )
         )
         labels.append(
-            tk.Label(self, text="Label", font=self.bold_font, width=20, anchor='w')
+            tk.Label(self, text="Label", font=self.bold_font, width=20, anchor="w")
         )
         labels.append(
             tk.Label(
                 self,
                 text="Minutes",
                 font=self.bold_font,
-                anchor='center',
+                anchor="center",
             )
         )
-        labels.append(tk.Label(self, text="Pump", font=self.bold_font, anchor='center'))
+        labels.append(tk.Label(self, text="Pump", font=self.bold_font, anchor="center"))
         labels.append(
-            tk.Label(self, text="Baseline PSI", font=self.bold_font, anchor='center')
-        )
-        labels.append(tk.Label(self, text="Max PSI", font=self.bold_font, anchor='center'))
-        labels.append(
-            tk.Label(self, text="Water Clarity", font=self.bold_font, anchor='center')
+            tk.Label(self, text="Baseline PSI", font=self.bold_font, anchor="center")
         )
         labels.append(
-            tk.Label(self, text="Notes", font=self.bold_font, anchor='w')
+            tk.Label(self, text="Max PSI", font=self.bold_font, anchor="center")
         )
         labels.append(
-            tk.Label(self, text="Score", font=self.bold_font, anchor='w')
+            tk.Label(self, text="Water Clarity", font=self.bold_font, anchor="center")
         )
-        labels.append(
-            tk.Label(self, text="On Report", font=self.bold_font, anchor='w')
-        )
-        labels.append(tk.Label(self, text=" ", font=self.bold_font, anchor='w'))
+        labels.append(tk.Label(self, text="Notes", font=self.bold_font, anchor="w"))
+        labels.append(tk.Label(self, text="Score", font=self.bold_font, anchor="w"))
+        labels.append(tk.Label(self, text="On Report", font=self.bold_font, anchor="w"))
+        labels.append(tk.Label(self, text=" ", font=self.bold_font, anchor="w"))
 
         for i, lbl in enumerate(labels):
             self.grid_columnconfigure(i, weight=1)
             if i in (0, 1, 7):
-                lbl.grid(row=0, column=i, padx=0, sticky='w')
+                lbl.grid(row=0, column=i, padx=0, sticky="w")
             else:
                 lbl.grid(row=0, column=i, padx=3, sticky="ew")
-
 
     def apply_test_row(self, test, row) -> None:
         """Creates a row for the test and grids it."""
@@ -117,7 +111,7 @@ class EvaluationDataView(ttk.Frame):
                 textvariable=test.label,
                 validate="focusout",
                 validatecommand=vcmd,
-                width=30
+                width=30,
             )
         )
         # col 2 - duration
@@ -146,20 +140,12 @@ class EvaluationDataView(ttk.Frame):
         # col 4 - obs baseline
         cols.append(
             ttk.Label(
-                self,
-                textvariable=test.observed_baseline,
-                anchor="center",
-                width=5
+                self, textvariable=test.observed_baseline, anchor="center", width=5
             )
         )
         # col 5 - max psi
         cols.append(
-            ttk.Label(
-                self,
-                textvariable=test.max_psi,
-                anchor="center",
-                width=7
-            )
+            ttk.Label(self, textvariable=test.max_psi, anchor="center", width=7)
         )
         # col 6 - clarity
         cols.append(
@@ -172,9 +158,7 @@ class EvaluationDataView(ttk.Frame):
         # col 7 - notes
         cols.append(ttk.Entry(self, textvariable=test.notes, width=30))
         # col 8 - result
-        cols.append(
-            ttk.Label(self, textvariable=test.result, width=5, anchor="center")
-        )
+        cols.append(ttk.Label(self, textvariable=test.result, width=5, anchor="center"))
         # col 9 - include on report
         cols.append(
             ttk.Checkbutton(
@@ -184,7 +168,7 @@ class EvaluationDataView(ttk.Frame):
             )
         )
         # col 10 - delete
-        delete = lambda: self.remove_from_project(test)
+        delete = lambda: self.remove_from_project(test)  # noqa: E731
         cols.append(
             ttk.Button(
                 self,
@@ -197,11 +181,11 @@ class EvaluationDataView(ttk.Frame):
         for i, col in enumerate(cols):
             if i == 0:  # left align the name col
                 col.grid(row=row, column=i, padx=1, pady=1, sticky="w")
-            elif i == 7: # make the notes col stretch
-                col.grid(row=row, column=i, padx=1, pady=1, sticky='ew')
+            elif i == 7:  # make the notes col stretch
+                col.grid(row=row, column=i, padx=1, pady=1, sticky="ew")
             elif i == 10:
-                col.grid(row=row, column=i, padx=(5, 0), pady=1, sticky='e')
-            else:  
+                col.grid(row=row, column=i, padx=(5, 0), pady=1, sticky="e")
+            else:
                 col.grid(row=row, column=i, padx=1, pady=1)
 
     def sort_tests(self) -> None:
@@ -216,7 +200,6 @@ class EvaluationDataView(ttk.Frame):
                 self.blanks.append(test)
             else:
                 self.trials.append(test)
-
 
     def remove_from_project(self, test: Test) -> None:
         """Removes a Test from the parent Project, then rebuilds the UI."""
