@@ -21,12 +21,9 @@ class TestResultRow(ttk.Frame):
         parent: EvaluationTestsFrame,
         test: Test,
         project: Project,
-        test_name_len: int = 0,
     ) -> None:
         super().__init__(parent)
         self.test = test
-        # the immediate parent will be a frame "tests_frame" in the EvaluationFrame
-        # self.master refers to the EvaluationFrame itself
         self.project = project
 
         cols: List[tk.Widget] = []
@@ -71,8 +68,8 @@ class TestResultRow(ttk.Frame):
             ttk.Label(
                 self,
                 textvariable=self.test.observed_baseline,
-                width=parent.baseline_len,
                 anchor="center",
+                width=5
             )
         )
         # col 5 - max psi
@@ -80,8 +77,8 @@ class TestResultRow(ttk.Frame):
             ttk.Label(
                 self,
                 textvariable=self.test.max_psi,
-                width=parent.max_psi_len,
                 anchor="center",
+                width=7
             )
         )
         # col 6 - clarity
@@ -89,7 +86,6 @@ class TestResultRow(ttk.Frame):
             ttk.Label(
                 self,
                 textvariable=self.test.clarity,
-                width=parent.clarity_len,
                 anchor="center",
             )
         )
@@ -120,7 +116,7 @@ class TestResultRow(ttk.Frame):
         for i, col in enumerate(cols):
             if i == 0:  # left align the name col
                 col.grid(row=0, column=i, padx=(3, 1), pady=1, sticky="w")
-            if i == 7:  # make the notes col stretch
+            elif i == 7:  # make the notes col stretch
                 # self.grid_columnconfigure(7, weight=1)
                 col.grid(row=0, column=i, padx=1, pady=1, sticky="ew")
             else:  # defaults for the rest
@@ -130,21 +126,6 @@ class TestResultRow(ttk.Frame):
                     padx=1,
                     pady=1,
                 )
+            # self.grid_columnconfigure(i, weight=1)
 
-    def remove_from_project(self) -> None:
-        """Removes a Test from the parent Project, then tries to rebuild the UI."""
-        msg = (
-            "You are about to delete {} from {}.\n"
-            "This will become permanent once you save the project.\n"
-            "Do you wish to continue?"
-        ).format(self.test.name.get(), self.project.name.get())
-        remove = messagebox.askyesno("Delete test", msg)
-        if remove and self.test in self.project.tests:
-            self.project.tests.remove(self.test)
-            self.master.build()
 
-    def update_score(self, *args) -> True:
-        """Method to call score from a validation callback. Doesn't check anything."""
-        # prevents a race condition when setting the score
-        self.after(1, self.master.score)
-        return True
