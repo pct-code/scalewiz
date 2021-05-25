@@ -4,24 +4,27 @@ Changelog
 All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a
-Changelog <https://keepachangelog.com/en/1.0.0/>`__, and this project
+Changelog <https://keepachangelog.com/en/1.0.0/>`_, and this project
 adheres to `Semantic
-Versioning <https://semver.org/spec/v2.0.0.html>`__.
+Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
-[v0.5.7]
+[unreleased v0.5.7]
 --------
 
 Changed
 ~~~~~~~
 
+- overhaul the :code:`TestHandlerView` to be better oragnized and less bad
+- overhaul the :code:`EvaluationWindow` to be better oragnized and less bad
 - updated :code:`EvaluationFrame` to handle the :code:`Reading` class
 - updated the :code:`Test` object model to handle the :code:`Reading` class
-- overhaul the :code:`TestHandlerView` to be better oragnized and less bad
-- replace all :code:`os.path` operations with fancy :code:`pathlib.Path` operations
+- ensure exported plot dimensions are always uniform
 - minor performance buff to the :code:`LivePlot` component
-- minor performance buffs; using sets/tuples over lists where appropriate/able
-- misc. code cleanup
+- minor performance buffs generally
+- update all :code:`os.path` operations to fancy :code:`pathlib.Path` operations
+- update all :code:`matplotlib` code to use the object oriented API
+- lots of misc. code cleanup
 
 
 [v0.5.6]
@@ -175,6 +178,9 @@ Added
 
 - rinse dialog, accessible from the menu bar
 - help text, accessible from the menu bar
-- get\_resource function for getting resource files. can be used for resources with bundled executables later ### Changed
+- get_resource function for getting resource files. can be used for resources with bundled executables later
+
+Changed
+~~~~~~~
 - reset versioning to v0.1.0
 - moved project loading functionality to menu bar

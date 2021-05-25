@@ -23,13 +23,8 @@ LOGGER: Logger = getLogger("scalewiz")
 class EvaluationDataView(ttk.Frame):
     """A widget for selecting devices."""
 
-    def __init__(
-        self,
-        parent: ttk.Frame,
-        project: Project,
-    ) -> None:
+    def __init__(self, parent: ttk.Frame, project: Project) -> None:
         super().__init__(parent)
-
         self.eval_window = parent.master
         self.project = project
         self.trials: List[Test] = []
@@ -38,6 +33,7 @@ class EvaluationDataView(ttk.Frame):
         self.build()
 
     def build(self) -> None:
+        """Build the UI."""
         for child in self.winfo_children():
             child.destroy()
         self.sort_tests()
@@ -55,7 +51,8 @@ class EvaluationDataView(ttk.Frame):
         for i, trial in enumerate(self.trials):
             self.apply_test_row(trial, i + len_blanks + 4)  # skips rows for headers
 
-    def apply_col_headers(self) -> None:
+    def apply_col_headers(self, row: int = 0) -> None:
+        """Insert header labels on the passed row."""
         labels = []
         labels.append(
             tk.Label(
@@ -89,16 +86,17 @@ class EvaluationDataView(ttk.Frame):
         labels.append(tk.Label(self, text="Notes", font=self.bold_font, anchor="w"))
         labels.append(tk.Label(self, text="Score", font=self.bold_font, anchor="w"))
         labels.append(tk.Label(self, text="On Report", font=self.bold_font, anchor="w"))
+        # extra for del button row
         labels.append(tk.Label(self, text=" ", font=self.bold_font, anchor="w"))
 
         for i, lbl in enumerate(labels):
             self.grid_columnconfigure(i, weight=1)
             if i in (0, 1, 7):
-                lbl.grid(row=0, column=i, padx=0, sticky="w")
+                lbl.grid(row=row, column=i, padx=0, sticky="w")
             else:
-                lbl.grid(row=0, column=i, padx=3, sticky="ew")
+                lbl.grid(row=row, column=i, padx=3, sticky="ew")
 
-    def apply_test_row(self, test, row) -> None:
+    def apply_test_row(self, test: Test, row: int) -> None:
         """Creates a row for the test and grids it."""
         cols: List[tk.Widget] = []
         vcmd = self.register(self.update_score)
@@ -168,11 +166,10 @@ class EvaluationDataView(ttk.Frame):
             )
         )
         # col 10 - delete
-        delete = lambda: self.remove_from_project(test)  # noqa: E731
         cols.append(
             ttk.Button(
                 self,
-                command=delete,
+                command=lambda: self.remove_from_project(test),  # noqa: E731
                 text="Delete",
                 width=7,
             )
@@ -189,9 +186,7 @@ class EvaluationDataView(ttk.Frame):
                 col.grid(row=row, column=i, padx=1, pady=1)
 
     def sort_tests(self) -> None:
-        """
-        Sort through the editor_project, populating the lists of blanks and trials.
-        """
+        """Sort through the project, populating the lists of blanks and trials."""
         self.blanks.clear()
         self.trials.clear()
 
@@ -215,7 +210,7 @@ class EvaluationDataView(ttk.Frame):
             self.build()
 
     def update_score(self, *args) -> True:
-        """Method to call score from a validation callback. Doesn't check anything."""
+        """Calls score from a validation callback. Doesn't check anything."""
         # prevents a race condition when setting the score
         self.after(0, score(self.project, self.eval_window.log_text))
         return True

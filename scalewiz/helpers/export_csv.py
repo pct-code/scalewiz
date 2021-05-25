@@ -4,15 +4,19 @@ import json
 import logging
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pandas import DataFrame
 
 from scalewiz.models.project import Project
 
+if TYPE_CHECKING:
+    from typing import Tuple
+
 LOGGER = logging.getLogger("scalewiz")
 
 
-def export_csv(project: Project) -> None:
+def export_csv(project: Project) -> Tuple[int, Path]:
     """Generates a report for a Project in a flattened CSV format (or ugly JSON)."""
     start_time = time.time()
     LOGGER.info("Beginning export of %s", project.name.get())
@@ -87,3 +91,8 @@ def export_csv(project: Project) -> None:
         project.output_format.get(),
         round(time.time() - start_time, 3),
     )
+
+    if out.is_file:
+        return 0, out
+    else:
+        return 1, out

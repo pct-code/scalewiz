@@ -111,7 +111,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
 
 
 def to_log(log: list[str], log_widget: ScrolledText) -> None:
-    """Adds the passed log message to the Text widget in the Calculations frame."""
+    """Adds the passed log message to the passed Text widget."""
     if log_widget.winfo_exists():
         log_widget.configure(state="normal")
         log_widget.delete(1.0, "end")
