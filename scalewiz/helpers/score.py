@@ -102,10 +102,6 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         log.append(f"Result: {result} \n")
         trial.result.set(f"{result:.2f}")
 
-    log.insert(
-        0,
-    )
-
     if isinstance(log_widget, tk.Text):
         to_log(log, log_widget)
 

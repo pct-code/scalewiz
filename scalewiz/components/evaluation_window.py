@@ -52,7 +52,8 @@ class EvaluationWindow(tk.Toplevel):
         if Path(self.handler.project.path.get()).is_file:
             self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
-        self.fig, self.axis, self.canvas = None, None, None
+        self.fig, self.axis, self.canvas = None, None, None  # matplotlib stuff
+        self.log_text: ScrolledText = None
         self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
         self.title(f"{self.handler.name} {self.handler.project.name.get()}")
         self.resizable(0, 0)
@@ -129,8 +130,7 @@ class EvaluationWindow(tk.Toplevel):
         with plt.style.context("bmh"):
             mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLORS)
             self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-            self.axis.set_facecolor("w")
-            self.axis.clear()
+            self.axis.set_facecolor("w")  # white
 
             # plot blanks
             for blank in self.editor_project.tests:

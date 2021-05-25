@@ -1,17 +1,16 @@
 """A function for exporting a representation of a Project as CSV."""
 
+from __future__ import annotations
+
 import json
 import logging
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import Tuple
 
 from pandas import DataFrame
 
 from scalewiz.models.project import Project
-
-if TYPE_CHECKING:
-    from typing import Tuple
 
 LOGGER = logging.getLogger("scalewiz")
 

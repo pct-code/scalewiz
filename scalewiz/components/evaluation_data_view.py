@@ -13,9 +13,9 @@ from scalewiz.helpers.score import score
 if TYPE_CHECKING:
     from typing import List
 
+    from scalewiz.components.evaluation_window import EvaluationWindow
     from scalewiz.models.project import Project
     from scalewiz.models.test import Test
-
 
 LOGGER: Logger = getLogger("scalewiz")
 
@@ -25,7 +25,7 @@ class EvaluationDataView(ttk.Frame):
 
     def __init__(self, parent: ttk.Frame, project: Project) -> None:
         super().__init__(parent)
-        self.eval_window = parent.master
+        self.eval_window: EvaluationWindow = parent.master
         self.project = project
         self.trials: List[Test] = []
         self.blanks: List[Test] = []
@@ -50,6 +50,7 @@ class EvaluationDataView(ttk.Frame):
         trials_lbl.grid(row=len_blanks + 3, sticky="w")  # skips rows for headers
         for i, trial in enumerate(self.trials):
             self.apply_test_row(trial, i + len_blanks + 4)  # skips rows for headers
+        self.update_score()
 
     def apply_col_headers(self, row: int = 0) -> None:
         """Insert header labels on the passed row."""
@@ -213,4 +214,5 @@ class EvaluationDataView(ttk.Frame):
         """Calls score from a validation callback. Doesn't check anything."""
         # prevents a race condition when setting the score
         self.after(0, score(self.project, self.eval_window.log_text))
+        self.after(0, self.eval_window.plot)
         return True
