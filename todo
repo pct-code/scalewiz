@@ -1,6 +1,7 @@
 bugs
 ----
 
+- no bugs! i think
 
 done
 ~~~~
@@ -9,7 +10,7 @@ done
     - this may be a recently introduced bug from matplotlib itself
     - may need to open an issue upstream if it isn't my fault
     related:
-        - current calls to matplotlib api (LivePlot.plot, EvaluationFrame.plot) are messy
+        - current calls to matplotlib api (EvaluationWindow.plot) are messy
 
 refactoring
 -----------
@@ -18,7 +19,6 @@ refactoring
 
 done
 ~~~~
-
 
 - TestHandlerView refactor is pretty much done
     - [fixed?] the LivePlot seems to not get rebuilt after a test ends
@@ -41,3 +41,4 @@ low prio
 - check for config missing keys ?
 - check the start button disabling
 - color cycle for config / projects
+- the score function could be hooked up to poll from a logging queue, perhaps overkill

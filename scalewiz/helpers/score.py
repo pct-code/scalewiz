@@ -2,6 +2,7 @@
 """
 from __future__ import annotations
 
+import tkinter as tk
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,13 +12,14 @@ if TYPE_CHECKING:
     from scalewiz.models.project import Project
 
 
-def score(project: Project, log_widget: ScrolledText, *args) -> None:
+def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
     """Updates the result for every Test in the Project.
 
     Accepts event args passed from the tkVar trace.
     """
-    # extra unused args are passed in by tkinter
+    # extra unused args may be passed in by tkinter
     log: List[str] = []
+    log.append(f"Evaluating results for {project.name.get()}...")
     # scoring props
     limit_minutes = project.limit_minutes.get()
     interval_seconds = project.interval_seconds.get()
@@ -36,7 +38,7 @@ def score(project: Project, log_widget: ScrolledText, *args) -> None:
     for test in project.tests:
         if test.is_blank.get() and test.include_on_report.get():
             blanks.append(test)
-    if len(blanks) < 1:
+    if len(blanks) < 1:  # this is bad enough to stop us, could check earlier ..?
         return
 
     areas_over_blanks = []
@@ -100,8 +102,12 @@ def score(project: Project, log_widget: ScrolledText, *args) -> None:
         log.append(f"Result: {result} \n")
         trial.result.set(f"{result:.2f}")
 
-    log.insert(0, f"Evaluating results for {project.name.get()}...")
-    to_log(log, log_widget)
+    log.insert(
+        0,
+    )
+
+    if isinstance(log_widget, tk.Text):
+        to_log(log, log_widget)
 
 
 def to_log(log: list[str], log_widget: ScrolledText) -> None:
