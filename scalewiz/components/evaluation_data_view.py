@@ -8,6 +8,7 @@ from tkinter import messagebox, ttk
 from tkinter.font import Font
 from typing import TYPE_CHECKING
 
+from scalewiz.components.evaluation_plot_view import EvaluationPlotView
 from scalewiz.helpers.score import score
 
 if TYPE_CHECKING:
@@ -101,16 +102,7 @@ class EvaluationDataView(ttk.Frame):
         vcmd = self.register(self.update_score)
         # col 0 - name
         cols.append(ttk.Label(self, textvariable=test.name))
-        # # col 1 - label
-        # cols.append(
-        #     ttk.Entry(
-        #         self,
-        #         textvariable=test.label,
-        #         validate="focusout",
-        #         validatecommand=vcmd,
-        #         width=25,
-        #     )
-        # )
+
         # col 2 - duration
         duration = round(
             len(test.readings) * self.project.interval_seconds.get() / 60, 2
@@ -179,7 +171,7 @@ class EvaluationDataView(ttk.Frame):
                 col.grid(row=row, column=i, padx=1, pady=1, sticky="w")
             elif i == 7:  # make the notes col stretch
                 col.grid(row=row, column=i, padx=1, pady=1, sticky="ew")
-            elif i == 10:
+            elif i == 10:  # right align the delete buttons
                 col.grid(row=row, column=i, padx=(5, 0), pady=1, sticky="e")
             else:
                 col.grid(row=row, column=i, padx=1, pady=1)
@@ -212,5 +204,6 @@ class EvaluationDataView(ttk.Frame):
         """Calls score from a validation callback. Doesn't check anything."""
         # prevents a race condition when setting the score
         self.after(0, score(self.project, self.eval_window.log_text))
-        self.after(0, self.eval_window.plot)
+        if isinstance(self.eval_window.plot_view, EvaluationPlotView):
+            self.after(0, self.eval_window.plot_view.update_plot)
         return True

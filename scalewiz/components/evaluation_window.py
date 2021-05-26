@@ -104,7 +104,8 @@ class EvaluationWindow(tk.Toplevel):
         """Saves to file the project, most recent plot, and calculations log."""
         if self.handler.is_running:
             messagebox.showwarning(
-                "Can't save right now", "Can't save while a Test is running"
+                "Can't save to this Project right now",
+                "Can't save while a Test in this Project is running",
             )
             return
 

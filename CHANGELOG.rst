@@ -10,21 +10,30 @@ Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
 [unreleased v0.5.7]
---------
+--------------------
 
 Changed
 ~~~~~~~
 
+User experience concerns
+
 - overhaul the :code:`TestHandlerView` to be better oragnized and less bad
 - overhaul the :code:`EvaluationWindow` to be better oragnized and less bad
-- updated :code:`EvaluationFrame` to handle the :code:`Reading` class
+- setting labels for each :code:`Test` is now handled in the :code:`EvaluationWindow`s' "Plot" tab
+- updated docs to reflect the above
+
+Coding concerns
+
 - updated the :code:`Test` object model to handle the :code:`Reading` class
-- ensure exported plot dimensions are always uniform
+- updated :code:`score` function to handle the :code:`Reading` class
+- updated the :code:`Project` object model to be more backwards compatible
+- updated the :code:`TestHandler` to be more robust when generating log files
+- ensured exported plot dimensions are always uniform
 - minor performance buff to the :code:`LivePlot` component
 - minor performance buffs generally
 - update all :code:`os.path` operations to fancy :code:`pathlib.Path` operations
 - update all :code:`matplotlib` code to use the object oriented API
-- lots of misc. code cleanup
+- lots of misc. code cleanup / reorganizing
 
 
 [v0.5.6]

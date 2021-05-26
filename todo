@@ -1,28 +1,16 @@
+todo
+----
+
+- new screenshots of eval window / plot for docs
+- implement a singleton pattern for dealing with the handler/editor_project desync ?
+
 bugs
 ----
 
-- no bugs! i think
-
-done
-~~~~
-
-- the LivePlot currently seems rather unreliable
-    - this may be a recently introduced bug from matplotlib itself
-    - may need to open an issue upstream if it isn't my fault
-    related:
-        - current calls to matplotlib api (EvaluationWindow.plot) are messy
+- eval window save only actually rebuilds every other time ?
 
 refactoring
 -----------
-
-- eval window only needs plot calls fixed to OOP style now
-
-done
-~~~~
-
-- TestHandlerView refactor is pretty much done
-    - [fixed?] the LivePlot seems to not get rebuilt after a test ends
-    - [fixed?] we still need to disable all the entries while a test is running
 
 - we have a dep. on Pandas for one little call in export_csv -- could be worked around
 
@@ -39,6 +27,5 @@ low prio
 
 - port over the old chlorides / ppm calculators
 - check for config missing keys ?
-- check the start button disabling
 - color cycle for config / projects
 - the score function could be hooked up to poll from a logging queue, perhaps overkill

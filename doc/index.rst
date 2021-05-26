@@ -87,7 +87,10 @@ Blanks
 ~~~~~~
 
 If you are running a blank, enter a name for it. The notes field may be
-used to store any other relevant information. |trial entry|
+used to store any other relevant information.
+
+ .. image:: ../img/main_menu(blank).PNG
+    :alt: blank entry
 
 Trials
 ~~~~~~
@@ -130,9 +133,11 @@ Rinses
 Between each test, it is necessary to rinse the system. Clicking 'Rinse'
 from the menu bar will create a small dialog that can do this for you.
 
-|rinse dialog|
+.. image:: ../img/rinse_dialog.PNG
+   :alt: rinse dialog
 
-|rinse dialog in progress|
+.. image:: ../img/rinse_dialog(rinsing).PNG
+   :alt: rinse dialog in progress
 
 The button will temporarily disable while acting as a status label to
 show the progression of the rinse. Closing the dialog will terminate the
@@ -149,23 +154,25 @@ Click 'Evaluation' from the menu bar to open the Evalutaion Window.
 The data for each test in the project will be displayed horizontally as
 a row.
 
--  Report As: what to call the test on the plot
--  Minutes: the duration of the test, (# of measurements)
+-  Minutes: the duration of the test
 -  Pump: which series of pressure measurements to use for scoring
--  Baseline: the observed baseline pressure for the selected Pump
--  Max: the highest pressure observed for the selected Pump
+-  Baseline PSI: the observed baseline pressure for the selected Pump
+-  Max PSI: the highest pressure observed for the selected Pump
 -  Clarity: the observed water clarity
--  Notes: any misc. info associated with the test. may be edited at any
-   time
--  Result: the test's score, considering the selected Pump
--  Report: a checkbox for indicating whether or not a test should be
-   included on the report
+-  Notes: any misc. info associated with the test.
+-  Result: the test's score, considering the selected Pump and blanks on report
+-  Report: a checkbox for indicating whether or not a test should be included on the report
+
+.. note::
+
+   Blanks will only be factored into the scoring process if marked as 'On Report'
+
 
 Plot
 ~~~~
 
-The 'Plot' tab displays the most recent plot of all tests with a ticked
-'Include on Report' box.
+The 'Plot' tab displays the most recent plot of all tests with a ticked 'Include on Report' box.
+You can change the Label associated with each test using the entries on the right.
 
 .. image:: ../img/evaluation(plot).PNG
    :alt: plot frame with some data
@@ -195,7 +202,3 @@ tab will appear on the main menu, and can be used normally.
 At the time of writing, a particular project may only be loaded to one
 system at a time. Loading the same project to more than one system may
 result in data loss.
-
-.. |trial entry| image:: ../img/main_menu(blank).PNG
-.. |rinse dialog| image:: ../img/rinse_dialog.PNG
-.. |rinse dialog in progress| image:: ../img/rinse_dialog(rinsing).PNG
