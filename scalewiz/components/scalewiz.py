@@ -7,8 +7,8 @@ from logging.handlers import QueueHandler
 from queue import Queue
 from tkinter import font, ttk
 
-from scalewiz.components.log_window import LogWindow
-from scalewiz.components.main_frame import MainFrame
+from scalewiz.components.scalewiz_log_window import LogWindow
+from scalewiz.components.scalewiz_main_frame import MainFrame
 from scalewiz.helpers.set_icon import set_icon
 
 

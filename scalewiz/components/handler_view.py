@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING
 
 from matplotlib import pyplot as plt
 
-from scalewiz.components.devices_comboboxes import DeviceBoxes
-from scalewiz.components.live_plot import LivePlot
-from scalewiz.components.test_controls import TestControls
-from scalewiz.components.test_info_widget import TestInfo
+from scalewiz.components.handler_view_controls import TestControls
+from scalewiz.components.handler_view_devices import DeviceBoxes
+from scalewiz.components.handler_view_info import TestInfo
+from scalewiz.components.handler_view_plot import LivePlot
 
 if TYPE_CHECKING:
 
