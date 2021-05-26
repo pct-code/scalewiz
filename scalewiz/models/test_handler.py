@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING
 
 from py_hplc import NextGenPump
 
-from scalewiz.components.test_handler_view import TestHandlerView
+from scalewiz.components.evaluation_data_view import LOGGER
+from scalewiz.components.handler_view import TestHandlerView
 from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
 
@@ -309,6 +310,10 @@ class TestHandler:
             logs_dir = parent_dir.joinpath("logs").resolve()
             if not logs_dir.is_dir:
                 logs_dir.mkdir()
+                if logs_dir.is_dir:
+                    LOGGER.info("Made a new logs directory at %s", logs_dir)
+                else:
+                    LOGGER.warn("Failed to make a new logs dir at %s", logs_dir)
             log_path = Path(logs_dir).joinpath(log_file).resolve()
             self.log_handler = FileHandler(log_path)
         except Exception as err:  # bad path chars from user can bug here

@@ -35,7 +35,7 @@ class EvaluationDataView(ttk.Frame):
     def build(self) -> None:
         """Build the UI."""
         for child in self.winfo_children():
-            child.destroy()
+            self.after(0, child.destroy)
         self.sort_tests()
 
         self.apply_col_headers()  # row 0
@@ -63,9 +63,7 @@ class EvaluationDataView(ttk.Frame):
                 anchor="w",
             )
         )
-        labels.append(
-            tk.Label(self, text="Label", font=self.bold_font, width=20, anchor="w")
-        )
+
         labels.append(
             tk.Label(
                 self,
@@ -103,16 +101,16 @@ class EvaluationDataView(ttk.Frame):
         vcmd = self.register(self.update_score)
         # col 0 - name
         cols.append(ttk.Label(self, textvariable=test.name))
-        # col 1 - label
-        cols.append(
-            ttk.Entry(
-                self,
-                textvariable=test.label,
-                validate="focusout",
-                validatecommand=vcmd,
-                width=25,
-            )
-        )
+        # # col 1 - label
+        # cols.append(
+        #     ttk.Entry(
+        #         self,
+        #         textvariable=test.label,
+        #         validate="focusout",
+        #         validatecommand=vcmd,
+        #         width=25,
+        #     )
+        # )
         # col 2 - duration
         duration = round(
             len(test.readings) * self.project.interval_seconds.get() / 60, 2

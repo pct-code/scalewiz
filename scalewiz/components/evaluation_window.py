@@ -9,13 +9,10 @@ from tkinter import messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 from typing import TYPE_CHECKING
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure, SubplotParams
-from matplotlib.ticker import MultipleLocator
 
 from scalewiz.components.evaluation_data_view import EvaluationDataView
+from scalewiz.components.evaluation_plot_view import EvaluationPlotView
 from scalewiz.helpers.export_csv import export_csv
 from scalewiz.helpers.score import score
 from scalewiz.helpers.set_icon import set_icon
@@ -25,19 +22,6 @@ if TYPE_CHECKING:
 
     from scalewiz.models.test_handler import TestHandler
 
-
-COLORS = (
-    "orange",
-    "blue",
-    "red",
-    "mediumseagreen",
-    "darkgoldenrod",
-    "indigo",
-    "mediumvioletred",
-    "darkcyan",
-    "maroon",
-    "darkslategrey",
-)
 
 LOGGER = getLogger("scalewiz")
 
@@ -54,7 +38,7 @@ class EvaluationWindow(tk.Toplevel):
         # matplotlib uses these later
         self.fig, self.axis, self.canvas = None, None, None  # matplotlib stuff
         self.log_text: ScrolledText = None
-        self.plot_frame: ttk.Frame = None  # this gets destroyed in plot()
+        self.plot_view: EvaluationPlotView = None  # this gets destroyed in plot()
         self.title(f"{self.handler.name} {self.handler.project.name.get()}")
         self.resizable(0, 0)
         set_icon(self)
@@ -71,7 +55,7 @@ class EvaluationWindow(tk.Toplevel):
             self.editor_project.load_json(self.handler.project.path.get())
 
         for child in self.winfo_children():
-            child.destroy()
+            self.after(0, child.destroy)
 
         self.grid_columnconfigure(0, weight=1)
         # we will build a few tabs in this
@@ -110,61 +94,12 @@ class EvaluationWindow(tk.Toplevel):
 
     def plot(self) -> None:
         """Destroys the old plot frame if it exists, then makes a new one."""
-        # close all pyplots to prevent memory leak
-        if isinstance(self.fig, Figure):
-            plt.close(self.fig)
-        # get rid of our old plot tab
-        if isinstance(self.plot_frame, ttk.Frame):
-            self.plot_frame.destroy()
+        if isinstance(self.plot_view, EvaluationPlotView):
+            plt.close(self.plot_view.fig)
+            self.plot_view.destroy()
 
-        self.plot_frame = ttk.Frame(self.tab_control, name="plot_frame")
-        self.fig, self.axis = plt.subplots(
-            figsize=(7.5, 4),
-            dpi=100,
-            subplotpars=SubplotParams(wspace=0, hspace=0),
-        )
-        self.fig.patch.set_facecolor("#FAFAFA")
-        # plt.subplots_adjust(wspace=0, hspace=0)
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
-        self.canvas.get_tk_widget().pack(fill="none", expand=False)
-        with plt.style.context("bmh"):
-            mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLORS)
-            self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-            self.axis.set_facecolor("w")  # white
-
-            # plot blanks
-            for blank in self.editor_project.tests:
-                if blank.is_blank.get() and blank.include_on_report.get():
-                    elapsed = []
-                    for reading in blank.readings:
-                        elapsed.append(reading.elapsedMin)
-                    self.axis.plot(
-                        elapsed,
-                        blank.get_readings(),
-                        label=blank.label.get(),
-                        linestyle=("-."),
-                    )
-            # then plot trials
-            for trial in self.editor_project.tests:
-                if trial.include_on_report.get() and not trial.is_blank.get():
-                    elapsed = []
-                    for reading in trial.readings:
-                        elapsed.append(reading.elapsedMin)
-                    self.axis.plot(
-                        elapsed, trial.get_readings(), label=trial.label.get()
-                    )
-
-            self.axis.set_xlabel("Time (min)")
-            self.axis.set_ylabel("Pressure (psi)")
-            self.axis.set_ylim(top=self.editor_project.limit_psi.get())
-            self.axis.yaxis.set_major_locator(MultipleLocator(100))
-            self.axis.set_xlim((0, self.editor_project.limit_minutes.get()))
-            self.axis.legend(loc="best")
-            self.axis.margins(0)
-
-        # finally, add to parent control
-        self.tab_control.add(self.plot_frame, text="   Plot   ")
-        self.tab_control.insert("end", self.plot_frame)
+        self.plot_view = EvaluationPlotView(self.tab_control, self.editor_project)
+        self.tab_control.add(self.plot_view, text="   Plot   ")
 
     def save(self) -> None:
         """Saves to file the project, most recent plot, and calculations log."""

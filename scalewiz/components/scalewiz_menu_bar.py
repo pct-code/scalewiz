@@ -8,8 +8,8 @@ from pathlib import Path
 from tkinter.messagebox import showinfo
 
 from scalewiz.components.evaluation_window import EvaluationWindow
-from scalewiz.components.project_window import ProjectWindow
-from scalewiz.components.rinse_window import RinseWindow
+from scalewiz.components.project_editor import ProjectWindow
+from scalewiz.components.scalewiz_rinse_window import RinseWindow
 from scalewiz.helpers.show_help import show_help
 
 LOGGER = logging.getLogger("scalewiz")

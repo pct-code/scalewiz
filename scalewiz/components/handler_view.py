@@ -35,7 +35,7 @@ class TestHandlerView(ttk.Frame):
         if isinstance(self.plot, LivePlot):  # explicityly close to prevent memory leak
             self.after(0, plt.close, self.plot.fig)
         for child in self.winfo_children():
-            child.destroy()
+            self.after(0, child.destroy)
         self.grid_columnconfigure(0, weight=1)
         # row 0 ------------------------------------------------------------------------
         dev_ent = DeviceBoxes(self, self.handler)

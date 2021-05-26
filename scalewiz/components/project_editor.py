@@ -7,9 +7,9 @@ from pathlib import Path
 from tkinter import filedialog, ttk
 from typing import TYPE_CHECKING
 
-from scalewiz.components.project_info import ProjectInfo
-from scalewiz.components.project_params import ProjectParams
-from scalewiz.components.project_report import ProjectReport
+from scalewiz.components.project_editor_info import ProjectInfo
+from scalewiz.components.project_editor_params import ProjectParams
+from scalewiz.components.project_editor_report import ProjectReport
 from scalewiz.helpers.configuration import open_config
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
@@ -46,7 +46,7 @@ class ProjectWindow(tk.Toplevel):
             self.editor_project.load_json(self.handler.project.path.get())
 
         for child in self.winfo_children():
-            child.destroy()
+            self.after(0, child.destroy)
 
         self.winfo_toplevel().resizable(0, 0)
         self.grid_columnconfigure(0, weight=1)

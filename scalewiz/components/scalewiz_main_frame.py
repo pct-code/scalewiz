@@ -4,8 +4,8 @@
 import logging
 from tkinter import ttk
 
-from scalewiz.components.menu_bar import MenuBar
-from scalewiz.components.test_handler_view import TestHandlerView
+from scalewiz.components.handler_view import TestHandlerView
+from scalewiz.components.scalewiz_menu_bar import MenuBar
 from scalewiz.helpers.configuration import get_config
 from scalewiz.models.test_handler import TestHandler
 
