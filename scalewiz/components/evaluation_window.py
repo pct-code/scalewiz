@@ -102,6 +102,12 @@ class EvaluationWindow(tk.Toplevel):
 
     def save(self) -> None:
         """Saves to file the project, most recent plot, and calculations log."""
+        if self.handler.is_running:
+            messagebox.showwarning(
+                "Can't save right now", "Can't save while a Test is running"
+            )
+            return
+
         # update image
         plot_output = (
             f"{self.editor_project.numbers.get().replace(' ', '')} "
