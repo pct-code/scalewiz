@@ -36,7 +36,6 @@ class EvaluationWindow(tk.Toplevel):
         if Path(self.handler.project.path.get()).is_file:
             self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
-        self.fig, self.axis, self.canvas = None, None, None  # matplotlib stuff
         self.log_text: ScrolledText = None
         self.plot_view: EvaluationPlotView = None  # this gets destroyed in plot()
         self.title(f"{self.handler.name} {self.handler.project.name.get()}")
@@ -111,7 +110,7 @@ class EvaluationWindow(tk.Toplevel):
         )
         parent_dir = Path(self.editor_project.path.get()).parent
         plot_output = Path(parent_dir, plot_output).resolve()
-        self.fig.savefig(plot_output)
+        self.plot_view.fig.savefig(plot_output)
         self.editor_project.plot.set(str(plot_output))
         # update log
         log_output = (
