@@ -72,6 +72,10 @@ class TestInfo(ttk.Frame):
             # test_frm row 1 -----------------------------------------------------------
             notes_lbl = ttk.Label(test_frm, text="Notes:", anchor="e")
             notes_lbl.grid(row=1, column=0, sticky="ew")
+            if self.handler.is_running or not self.handler.is_done:
+                state = "normal"
+            else:
+                state = "disabled"
             notes_ent = ttk.Entry(
                 test_frm, textvariable=self.handler.test.notes, state=state
             )

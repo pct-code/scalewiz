@@ -75,22 +75,23 @@ class EvaluationWindow(tk.Toplevel):
 
         self.grid_columnconfigure(0, weight=1)
         # we will build a few tabs in this
-        self.tab_control = ttk.Notebook(self)
+        self.tab_control = ttk.Notebook(self, name="tab_control")
         self.tab_control.grid(row=0, column=0)
 
         data_view = EvaluationDataView(self.tab_control, self.editor_project)
         self.tab_control.add(data_view, text="   Data   ")
 
         # plot stuff ----------------------------------------------------------
-        self.plot()
 
         # evaluation stuff ----------------------------------------------------
-        log_frame = ttk.Frame(self)
-        log_frame.grid_columnconfigure(0, weight=1)
-        self.log_text = ScrolledText(log_frame, background="white", state="disabled")
-        self.log_text.grid(sticky="ew")
-        self.tab_control.add(log_frame, text="   Calculations   ")
-
+        self.log_frame = ttk.Frame(self.tab_control, name="log_frame")
+        self.log_frame.grid_columnconfigure(0, weight=1)
+        self.log_text = ScrolledText(
+            self.log_frame, background="white", state="disabled", name="log_text"
+        )
+        self.log_text.grid(sticky="nsew")
+        self.tab_control.add(self.log_frame, text="   Calculations   ")
+        self.plot()
         # finished adding to tab control
 
         button_frame = ttk.Frame(self)
@@ -116,11 +117,10 @@ class EvaluationWindow(tk.Toplevel):
         if isinstance(self.plot_frame, ttk.Frame):
             self.plot_frame.destroy()
 
-        self.plot_frame = ttk.Frame(self)
+        self.plot_frame = ttk.Frame(self.tab_control, name="plot_frame")
         self.fig, self.axis = plt.subplots(
             figsize=(7.5, 4),
             dpi=100,
-            constrained_layout=True,
             subplotpars=SubplotParams(wspace=0, hspace=0),
         )
         self.fig.patch.set_facecolor("#FAFAFA")
@@ -164,7 +164,7 @@ class EvaluationWindow(tk.Toplevel):
 
         # finally, add to parent control
         self.tab_control.add(self.plot_frame, text="   Plot   ")
-        self.tab_control.insert(1, self.plot_frame)
+        self.tab_control.insert("end", self.plot_frame)
 
     def save(self) -> None:
         """Saves to file the project, most recent plot, and calculations log."""

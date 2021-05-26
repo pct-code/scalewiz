@@ -293,11 +293,12 @@ class TestHandler:
         for widget in self.editors:
             if widget.winfo_exists():
                 self.logger.debug("Rebuilding %s", widget)
-                widget.build(reload=True)
+                widget.after(0, widget.build, True)
             else:  # clean up as we go
                 self.editors.remove(widget)
         if isinstance(self.view, TestHandlerView):
             self.view.after(0, self.view.build)
+
         self.logger.info("Rebuilt all view widgets")
 
     def update_log_handler(self, issues: List[str]) -> None:

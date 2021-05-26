@@ -110,7 +110,7 @@ class EvaluationDataView(ttk.Frame):
                 textvariable=test.label,
                 validate="focusout",
                 validatecommand=vcmd,
-                width=30,
+                width=25,
             )
         )
         # col 2 - duration
@@ -155,7 +155,7 @@ class EvaluationDataView(ttk.Frame):
             )
         )
         # col 7 - notes
-        cols.append(ttk.Entry(self, textvariable=test.notes, width=30))
+        cols.append(ttk.Entry(self, textvariable=test.notes, width=25))
         # col 8 - result
         cols.append(ttk.Label(self, textvariable=test.result, width=5, anchor="center"))
         # col 9 - include on report

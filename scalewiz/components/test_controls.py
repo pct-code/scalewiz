@@ -29,15 +29,12 @@ class TestControls(ttk.Frame):
         # row 0 col 0
         start_btn = ttk.Button(self)
         if self.handler.is_done and not self.handler.is_running:
-            LOGGER.warn("building enabled new")
             start_btn.configure(text="New", command=self.handler.new_test)
         elif self.handler.is_running and not self.handler.is_done:
-            LOGGER.warn("building disabled new")
             start_btn.configure(
                 text="New", command=self.handler.new_test, state="disabled"
             )
         else:
-            LOGGER.warn("building enabled start")
             start_btn.configure(text="Start", command=self.handler.start_test)
         start_btn.grid(row=0, column=0, sticky="ew")
         # row 0 col 1

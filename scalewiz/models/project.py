@@ -159,7 +159,7 @@ class Project:
                 obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
-        if path != obj.get("info").get("path"):
+        if str(path) != obj.get("info").get("path"):
             LOGGER.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )
