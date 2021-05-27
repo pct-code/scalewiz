@@ -89,7 +89,7 @@ class Project:
     def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
         if path is None:
-            path = self.path.get()
+            path = Path(self.path.get())
 
         blanks = [test for test in self.tests if test.is_blank.get()]
         trials = [test for test in self.tests if not test.is_blank.get()]
@@ -143,12 +143,14 @@ class Project:
             "outputFormat": self.output_format.get(),
             "plot": str(Path(self.plot.get()).resolve()),
         }
-
-        with Path(path).open("w") as file:
-            json.dump(this, file, indent=4)
-        LOGGER.info("Saved %s to %s", self.name.get(), path)
-        update_config("recents", "analyst", self.analyst.get())
-        update_config("recents", "project", self.path.get())
+        try:
+            with Path(path).open("w") as file:
+                json.dump(this, file, indent=4)
+            LOGGER.info("Saved %s to %s", self.name.get(), path)
+            update_config("recents", "analyst", self.analyst.get())
+            update_config("recents", "project", str(Path(self.path.get()).resolve()))
+        except Exception as err:
+            LOGGER.exception(err)
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
