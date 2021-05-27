@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING
 
 from py_hplc import NextGenPump
 
-from scalewiz.components.evaluation_data_view import LOGGER
 from scalewiz.components.handler_view import TestHandlerView
 from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
@@ -62,10 +61,10 @@ class TestHandler:
         """Returns a bool indicating whether or not the test can run."""
         return (
             (
-                self.max_psi_1 <= self.project.limit_psi.get()
-                or self.max_psi_2 <= self.project.limit_psi.get()
+                self.max_psi_1 < self.project.limit_psi.get()
+                or self.max_psi_2 < self.project.limit_psi.get()
             )
-            and self.elapsed_min <= self.project.limit_minutes.get()
+            and self.elapsed_min < self.project.limit_minutes.get()
             and self.readings.qsize() < self.max_readings
             and not self.stop_requested.is_set()
         )
@@ -140,7 +139,7 @@ class TestHandler:
                 minutes_elapsed, psi1, psi2, average
             )
             self.log_queue.put(msg)
-            self.logger.info(msg)
+            self.logger.debug(msg)
 
             self.readings.put(reading)
             self.elapsed_min = minutes_elapsed
@@ -238,7 +237,11 @@ class TestHandler:
             "saved %s readings to %s", len(self.test.readings), self.test.name.get()
         )
         self.project.tests.append(self.test)
-        self.project.dump_json()
+        try:
+            self.project.dump_json()
+        except Exception as err:
+            self.logger.exception(err)
+
         # refresh data / UI
         self.load_project(path=self.project.path.get(), new_test=False)
         self.rebuild_views()
@@ -263,10 +266,6 @@ class TestHandler:
             logs_dir = parent_dir.joinpath("logs").resolve()
             if not logs_dir.is_dir():
                 logs_dir.mkdir()
-                if logs_dir.is_dir():
-                    LOGGER.info("Made a new logs directory at %s", logs_dir)
-                else:
-                    LOGGER.warn("Failed to make a new logs dir at %s", logs_dir)
             log_path = Path(logs_dir).joinpath(log_file).resolve()
             self.log_handler = FileHandler(log_path)
         except Exception as err:  # bad path chars from user can bug here
