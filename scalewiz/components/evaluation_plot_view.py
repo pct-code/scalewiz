@@ -50,14 +50,15 @@ class EvaluationPlotView(ttk.Frame):
 
     def build(self) -> None:
         """Builds the UI."""
-
-        # close all pyplots to prevent memory leak
         if isinstance(self.fig, Figure):
             self.after(0, plt.close, self.fig)
-        # get rid of our old plot tab
 
         for child in self.winfo_children():
-            self.after(0, child.destroy)
+            LOGGER.warn("looking @ %s", child)
+            if child.winfo_exists():
+                LOGGER.warn("destroying %s", child)
+                self.after(0, child.destroy)
+                LOGGER.warn("%s exists %s", child, child.winfo_exists())
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)

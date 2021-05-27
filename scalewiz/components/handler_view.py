@@ -33,7 +33,7 @@ class TestHandlerView(ttk.Frame):
 
     def build(self, *args) -> None:
         """Builds the UI, destroying any currently existing widgets."""
-        if isinstance(self.plot, LivePlot):  # explicityly close to prevent memory leak
+        if isinstance(self.plot, LivePlot):  # explicitly close to prevent memory leak
             self.after(0, plt.close, self.plot.fig)
         for child in self.winfo_children():
             self.after(0, child.destroy)

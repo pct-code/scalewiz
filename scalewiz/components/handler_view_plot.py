@@ -44,29 +44,26 @@ class LivePlot(ttk.Frame):
     def animate(self, interval: float) -> None:
         """Animates the live plot if a test isn't running.
 
-        The interval argument is used by matplotlib internally
+        The interval argument is used by matplotlib internally.
         """
         # we can just skip this if the test isn't running
         if self.handler.is_running and not self.handler.is_done:
-            if self.handler.readings.qsize() > 0:
-                LOGGER.debug("%s: Drawing a new plot ...", self.handler.name)
-                pump1 = []
-                pump2 = []
-                elapsed = []  # we will share this series as an axis
-                readings = tuple(self.handler.readings.queue)
-                for reading in readings:
-                    pump1.append(reading.pump1)
-                    pump2.append(reading.pump2)
-                    elapsed.append(reading.elapsedMin)
-                max_psi = max((self.handler.max_psi_1, self.handler.max_psi_2))
-                self.axis.clear()
-                with plt.style.context("bmh"):
-                    self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-                    self.axis.set_facecolor("w")  # white
-                    self.axis.set_xlabel("Time (min)")
-                    self.axis.set_ylabel("Pressure (psi)")
-                    self.axis.set_ylim((0, max_psi + 50))
-                    self.axis.margins(0, tight=True)
-                    self.axis.plot(elapsed, pump1, label="Pump 1")
-                    self.axis.plot(elapsed, pump2, label="Pump 2")
-                    self.axis.legend(loc="best")
+            pump1 = []
+            pump2 = []
+            elapsed = []  # we will share this series as an axis
+            for reading in tuple(self.handler.readings.queue):
+                pump1.append(reading.pump1)
+                pump2.append(reading.pump2)
+                elapsed.append(reading.elapsedMin)
+            max_psi = max((self.handler.max_psi_1, self.handler.max_psi_2))
+            self.axis.clear()
+            with plt.style.context("bmh"):
+                self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
+                self.axis.set_facecolor("w")  # white
+                self.axis.set_xlabel("Time (min)")
+                self.axis.set_ylabel("Pressure (psi)")
+                self.axis.set_ylim((0, max_psi + 50))
+                self.axis.margins(0, tight=True)
+                self.axis.plot(elapsed, pump1, label="Pump 1")
+                self.axis.plot(elapsed, pump2, label="Pump 2")
+                self.axis.legend(loc="best")
