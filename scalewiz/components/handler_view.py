@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING
 from matplotlib import pyplot as plt
 
 from scalewiz.components.handler_view_controls import TestControls
-from scalewiz.components.handler_view_devices import DeviceBoxes
-from scalewiz.components.handler_view_info import TestInfo
+from scalewiz.components.handler_view_devices_entry import DeviceBoxes
+from scalewiz.components.handler_view_info_entry import TestInfoEntry
 from scalewiz.components.handler_view_plot import LivePlot
 
 if TYPE_CHECKING:
@@ -27,6 +27,7 @@ class TestHandlerView(ttk.Frame):
         super().__init__(parent)
         self.parent: ttk.Frame = parent
         self.handler: TestHandler = handler
+        self.handler.views.append(self)
         self.plot: LivePlot = None
         self.build()
 
@@ -51,7 +52,7 @@ class TestHandlerView(ttk.Frame):
         frm.grid(row=1, column=0, sticky="new")
 
         # row 2 ------------------------------------------------------------------------
-        test_info = TestInfo(self, self.handler)
+        test_info = TestInfoEntry(self, self.handler)
         test_info.grid(row=2, column=0, sticky="new")
 
         # row 3-------------------------------------------------------------------------

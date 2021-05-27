@@ -91,7 +91,7 @@ def export_csv(project: Project) -> Tuple[int, Path]:
         round(time.time() - start_time, 3),
     )
 
-    if out.is_file:
+    if out.is_file():
         return 0, out
     else:
         return 1, out

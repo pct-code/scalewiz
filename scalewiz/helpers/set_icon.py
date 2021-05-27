@@ -16,7 +16,7 @@ def set_icon(widget: tk.Widget) -> None:
     # set the Toplevel's icon
     try:  # this makes me nervous, but whatever
         icon_path = Path(get_resource(r"../components/icon.ico")).resolve()
-        if icon_path.is_file:
+        if icon_path.is_file():
             widget.winfo_toplevel().wm_iconbitmap(icon_path)
         # for windows, set the taskbar icon
         if "nt" in os.name:

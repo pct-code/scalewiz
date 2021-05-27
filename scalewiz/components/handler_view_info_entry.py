@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 LOGGER: Logger = getLogger("scalewiz")
 
 
-class TestInfo(ttk.Frame):
+class TestInfoEntry(ttk.Frame):
     """A widget for inputting Test information."""
 
     def __init__(self, parent: tk.Widget, handler: TestHandler) -> None:

@@ -10,6 +10,8 @@ from typing import Union
 from appdirs import user_config_dir
 from tomlkit import comment, document, dumps, loads, table
 
+import scalewiz
+
 LOGGER = getLogger("scalewiz.config")
 
 CONFIG_DIR = Path(user_config_dir("ScaleWiz", "teauxfu"))
@@ -149,5 +151,6 @@ def update_config(table: str, key: str, value: Union[float, int, str]) -> None:
         doc[table][key] = value
         CONFIG_FILE.write_text(dumps(doc))
         LOGGER.info("Updated %s.%s to %s", table, key, value)
+        scalewiz.CONFIG = get_config()
     else:
         LOGGER.info("Failed to update %s.%s to %s", table, key, value)

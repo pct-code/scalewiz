@@ -22,8 +22,7 @@ from scalewiz.models.test import Reading, Test
 
 if TYPE_CHECKING:
     from logging import Logger
-    from tkinter import ttk
-    from typing import List, Tuple
+    from typing import List, Set
 
 
 class TestHandler:
@@ -37,9 +36,7 @@ class TestHandler:
         self.view: TestHandlerView = None
         self.project: Project = Project()
         self.test: Test = None
-        self.pool = ThreadPoolExecutor(max_workers=1)
-        self.readings: Queue[dict] = Queue()
-        self.editors: List[tk.Widget] = []  # list of views displaying the project
+        self.readings: Queue[Reading] = Queue()
         self.max_readings: int = None  # max # of readings to collect
         self.max_psi_1: int = None
         self.max_psi_2: int = None
@@ -51,11 +48,11 @@ class TestHandler:
         self.stop_requested: Event = Event()
         self.progress = tk.IntVar()
         self.elapsed_min: float = float()  # used for evaluations
-
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
 
         # UI concerns
+        self.views: List[tk.Widget] = []  # list of views displaying the project
         self.is_running: bool = bool()
         self.is_done: bool = bool()
         self.new_test()
@@ -73,51 +70,10 @@ class TestHandler:
             and not self.stop_requested.is_set()
         )
 
-    def load_project(
-        self, path: str = None, loaded: Tuple[Path] = [], new_test: bool = True
-    ) -> None:
-        """Opens a file dialog then loads the selected Project file.
-
-        `loaded` gets built from scratch every time it is passed in -- no need to update
-        """
-        if path is None:
-            path = Path(
-                filedialog.askopenfilename(
-                    initialdir='C:"',
-                    title="Select project file:",
-                    filetypes=[("JSON files", "*.json")],
-                )
-            ).resolve()
-        else:
-            path = Path(path)
-
-        # check that the dialog succeeded, the file exists, and isn't already loaded
-        if path != "" and path.is_file:
-            if path in loaded:
-                msg = "Attempted to load an already-loaded project"
-                self.logger.warning(msg)
-                messagebox.showwarning("Project already loaded", msg)
-            else:
-                # traces are set in Project and Test __init__ methods
-                # we need to explicitly clean them up here
-                if self.project is not None:
-                    for test in self.project.tests:
-                        test.remove_traces()
-                self.project.remove_traces()
-                self.project = Project()
-                self.project.load_json(path)
-                if new_test:
-                    self.new_test()
-                self.logger.info("Loaded %s", self.project.name.get())
-
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
-        # todo disable the start button instead of this
-        if self.is_running:
-            return
-
         issues = []
-        if not Path(self.project.path.get()).is_file:
+        if not Path(self.project.path.get()).is_file():
             msg = "Select an existing project file first"
             issues.append(msg)
 
@@ -146,7 +102,8 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.pool.submit(self.take_readings)
+
+            ThreadPoolExecutor(max_workers=1).submit(self.take_readings)
 
     def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
@@ -156,7 +113,6 @@ class TestHandler:
         self.pump1.run()
         self.pump2.run()
         rinse_start = monotonic()
-        sleep(step)
         for i in range(100):
             if self.can_run:
                 self.progress.set(i)
@@ -164,11 +120,9 @@ class TestHandler:
             else:
                 self.stop_test()
                 break
-        self.log_queue.put("")  # add newline for clarity
         # we use these in the loop
         interval = self.project.interval_seconds.get()
         test_start_time = monotonic()
-        sleep(interval)
         # readings loop ----------------------------------------------------------------
         while self.can_run:
             minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
@@ -204,11 +158,55 @@ class TestHandler:
         self.stop_test()
         self.save_test()
 
-    # because the readings loop is blocking, it is handled on a separate thread
-    # beacuse of this, we have to interact with it in a somewhat backhanded way
-    # this method is intended to be called from the test handler view
+    # logging stuff / methods that affect UI
+    def new_test(self) -> None:
+        """Initialize a new test."""
+        self.logger.info("Initializing a new test")
+        if isinstance(self.test, Test):
+            self.test.remove_traces()
+            del self.test
+        self.test = Test()
+        with self.readings.mutex:
+            self.readings.queue.clear()
+        self.max_psi_1, self.max_psi_2 = 0, 0
+        self.is_running, self.is_done = False, False
+        self.progress.set(0)
+        self.max_readings = round(
+            self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
+        )
+        self.rebuild_views()
+
+    def setup_pumps(self, issues: List[str] = None) -> None:
+        """Set up the pumps with some default values.
+        Appends errors to the passed list
+        """
+        if issues is None:
+            issues = []
+
+        if self.dev1.get() in ("", "None found"):
+            issues.append("Select a port for pump 1")
+
+        if self.dev2.get() in ("", "None found"):
+            issues.append("Select a port for pump 2")
+
+        if self.dev1.get() == self.dev2.get():
+            issues.append("Select two unique ports")
+        else:
+            self.pump1 = NextGenPump(self.dev1.get(), self.logger)
+            self.pump2 = NextGenPump(self.dev2.get(), self.logger)
+
+        for pump in (self.pump1, self.pump2):
+            if pump is None or not pump.is_open:
+                issues.append(f"Couldn't connect to {pump.serial.name}")
+                continue
+            pump.flowrate = self.project.flowrate.get()
+            self.logger.info("Set flowrates to %s", pump.flowrate)
+
     def request_stop(self) -> None:
         """Requests that the Test stop."""
+        # because the readings loop is blocking, it is handled on a separate thread
+        # beacuse of this, we have to interact with it in a somewhat backhanded way
+        # this method is intended to be called from the test handler view
         if self.is_running:
             # the readings loop thread checks this flag on each iteration
             self.stop_requested.set()
@@ -245,60 +243,14 @@ class TestHandler:
         self.load_project(path=self.project.path.get(), new_test=False)
         self.rebuild_views()
 
-    def setup_pumps(self, issues: List[str] = None) -> None:
-        """Set up the pumps with some default values.
-        Appends errors to the passed list
-        """
-        if issues is None:
-            issues = []
-
-        if self.dev1.get() in ("", "None found"):
-            issues.append("Select a port for pump 1")
-
-        if self.dev2.get() in ("", "None found"):
-            issues.append("Select a port for pump 2")
-
-        if self.dev1.get() == self.dev2.get():
-            issues.append("Select two unique ports")
-        else:
-            self.pump1 = NextGenPump(self.dev1.get(), self.logger)
-            self.pump2 = NextGenPump(self.dev2.get(), self.logger)
-
-        for pump in (self.pump1, self.pump2):
-            if pump is None or not pump.is_open:
-                issues.append(f"Couldn't connect to {pump.serial.name}")
-                continue
-            pump.flowrate = self.project.flowrate.get()
-            self.logger.info("Set flowrates to %s", pump.flowrate)
-
-    # logging stuff / methods that affect UI
-    def new_test(self) -> None:
-        """Initialize a new test."""
-        self.logger.info("Initializing a new test")
-        if isinstance(self.test, Test):
-            self.test.remove_traces()
-            del self.test
-        self.test = Test()
-        with self.readings.mutex:
-            self.readings.queue.clear()
-        self.max_psi_1, self.max_psi_2 = 0, 0
-        self.is_running, self.is_done = False, False
-        self.progress.set(0)
-        self.max_readings = round(
-            self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
-        )
-        self.rebuild_views()
-
     def rebuild_views(self) -> None:
-        """Rebuild all open Widgets that could modify the Project file."""
-        for widget in self.editors:
+        """Rebuild all open Widgets that display or modify the Project file."""
+        for widget in self.views:
             if widget.winfo_exists():
                 self.logger.debug("Rebuilding %s", widget)
                 widget.after(0, widget.build, True)
             else:  # clean up as we go
-                self.editors.remove(widget)
-        if isinstance(self.view, TestHandlerView):
-            self.view.after(0, self.view.build)
+                self.views.remove(widget)
 
         self.logger.info("Rebuilt all view widgets")
 
@@ -309,9 +261,9 @@ class TestHandler:
             log_file = f"{time():.0f}_{id}_{date.today()}.txt"
             parent_dir = Path(self.project.path.get()).parent.resolve()
             logs_dir = parent_dir.joinpath("logs").resolve()
-            if not logs_dir.is_dir:
+            if not logs_dir.is_dir():
                 logs_dir.mkdir()
-                if logs_dir.is_dir:
+                if logs_dir.is_dir():
                     LOGGER.info("Made a new logs directory at %s", logs_dir)
                 else:
                     LOGGER.warn("Failed to make a new logs dir at %s", logs_dir)
@@ -334,6 +286,37 @@ class TestHandler:
             self.logger.info("Set up a log file at %s", log_file)
             self.logger.info("Starting a test for %s", self.project.name.get())
 
-    def set_view(self, view: ttk.Frame) -> None:
-        """Stores a ref to the view displaying the handler."""
-        self.view = view
+    def load_project(
+        self, path: str = None, loaded: Set[Path] = [], new_test: bool = True
+    ) -> None:
+        """Opens a file dialog then loads the selected Project file.
+
+        `loaded` gets built from scratch every time it is passed in -- no need to update
+        """
+        if path is None:
+            path = filedialog.askopenfilename(
+                initialdir='C:"',
+                title="Select project file:",
+                filetypes=[("JSON files", "*.json")],
+            )
+        if path is not None:
+            path = Path(path).resolve()
+
+        # check that the dialog succeeded, the file exists, and isn't already loaded
+        if path.is_file():
+            if path in loaded:
+                msg = "Attempted to load an already-loaded project"
+                self.logger.warning(msg)
+                messagebox.showwarning("Project already loaded", msg)
+            else:
+                # traces are set in Project and Test __init__ methods
+                # we need to explicitly clean them up here
+                if self.project is not None:
+                    for test in self.project.tests:
+                        test.remove_traces()
+                self.project.remove_traces()
+                self.project = Project()
+                self.project.load_json(path)
+                if new_test:
+                    self.new_test()
+                self.logger.info("Loaded %s", self.project.name.get())

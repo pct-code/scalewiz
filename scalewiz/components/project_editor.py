@@ -28,7 +28,7 @@ class ProjectWindow(tk.Toplevel):
         super().__init__()
         self.handler: TestHandler = handler
         self.editor_project: Project = Project()
-        if Path(handler.project.path.get()).is_file:
+        if Path(handler.project.path.get()).is_file():
             self.editor_project.load_json(handler.project.path.get())
 
         self.title(f"{self.handler.name}")
@@ -102,7 +102,7 @@ class ProjectWindow(tk.Toplevel):
             ext = file_path[-5:]
             if ext not in (".json", ".JSON"):
                 file_path = f"{file_path}.json"
-            self.editor_project.path.set(file_path)
+            self.editor_project.path.set(str(Path(file_path).resolve()))
             self.save()
 
     def edit(self) -> None:

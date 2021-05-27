@@ -16,10 +16,9 @@ class RinseWindow(tk.Toplevel):
     """Toplevel control that starts and stops the pumps on a timer."""
 
     def __init__(self, handler: TestHandler) -> None:
-        tk.Toplevel.__init__(self)
-        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
+        super().__init__()
+        self.protocol("WM_DELETE_WINDOW", self.close)
         self.handler = handler
-        self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
         set_icon(self)
@@ -44,7 +43,7 @@ class RinseWindow(tk.Toplevel):
     def request_rinse(self) -> None:
         """Try to start a rinse cycle if a test isn't running."""
         if not self.handler.is_running or self.handler.is_done:
-            self.pool.submit(self.rinse)
+            ThreadPoolExecutor(max_workers=1).submit(self.rinse)
 
     def rinse(self) -> None:
         """Run the pumps and disable the button for the duration of a timer."""

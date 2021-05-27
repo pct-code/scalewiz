@@ -21,6 +21,7 @@ class TestControls(ttk.Frame):
     def __init__(self, parent: tk.Widget, handler: TestHandler) -> None:
         super().__init__(parent)
         self.handler: TestHandler = handler
+        self.interval: int = round(handler.project.interval_seconds.get() * 1000)
         self.build()
 
     def build(self) -> None:
@@ -64,13 +65,11 @@ class TestControls(ttk.Frame):
             pass
         else:
             self.display(record)
-        interval = round(self.handler.project.interval_seconds.get() * 1000)
-        self.after(interval, self.poll_log_queue)
+        self.after(self.interval, self.poll_log_queue)
 
     def display(self, msg: str) -> None:
         """Displays a message in the log."""
         self.log_text.configure(state="normal")
-        self.log_text.insert("end", msg)
-        self.log_text.insert("end", "\n")
+        self.log_text.insert("end", "".join((msg, "\n")))
         self.log_text.configure(state="disabled")
         self.log_text.yview("end")  # scroll to bottom

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from tkinter.scrolledtext import ScrolledText
-    from typing import List
+    from typing import List, Set
 
     from scalewiz.models.project import Project
 
@@ -41,7 +41,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
     if len(blanks) < 1:  # this is bad enough to stop us, could check earlier ..?
         return
 
-    areas_over_blanks = []
+    areas_over_blanks: Set[int] = set()
     for blank in blanks:
         log.append(f"Evaluating {blank.name.get()}")
         log.append(f"Considering data: {blank.pump_to_score.get()}")
@@ -59,7 +59,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         )
         log.append(f"Area over blank: {area}")
         log.append("")
-        areas_over_blanks.append(area)
+        areas_over_blanks.add(area)
 
     # get protectable area
     avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
@@ -107,7 +107,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
 
 
 def to_log(log: list[str], log_widget: ScrolledText) -> None:
-    """Adds the passed log message to the passed Text widget."""
+    """Adds the passed log messages to the passed Text widget."""
     if log_widget.winfo_exists():
         log_widget.configure(state="normal")
         log_widget.delete(1.0, "end")

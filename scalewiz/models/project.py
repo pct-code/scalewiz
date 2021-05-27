@@ -8,7 +8,8 @@ import tkinter as tk
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from scalewiz.helpers.configuration import get_config, update_config
+from scalewiz import CONFIG
+from scalewiz.helpers.configuration import update_config
 from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.models.test import Test
 
@@ -59,8 +60,7 @@ class Project:
 
     def set_defaults(self) -> None:
         """Sets project parameters to the defaults read from the config file."""
-        config = get_config()  # load from cofig toml
-        defaults = config["defaults"]
+        defaults = CONFIG["defaults"]
         # make sure we are seeing reasonable values
         for key, value in defaults.items():
             if not isinstance(value, str) and value < 0:
@@ -77,7 +77,7 @@ class Project:
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:
             self.interval_seconds.set(1)
-        self.analyst.set(config.get("recents").get("analyst"))
+        self.analyst.set(CONFIG.get("recents").get("analyst"))
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
@@ -153,13 +153,13 @@ class Project:
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
         path = Path(path).resolve()
-        if path.is_file:
+        if path.is_file():
             LOGGER.info("Loading from %s", path)
             with path.open("r") as file:
                 obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
-        if str(path) != obj.get("info").get("path"):
+        if str(path) != obj["info"]["path"]:
             LOGGER.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )
@@ -177,10 +177,10 @@ class Project:
         self.name.set(info.get("name"))
         self.numbers.set(info.get("numbers"))
         self.analyst.set(info.get("analyst"))
-        self.path.set(info.get("path"))
+        self.path.set(str(Path(info.get("path")).resolve()))
         self.notes.set(info.get("notes"))
 
-        defaults = get_config()["defaults"]
+        defaults = CONFIG["defaults"]
         params: dict = obj.get("params")
         self.bicarbs.set(params.get("bicarbonates", 0))
         self.bicarbs_increased.set(params.get("bicarbsIncreased", False))

@@ -33,7 +33,7 @@ class EvaluationWindow(tk.Toplevel):
         super().__init__()
         self.handler = handler
         self.editor_project = Project()
-        if Path(self.handler.project.path.get()).is_file:
+        if Path(self.handler.project.path.get()).is_file():
             self.editor_project.load_json(self.handler.project.path.get())
         # matplotlib uses these later
         self.log_text: ScrolledText = None
@@ -45,7 +45,7 @@ class EvaluationWindow(tk.Toplevel):
 
     def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
-        if reload and Path(self.handler.project.path.get()).is_file:
+        if reload and Path(self.handler.project.path.get()).is_file():
             # cleanup for the GC
             for test in self.editor_project.tests:
                 test.remove_traces()
