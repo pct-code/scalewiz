@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog, ttk
+from tkinter import filedialog, messagebox, ttk
 from typing import TYPE_CHECKING
 
 from scalewiz.components.project_editor_info import ProjectInfo
@@ -82,12 +82,15 @@ class ProjectWindow(tk.Toplevel):
 
     def save(self) -> None:
         """Save the current Project to file as JSON."""
-        if self.editor_project.path.get() == "":
-            self.save_as()
+        if not self.handler.is_running:
+            if self.editor_project.path.get() == "":
+                self.save_as()
+            else:
+                self.editor_project.dump_json()
+                self.handler.load_project(self.editor_project.path.get())
+                self.handler.rebuild_views()
         else:
-            self.editor_project.dump_json()
-            self.handler.load_project(self.editor_project.path.get())
-            self.handler.view.build()
+            messagebox.showwarning("can't save while a test is running")
 
     def save_as(self) -> None:
         """Saves the Project to JSON using a Save As dialog."""

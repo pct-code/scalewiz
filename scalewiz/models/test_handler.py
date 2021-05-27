@@ -49,6 +49,7 @@ class TestHandler:
         self.elapsed_min: float = float()  # used for evaluations
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
+        self.pool = ThreadPoolExecutor(max_workers=1)
 
         # UI concerns
         self.views: List[tk.Widget] = []  # list of views displaying the project
@@ -102,7 +103,7 @@ class TestHandler:
             self.is_running = True
             self.rebuild_views()
 
-            ThreadPoolExecutor(max_workers=1).submit(self.take_readings)
+            self.pool.submit(self.take_readings)
 
     def take_readings(self) -> None:
         """Get ready to take readings, then start doing it on a second thread."""
@@ -117,7 +118,7 @@ class TestHandler:
                 self.progress.set(i)
                 sleep(step - ((monotonic() - rinse_start) % step))
             else:
-                self.stop_test()
+                self.stop_test(save=False)
                 break
         # we use these in the loop
         interval = self.project.interval_seconds.get()
@@ -154,8 +155,8 @@ class TestHandler:
             # TYSM https://stackoverflow.com/a/25251804
             sleep(interval - ((monotonic() - test_start_time) % interval))
         # end of readings loop ---------------------------------------------------------
-        self.stop_test()
-        self.save_test()
+        self.logger.warn("about to request saving")
+        self.stop_test(save=True)
 
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
@@ -211,7 +212,7 @@ class TestHandler:
             self.stop_requested.set()
             self.logger.info("Received a stop request")
 
-    def stop_test(self) -> None:
+    def stop_test(self, save: bool = True) -> None:
         """Stops the pumps, closes their ports."""
         for pump in (self.pump1, self.pump2):
             if pump.is_open:
@@ -224,16 +225,20 @@ class TestHandler:
 
         self.is_done = True
         self.is_running = False
-        self.logger.info("Test for %s has been stopped", self.test.name.get())
+        self.logger.warn("Test for %s has been stopped", self.test.name.get())
         for _ in range(3):
-            self.view.bell()
+            self.views[0].bell()
+        if save:
+            self.logger.warn("TRYING TO SAVE")
+            self.save_test()
         self.rebuild_views()
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
+        self.logger.warn("TRYING TO SAVE")
         for reading in tuple(self.readings.queue):
             self.test.readings.append(reading)
-        self.logger.info(
+        self.logger.warn(
             "saved %s readings to %s", len(self.test.readings), self.test.name.get()
         )
         self.project.tests.append(self.test)
@@ -244,14 +249,14 @@ class TestHandler:
 
         # refresh data / UI
         self.load_project(path=self.project.path.get(), new_test=False)
-        self.rebuild_views()
+        # self.rebuild_views()
 
     def rebuild_views(self) -> None:
         """Rebuild all open Widgets that display or modify the Project file."""
         for widget in self.views:
             if widget.winfo_exists():
                 self.logger.debug("Rebuilding %s", widget)
-                widget.after(0, widget.build, True)
+                widget.build(reload=True)
             else:  # clean up as we go
                 self.views.remove(widget)
 

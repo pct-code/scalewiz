@@ -73,10 +73,6 @@ class DeviceBoxes(ttk.Frame):
         self.device1_entry.configure(values=self.devices_list)
         self.device2_entry.configure(values=self.devices_list)
 
-        if len(self.devices_list) > 1:
-            self.device1_entry.current(0)
-            self.device2_entry.current(1)
-
         if "None found" not in self.devices_list:
             LOGGER.debug(
                 "%s found devices: %s", self.parent.handler.name, self.devices_list

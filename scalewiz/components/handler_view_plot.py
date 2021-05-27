@@ -24,6 +24,12 @@ class LivePlot(ttk.Frame):
         """Initialize a LivePlot."""
         super().__init__(parent)
         self.handler = handler
+        self.build()
+
+    def build(self) -> None:
+        if not self.winfo_exists():
+            return
+
         self.fig, self.axis = plt.subplots(
             figsize=(5, 3),
             dpi=100,
@@ -37,7 +43,7 @@ class LivePlot(ttk.Frame):
         self.fig.patch.set_facecolor("#FAFAFA")
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
-        interval = round(handler.project.interval_seconds.get() * 1000)  # -> ms
+        interval = round(self.handler.project.interval_seconds.get() * 1000)  # -> ms
         self.ani = FuncAnimation(self.fig, self.animate, interval=interval)
 
     # could probably rewrite this with some tk.Widget.after calls

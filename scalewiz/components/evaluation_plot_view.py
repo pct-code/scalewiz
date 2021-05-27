@@ -50,6 +50,10 @@ class EvaluationPlotView(ttk.Frame):
 
     def build(self) -> None:
         """Builds the UI."""
+        if not self.winfo_exists():
+            LOGGER.warn("im not real ???/")
+            return  # ?????????/
+
         if isinstance(self.fig, Figure):
             self.after(0, plt.close, self.fig)
 

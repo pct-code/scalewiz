@@ -54,7 +54,8 @@ class EvaluationWindow(tk.Toplevel):
             self.editor_project.load_json(self.handler.project.path.get())
 
         for child in self.winfo_children():
-            self.after(0, child.destroy)
+            if child.winfo_exists():
+                child.destroy()
 
         self.grid_columnconfigure(0, weight=1)
         # we will build a few tabs in this
