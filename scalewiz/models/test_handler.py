@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING
 
 from py_hplc import NextGenPump
 
-from scalewiz.components.handler_view import TestHandlerView
 from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
 
@@ -29,10 +28,10 @@ class TestHandler:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, name: str = "Nemo") -> None:
+    def __init__(self, root: tk.Tk, name: str = "Nemo") -> None:
         self.name = name
+        self.root: tk.Tk = root
         self.logger: Logger = getLogger(f"scalewiz.{name}")
-        self.view: TestHandlerView = None
         self.project: Project = Project()
         self.test: Test = None
         self.readings: Queue[Reading] = Queue()
