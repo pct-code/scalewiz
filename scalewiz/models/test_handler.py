@@ -102,8 +102,7 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-
-            self.pool.submit(self.take_readings)
+            self.uptake_cycle()
 
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
