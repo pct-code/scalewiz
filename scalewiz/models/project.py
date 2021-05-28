@@ -108,7 +108,6 @@ class Project:
 
         self.tests.clear()
         for test in tests:
-            test.index.set(tests.index(test))
             self.tests.append(test)
 
         this = {

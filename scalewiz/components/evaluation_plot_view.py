@@ -78,7 +78,7 @@ class EvaluationPlotView(ttk.Frame):
             if test.include_on_report.get():
                 tests_on_report.append(test)
 
-        for test in tests_on_report:
+        for i, test in enumerate(tests_on_report):
             label_ent = ttk.Entry(
                 label_frame,
                 textvariable=test.label,
@@ -86,7 +86,7 @@ class EvaluationPlotView(ttk.Frame):
                 validatecommand=vcmd,
                 width=25,
             )
-            label_ent.grid(row=test.index.get() + 1, column=0, sticky="ew", pady=2)
+            label_ent.grid(row=i + 1, column=0, sticky="ew", pady=2)
 
         label_frame.grid(row=0, column=1, sticky="ns")
 

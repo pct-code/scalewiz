@@ -9,7 +9,7 @@ from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
 from queue import Queue
 from threading import Event
-from time import monotonic, sleep, time
+from time import monotonic, time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
 
@@ -107,26 +107,35 @@ class TestHandler:
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
         # run the uptake cycle ---------------------------------------------------------
-        uptake = self.project.uptake_seconds.get()
-        step = uptake / 100  # we will sleep for 100 steps
+        uptake = self.project.uptake_seconds.get() * 1000  # ms
+        ms_step = round((uptake / 100))  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
-        rinse_start = monotonic()
-        for i in range(100):
+
+        def cycle(start, i, step) -> None:
             if self.can_run:
-                self.progress.set(i)
-                sleep(step - ((monotonic() - rinse_start) % step))
+                if i < 100:
+                    i += 1
+                    self.progress.set(i)
+                    self.root.after(
+                        round(step - ((monotonic() - start) % step)),
+                        cycle,
+                        start,
+                        i,
+                        step,
+                    )
+                else:
+                    self.take_readings()
             else:
                 self.stop_test(save=False)
-                break
-        # we use these in the loop
-        self.take_readings()
+
+        cycle(monotonic(), 0, ms_step)
 
     def take_readings(self, start_time: float = None, interval: float = None) -> None:
         if start_time is None:
             start_time = monotonic()
         if interval is None:
-            interval = self.project.interval_seconds.get()
+            interval = self.project.interval_seconds.get() * 1000
         # readings loop ----------------------------------------------------------------
         if self.can_run:
             minutes_elapsed = round((monotonic() - start_time) / 60, 2)
@@ -158,10 +167,10 @@ class TestHandler:
 
             # TYSM https://stackoverflow.com/a/25251804
             self.root.after(
-                interval - ((monotonic() - start_time) % interval),
+                round(interval - ((monotonic() - start_time) % interval)),
                 self.take_readings,
-                start_time=start_time,
-                interval=interval,
+                start_time,
+                interval,
             )
         else:
             # end of readings loop -----------------------------------------------------
