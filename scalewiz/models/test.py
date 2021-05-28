@@ -99,10 +99,10 @@ class Test:
         for reading in readings:
             self.readings.append(
                 Reading(
-                    pump1=reading.get("pump 1"),
-                    pump2=reading.get("pump 2"),
-                    average=reading.get("average"),
-                    elapsedMin=reading.get("elapsedMin"),
+                    pump1=reading["pump 1"],
+                    pump2=reading["pump 2"],
+                    average=reading["average"],
+                    elapsedMin=reading["elapsedMin"],
                 )
             )
         self.update_obs_baseline()
@@ -146,5 +146,5 @@ class Test:
         for var in variables:
             try:
                 var.trace_remove("write", var.trace_info()[0][1])
-            except IndexError as err:  # sometimes this spaghets on empty projects...
-                LOGGER.exception(err)  # just pass and move on
+            except IndexError:  # sometimes this spaghets on empty projects...
+                pass

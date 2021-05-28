@@ -92,22 +92,23 @@ class Project:
             path = Path(self.path.get())
 
         blanks = [test for test in self.tests if test.is_blank.get()]
-        trials = [test for test in self.tests if not test.is_blank.get()]
         blank_labels = sort_nicely([test.label.get().lower() for test in blanks])
+        trials = [test for test in self.tests if not test.is_blank.get()]
         trial_labels = sort_nicely([test.label.get().lower() for test in trials])
         tests = []
         for label in blank_labels:
-            for test in self.tests:
-                if test.label.get().lower() == label:
+            for test in blanks:
+                if label == test.label.get().lower():
                     tests.append(test)
 
         for label in trial_labels:
-            for test in self.tests:
-                if test.label.get().lower() == label:
+            for test in trials:
+                if label == test.label.get().lower():
                     tests.append(test)
 
         self.tests.clear()
         for test in tests:
+            test.index.set(tests.index(test))
             self.tests.append(test)
 
         this = {
@@ -204,6 +205,7 @@ class Project:
             test = Test()
             test.load_json(entry)
             self.tests.append(test)
+        LOGGER.info("finished loading")
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""
@@ -213,6 +215,8 @@ class Project:
                 var.trace_remove("write", var.trace_info()[0][1])
             except IndexError:  # sometimes this spaghets when loading empty projects...
                 pass
+        for test in self.tests:
+            test.remove_traces()
 
     def update_proj_name(self, *args) -> None:
         """Constructs a default name for the Project."""

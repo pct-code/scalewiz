@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 from py_hplc import NextGenPump
 
+import scalewiz
 from scalewiz.models.project import Project
 from scalewiz.models.test import Reading, Test
 
@@ -28,9 +29,9 @@ class TestHandler:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, root: tk.Tk, name: str = "Nemo") -> None:
+    def __init__(self, name: str = "Nemo") -> None:
         self.name = name
-        self.root: tk.Tk = root
+        self.root: tk.Tk = scalewiz.ROOT
         self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.project: Project = Project()
         self.test: Test = None
@@ -104,8 +105,8 @@ class TestHandler:
 
             self.pool.submit(self.take_readings)
 
-    def take_readings(self) -> None:
-        """Get ready to take readings, then start doing it on a second thread."""
+    def uptake_cycle(self) -> None:
+        """Get ready to take readings."""
         # run the uptake cycle ---------------------------------------------------------
         uptake = self.project.uptake_seconds.get()
         step = uptake / 100  # we will sleep for 100 steps
@@ -120,11 +121,16 @@ class TestHandler:
                 self.stop_test(save=False)
                 break
         # we use these in the loop
-        interval = self.project.interval_seconds.get()
-        test_start_time = monotonic()
+        self.take_readings()
+
+    def take_readings(self, start_time: float = None, interval: float = None) -> None:
+        if start_time is None:
+            start_time = monotonic()
+        if interval is None:
+            interval = self.project.interval_seconds.get()
         # readings loop ----------------------------------------------------------------
-        while self.can_run:
-            minutes_elapsed = round((monotonic() - test_start_time) / 60, 2)
+        if self.can_run:
+            minutes_elapsed = round((monotonic() - start_time) / 60, 2)
 
             psi1 = self.pump1.pressure
             psi2 = self.pump2.pressure
@@ -152,10 +158,16 @@ class TestHandler:
                 self.max_psi_2 = psi2
 
             # TYSM https://stackoverflow.com/a/25251804
-            sleep(interval - ((monotonic() - test_start_time) % interval))
-        # end of readings loop ---------------------------------------------------------
-        self.logger.warn("about to request saving")
-        self.stop_test(save=True)
+            self.root.after(
+                interval - ((monotonic() - start_time) % interval),
+                self.take_readings,
+                start_time=start_time,
+                interval=interval,
+            )
+        else:
+            # end of readings loop -----------------------------------------------------
+            self.logger.warn("about to request saving")
+            self.stop_test(save=True)
 
     # logging stuff / methods that affect UI
     def new_test(self) -> None:
@@ -255,7 +267,7 @@ class TestHandler:
         for widget in self.views:
             if widget.winfo_exists():
                 self.logger.debug("Rebuilding %s", widget)
-                widget.build(reload=True)
+                self.root.after(0, lambda: widget.build(reload=True))
             else:  # clean up as we go
                 self.views.remove(widget)
 
@@ -314,10 +326,8 @@ class TestHandler:
             else:
                 # traces are set in Project and Test __init__ methods
                 # we need to explicitly clean them up here
-                if self.project is not None:
-                    for test in self.project.tests:
-                        test.remove_traces()
                 self.project.remove_traces()
+                del self.project
                 self.project = Project()
                 self.project.load_json(path)
                 if new_test:

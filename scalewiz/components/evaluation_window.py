@@ -45,21 +45,23 @@ class EvaluationWindow(tk.Toplevel):
 
     def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
+        if not self.winfo_exists():
+            return
+
         if reload and Path(self.handler.project.path.get()).is_file():
             # cleanup for the GC
-            for test in self.editor_project.tests:
-                test.remove_traces()
             self.editor_project.remove_traces()
+            del self.editor_project
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
         for child in self.winfo_children():
             if child.winfo_exists():
-                child.destroy()
+                self.after(0, child.destroy)
 
         self.grid_columnconfigure(0, weight=1)
         # we will build a few tabs in this
-        self.tab_control = ttk.Notebook(self, name="tab_control")
+        self.tab_control = ttk.Notebook(self)
         self.tab_control.grid(row=0, column=0)
 
         data_view = EvaluationDataView(self.tab_control, self.editor_project)
@@ -68,10 +70,10 @@ class EvaluationWindow(tk.Toplevel):
         # plot stuff ----------------------------------------------------------
 
         # evaluation stuff ----------------------------------------------------
-        self.log_frame = ttk.Frame(self.tab_control, name="log_frame")
+        self.log_frame = ttk.Frame(self.tab_control)
         self.log_frame.grid_columnconfigure(0, weight=1)
         self.log_text = ScrolledText(
-            self.log_frame, background="white", state="disabled", name="log_text"
+            self.log_frame, background="white", state="disabled"
         )
         self.log_text.grid(sticky="nsew")
         self.tab_control.add(self.log_frame, text="   Calculations   ")
@@ -134,7 +136,7 @@ class EvaluationWindow(tk.Toplevel):
         # refresh
         self.editor_project.dump_json()
         self.handler.load_project(self.editor_project.path.get())
-        self.handler.rebuild_views()
+        self.after(0, self.handler.rebuild_views)
 
     def export(self) -> None:
         result, file = export_csv(self.editor_project)

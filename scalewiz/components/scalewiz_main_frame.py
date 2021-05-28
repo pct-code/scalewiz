@@ -29,9 +29,7 @@ class MainFrame(ttk.Frame):
     def add_handler(self) -> None:
         """Adds a new tab with an associated test handler."""
         system_name = f"  System {len(self.tab_control.tabs())+1}  "
-        handler = TestHandler(
-            name=system_name.strip(), root=self.winfo_toplevel().master
-        )
+        handler = TestHandler(name=system_name.strip())
         self.tab_control.add(
             TestHandlerView(self.tab_control, handler), sticky="nsew", text=system_name
         )
