@@ -87,7 +87,7 @@ class ProjectWindow(tk.Toplevel):
                 self.handler.load_project(self.editor_project.path.get())
                 self.handler.rebuild_views()
         else:
-            messagebox.showwarning("can't save while a test is running")
+            messagebox.showwarning("Can't save while a Test is running")
 
     def save_as(self) -> None:
         """Saves the Project to JSON using a Save As dialog."""
