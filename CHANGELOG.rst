@@ -24,10 +24,11 @@ User experience concerns
 
 Coding concerns
 
+- updated the :code:`TestHandler` to be single-threaded, collecting readings asynchronously
+- updated the :code:`TestHandler` to be more robust when generating log files
 - updated the :code:`Test` object model to handle the :code:`Reading` class
 - updated :code:`score` function to handle the :code:`Reading` class
 - updated the :code:`Project` object model to be more backwards compatible
-- updated the :code:`TestHandler` to be more robust when generating log files
 - ensured exported plot dimensions are always uniform
 - minor performance buff to the :code:`LivePlot` component
 - minor performance buffs generally

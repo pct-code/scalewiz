@@ -51,7 +51,6 @@ class EvaluationWindow(tk.Toplevel):
         if reload and Path(self.handler.project.path.get()).is_file():
             # cleanup for the GC
             self.editor_project.remove_traces()
-            del self.editor_project
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 

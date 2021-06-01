@@ -39,7 +39,6 @@ class ProjectWindow(tk.Toplevel):
         """Destroys all child widgets, then builds the UI."""
         if reload:
             self.editor_project.remove_traces()  # clean up the old one for GC
-            del self.editor_project
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 

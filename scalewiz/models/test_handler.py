@@ -34,7 +34,7 @@ class TestHandler:
         self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.project: Project = Project()
         self.test: Test = None
-        self.readings: Queue[Reading] = Queue()
+        self.readings: List[Reading] = []
         self.max_readings: int = None  # max # of readings to collect
         self.max_psi_1: int = None
         self.max_psi_2: int = None
@@ -65,7 +65,7 @@ class TestHandler:
                 or self.max_psi_2 < self.project.limit_psi.get()
             )
             and self.elapsed_min < self.project.limit_minutes.get()
-            and self.readings.qsize() < self.max_readings
+            and len(self.readings) < self.max_readings
             and not self.stop_requested
         )
 
@@ -153,7 +153,7 @@ class TestHandler:
             self.log_queue.put(msg)
             self.logger.debug(msg)
 
-            self.readings.put(reading)
+            self.readings.append(reading)
             self.elapsed_min = minutes_elapsed
             prog = round((self.readings.qsize() / self.max_readings) * 100)
             self.progress.set(prog)
@@ -172,7 +172,6 @@ class TestHandler:
             )
         else:
             # end of readings loop -----------------------------------------------------
-            self.logger.warn("about to request saving")
             self.stop_test(save=True)
 
     # logging stuff / methods that affect UI
@@ -181,10 +180,8 @@ class TestHandler:
         self.logger.info("Initializing a new test")
         if isinstance(self.test, Test):
             self.test.remove_traces()
-            del self.test
         self.test = Test()
-        with self.readings.mutex:
-            self.readings.queue.clear()
+        self.readings.clear()
         self.max_psi_1, self.max_psi_2 = 0, 0
         self.is_running, self.is_done = False, False
         self.progress.set(0)
@@ -243,27 +240,22 @@ class TestHandler:
             for _ in range(3):
                 self.views[0].bell()
         if save:
-            self.logger.warn("TRYING TO SAVE")
             self.save_test()
-            self.rebuild_views()
+
+        self.rebuild_views()
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
         self.logger.warn("TRYING TO SAVE")
-        for reading in tuple(self.readings.queue):
-            self.test.readings.append(reading)
+        self.test.readings.extend(self.readings)
         self.logger.warn(
             "saved %s readings to %s", len(self.test.readings), self.test.name.get()
         )
         self.project.tests.append(self.test)
-        try:
-            self.project.dump_json()
-        except Exception as err:
-            self.logger.exception(err)
+        self.project.dump_json()
 
         # refresh data / UI
         self.load_project(path=self.project.path.get(), new_test=False)
-        # self.rebuild_views()
 
     def rebuild_views(self) -> None:
         """Rebuild all open Widgets that display or modify the Project file."""
@@ -329,7 +321,6 @@ class TestHandler:
                 messagebox.showwarning("Project already loaded", msg)
             else:
                 self.project.remove_traces()
-                del self.project
                 self.project = Project()
                 self.project.load_json(path)
                 if new_test:
