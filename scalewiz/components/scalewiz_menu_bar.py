@@ -17,12 +17,13 @@ LOGGER = logging.getLogger("scalewiz")
 
 if TYPE_CHECKING:
     from scalewiz.components.handler_view import TestHandlerView
+    from scalewiz.components.scalewiz_main_frame import MainFrame
 
 
 class MenuBar:
     """Menu bar to be displayed on the Main Frame."""
 
-    def __init__(self, parent: tk.Frame) -> None:
+    def __init__(self, parent: MainFrame) -> None:
         # expecting parent to be the toplevel parent of the main frame
         self.parent = parent
 

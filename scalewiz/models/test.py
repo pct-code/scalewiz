@@ -85,17 +85,17 @@ class Test:
 
     def load_json(self, obj: dict[str, Union[bool, float, int, str]]) -> None:
         """Load a Test with values from a JSON object."""
-        self.name.set(obj.get("name"))
-        self.is_blank.set(obj.get("isBlank"))
-        self.chemical.set(obj.get("chemical"))
-        self.rate.set(obj.get("rate"))
-        self.label.set(obj.get("reportAs"))
-        self.clarity.set(obj.get("clarity"))
-        self.notes.set(obj.get("notes"))
-        self.pump_to_score.set(obj.get("toConsider"))
-        self.include_on_report.set(obj.get("includeOnRep"))
-        self.result.set(obj.get("result"))
-        readings = obj.get("readings")
+        self.name.set(obj["name"])
+        self.is_blank.set(obj["isBlank"])
+        self.chemical.set(obj["chemical"])
+        self.rate.set(obj["rate"])
+        self.label.set(obj["reportAs"])
+        self.clarity.set(obj["clarity"])
+        self.notes.set(obj["notes"])
+        self.pump_to_score.set(obj["toConsider"])
+        self.include_on_report.set(obj["includeOnRep"])
+        self.result.set(obj["result"])
+        readings = obj["readings"]
         for reading in readings:
             self.readings.append(
                 Reading(

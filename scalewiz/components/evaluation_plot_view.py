@@ -88,15 +88,15 @@ class EvaluationPlotView(ttk.Frame):
             )
             label_ent.grid(row=i + 1, column=0, sticky="ew", pady=2)
 
-        label_frame.grid(row=0, column=1, sticky="ns")
-
-        print("plottings")
+        label_frame.grid(row=0, column=1, sticky="nsew")
 
         self.plot_frame = ttk.Frame(self)
         self.fig, self.axis = plt.subplots(
             figsize=(7.5, 4),
             dpi=100,
-            subplotpars=SubplotParams(wspace=0, hspace=0, top=0.95),
+            subplotpars=SubplotParams(
+                wspace=0, hspace=0, left=0.1, right=0.9, top=0.95
+            ),
         )
         self.fig.patch.set_facecolor("#FAFAFA")
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
@@ -138,8 +138,5 @@ class EvaluationPlotView(ttk.Frame):
 
     def update_plot(self) -> True:
         """Rebuilds the plot."""
-        # running into a weird race condition when rebuilding...
-        # this is a workaround
-        self.after(0, self.build)
-        self.after(100, self.build)
+        self.after_idle(self.build)
         return True

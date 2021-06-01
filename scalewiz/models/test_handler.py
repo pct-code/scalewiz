@@ -8,7 +8,7 @@ from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
 from queue import Queue
-from time import monotonic, time
+from time import time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
 
@@ -36,8 +36,10 @@ class TestHandler:
         self.test: Test = None
         self.readings: List[Reading] = []
         self.max_readings: int = None  # max # of readings to collect
+        self.limit_psi: int = None
         self.max_psi_1: int = None
         self.max_psi_2: int = None
+        self.limit_minutes: float = None
         self.log_handler: FileHandler = None  # handles logging to log window
         # test handler view overwrites this attribute in the view's build()
         self.log_queue: Queue[str] = Queue()  # view pulls from this queue
@@ -60,11 +62,8 @@ class TestHandler:
     def can_run(self) -> bool:
         """Returns a bool indicating whether or not the test can run."""
         return (
-            (
-                self.max_psi_1 < self.project.limit_psi.get()
-                or self.max_psi_2 < self.project.limit_psi.get()
-            )
-            and self.elapsed_min < self.project.limit_minutes.get()
+            (self.max_psi_1 < self.limit_psi or self.max_psi_2 < self.limit_psi)
+            and self.elapsed_min < self.limit_minutes
             and len(self.readings) < self.max_readings
             and not self.stop_requested
         )
@@ -116,7 +115,7 @@ class TestHandler:
                     i += 1
                     self.progress.set(i)
                     self.root.after(
-                        round(step_ms - ((monotonic() - start) % step_ms)),
+                        round(step_ms - ((time() - start) % step_ms)),
                         cycle,
                         start,
                         i,
@@ -127,16 +126,14 @@ class TestHandler:
             else:
                 self.stop_test(save=False)
 
-        cycle(monotonic(), 0, ms_step)
+        cycle(time(), 0, ms_step)
 
-    def take_readings(self, start_time: float = None, interval: float = None) -> None:
-        if start_time is None:
-            start_time = monotonic()
+    def take_readings(self, start_time: float = time(), interval: float = None) -> None:
         if interval is None:
             interval = self.project.interval_seconds.get() * 1000
         # readings loop ----------------------------------------------------------------
         if self.can_run:
-            minutes_elapsed = round((monotonic() - start_time) / 60, 2)
+            minutes_elapsed = (time() - start_time) / 60
 
             psi1 = self.pump1.pressure
             psi2 = self.pump2.pressure
@@ -152,10 +149,10 @@ class TestHandler:
             )
             self.log_queue.put(msg)
             self.logger.debug(msg)
-
             self.readings.append(reading)
             self.elapsed_min = minutes_elapsed
-            prog = round((self.readings.qsize() / self.max_readings) * 100)
+            self.logger.warn("%s / %s", len(self.readings), self.max_readings)
+            prog = round((len(self.readings) / self.max_readings) * 100)
             self.progress.set(prog)
 
             if psi1 > self.max_psi_1:
@@ -164,8 +161,9 @@ class TestHandler:
                 self.max_psi_2 = psi2
 
             # TYSM https://stackoverflow.com/a/25251804
+            self.logger.warn("%s", interval - ((time() - start_time) % interval))
             self.root.after(
-                round(interval - ((monotonic() - start_time) % interval)),
+                round(interval - ((time() - start_time) % interval)),
                 self.take_readings,
                 start_time,
                 interval,
@@ -182,6 +180,8 @@ class TestHandler:
             self.test.remove_traces()
         self.test = Test()
         self.readings.clear()
+        self.limit_psi = self.project.limit_psi.get()
+        self.limit_minutes = self.project.limit_minutes.get()
         self.max_psi_1, self.max_psi_2 = 0, 0
         self.is_running, self.is_done = False, False
         self.progress.set(0)
@@ -219,7 +219,6 @@ class TestHandler:
     def request_stop(self) -> None:
         """Requests that the Test stop."""
         if self.is_running:
-            self.logger.info("Received a stop request")
             self.stop_requested = True
 
     def stop_test(self, save: bool = False, rinsing: bool = False) -> None:
@@ -326,3 +325,4 @@ class TestHandler:
                 if new_test:
                     self.new_test()
                 self.logger.info("Loaded %s", self.project.name.get())
+                self.rebuild_views()

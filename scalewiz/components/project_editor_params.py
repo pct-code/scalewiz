@@ -5,11 +5,16 @@ from __future__ import annotations
 from tkinter import ttk
 from typing import TYPE_CHECKING
 
-from scalewiz.helpers.render import render
 from scalewiz.helpers.validation import can_be_float, can_be_pos_float, can_be_pos_int
 
 if TYPE_CHECKING:
     from scalewiz.models.project import Project
+
+
+def render(lbl: ttk.Label, ent: ttk.Entry, row: int) -> None:
+    """Grids a label and entry on the passed row."""
+    lbl.grid(row=row, column=0, sticky="e")
+    ent.grid(row=row, column=1, sticky="ew", pady=1)
 
 
 class ProjectParams(ttk.Frame):

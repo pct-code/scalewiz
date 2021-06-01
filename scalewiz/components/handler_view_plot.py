@@ -34,7 +34,7 @@ class LivePlot(ttk.Frame):
             figsize=(5, 3),
             dpi=100,
             constrained_layout=True,
-            subplotpars=SubplotParams(left=0.15, bottom=0.15, right=0.95, top=0.95),
+            subplotpars=SubplotParams(left=0.1, bottom=0.1, right=0.95, top=0.95),
         )
         self.axis.set_xlabel("Time (min)")
         self.axis.set_ylabel("Pressure (psi)")
@@ -44,7 +44,7 @@ class LivePlot(ttk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
         interval = round(self.handler.project.interval_seconds.get() * 1000)  # -> ms
-        self.ani = FuncAnimation(self.fig, self.animate, interval=interval)
+        self.ani = FuncAnimation(self.fig, self.animate, interval=interval * 3)
 
     # could probably rewrite this with some tk.Widget.after calls
     def animate(self, interval: float) -> None:
@@ -52,24 +52,28 @@ class LivePlot(ttk.Frame):
 
         The interval argument is used by matplotlib internally.
         """
-        # we can just skip this if the test isn't running
-        if self.handler.is_running and not self.handler.is_done:
-            pump1 = []
-            pump2 = []
-            elapsed = []  # we will share this series as an axis
-            for reading in self.handler.readings:
-                pump1.append(reading.pump1)
-                pump2.append(reading.pump2)
-                elapsed.append(reading.elapsedMin)
-            max_psi = max((self.handler.max_psi_1, self.handler.max_psi_2))
-            self.axis.clear()
-            with plt.style.context("bmh"):
-                self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
-                self.axis.set_facecolor("w")  # white
-                self.axis.set_xlabel("Time (min)")
-                self.axis.set_ylabel("Pressure (psi)")
-                self.axis.set_ylim((0, max_psi + 50))
-                self.axis.margins(0, tight=True)
-                self.axis.plot(elapsed, pump1, label="Pump 1")
-                self.axis.plot(elapsed, pump2, label="Pump 2")
-                self.axis.legend(loc="best")
+
+        return
+
+        # # we can just skip this if the test isn't running
+        # if self.handler.is_running and not self.handler.is_done:
+        #     if len(self.handler.readings) > 0:
+        #         pump1 = []
+        #         pump2 = []
+        #         elapsed = []  # we will share this series as an axis
+        #         for reading in self.handler.readings:
+        #             pump1.append(reading.pump1)
+        #             pump2.append(reading.pump2)
+        #             elapsed.append(reading.elapsedMin)
+        #         max_psi = max((self.handler.max_psi_1, self.handler.max_psi_2))
+        #         self.axis.clear()
+        #         with plt.style.context("bmh"):
+        #             self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
+        #             self.axis.set_facecolor("w")  # white
+        #             self.axis.set_xlabel("Time (min)")
+        #             self.axis.set_ylabel("Pressure (psi)")
+        #             self.axis.set_ylim((0, max_psi + 50))
+        #             self.axis.margins(0, tight=True)
+        #             self.axis.plot(elapsed, pump1, label="Pump 1")
+        #             self.axis.plot(elapsed, pump2, label="Pump 2")
+        #             self.axis.legend(loc="best")

@@ -91,24 +91,28 @@ class Project:
         if path is None:
             path = Path(self.path.get())
 
-        blanks = [test for test in self.tests if test.is_blank.get()]
-        blank_labels = sort_nicely([test.label.get().lower() for test in blanks])
-        trials = [test for test in self.tests if not test.is_blank.get()]
-        trial_labels = sort_nicely([test.label.get().lower() for test in trials])
+        blanks = {}
+        trials = {}
+        for test in self.tests:
+            label = test.label.get().lower()
+            while label in blanks or label in trials:  # make sure we don't overwrite
+                label = "".join((label, " - copy"))
+            if test.is_blank.get():
+                blanks[label] = test
+            else:
+                trials[label] = test
+
+        blank_labels = sort_nicely(list(blanks.keys()))
+        trial_labels = sort_nicely(list(trials.keys()))
+
         tests = []
         for label in blank_labels:
-            for test in blanks:
-                if label == test.label.get().lower():
-                    tests.append(test)
-
+            tests.append(blanks.pop(label))
         for label in trial_labels:
-            for test in trials:
-                if label == test.label.get().lower():
-                    tests.append(test)
+            tests.append(trials.pop(label))
 
         self.tests.clear()
-        for test in tests:
-            self.tests.append(test)
+        self.tests = [test for test in tests]
 
         this = {
             "info": {

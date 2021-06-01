@@ -2,12 +2,9 @@ todo
 ----
 
 - new screenshots of eval window / plot for docs
-- implement a singleton pattern for dealing with the handler/editor_project desync ?
 
 bugs
 ----
-
-- eval window save only actually rebuilds every other time ?
 
 refactoring
 -----------
