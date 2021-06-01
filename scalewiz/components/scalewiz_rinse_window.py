@@ -1,8 +1,9 @@
 """Simple frame that starts and stops the pumps on a timer."""
 
 import logging
+import time
 import tkinter as tk
-from time import monotonic
+from concurrent.futures import ThreadPoolExecutor
 from tkinter import ttk
 
 from scalewiz.helpers.set_icon import set_icon
@@ -15,9 +16,10 @@ class RinseWindow(tk.Toplevel):
     """Toplevel control that starts and stops the pumps on a timer."""
 
     def __init__(self, handler: TestHandler) -> None:
-        super().__init__()
-        self.protocol("WM_DELETE_WINDOW", self.close)
-        self.handler = handler
+        tk.Toplevel.__init__(self)
+        self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
+        self.handler: TestHandler = handler
+        self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
         set_icon(self)
@@ -34,44 +36,31 @@ class RinseWindow(tk.Toplevel):
         ent = ttk.Spinbox(self, textvariable=self.rinse_minutes, from_=3, to=60)
         ent.grid(row=0, column=1)
 
-        self.button = ttk.Button(
-            self, textvariable=self.txt, command=self.request_rinse
-        )
+        self.button = ttk.Button(self, text="Rinse", command=self.request_rinse)
         self.button.grid(row=2, column=0, columnspan=2)
 
     def request_rinse(self) -> None:
         """Try to start a rinse cycle if a test isn't running."""
-        if self.handler.is_done or not self.handler.is_running:
-            self.handler.setup_pumps()
-            self.handler.pump1.run()
-            self.handler.pump2.run()
-            self.button.configure(state="disabled")
-            self.rinse(round(self.rinse_minutes.get() * 60 * 1000))
+        if not self.handler.is_running.get() or self.handler.is_done.get():
+            self.pool.submit(self.rinse)
 
-    def rinse(self, duration_ms: int) -> None:
+    def rinse(self) -> None:
         """Run the pumps and disable the button for the duration of a timer."""
-        step_ms = round((duration_ms / 100))  # we will sleep for 100 steps
-        self.pump1.run()
-        self.pump2.run()
+        self.handler.setup_pumps()
+        self.handler.pump1.run()
+        self.handler.pump2.run()
 
-        def cycle(start, i, step_ms) -> None:
-            if self.can_run:
-                if i < 100:
-                    i += 1
-                    self.txt.set(f"{i+1}/{duration_ms/1000:.0f} s")
-                    self.root.after(
-                        round(step_ms - ((monotonic() - start) % step_ms)),
-                        cycle,
-                        start,
-                        i,
-                        step_ms,
-                    )
-                else:
-                    self.bell()
-                    self.handler.stop_test(rinsing=True)
-                    self.button.configure(state="normal")
-
-        cycle(monotonic(), 0, step_ms)
+        self.button.configure(state="disabled")
+        duration = self.rinse_minutes.get() * 60
+        for i in range(duration):
+            if not self.stop:
+                self.button.configure(text=f"{i+1}/{duration} s")
+                time.sleep(1)
+            else:
+                break
+        self.bell()
+        self.end_rinse()
+        self.button.configure(state="normal", text="Rinse")
 
     def end_rinse(self) -> None:
         """Stop the pumps if they are running, then close their ports."""

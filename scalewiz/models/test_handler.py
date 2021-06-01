@@ -8,7 +8,7 @@ from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
 from queue import Queue
-from time import time
+from time import sleep, time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
 
@@ -100,39 +100,30 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.uptake_cycle(self.project.uptake_seconds.get() * 1000)
+            self.uptake_cycle()
 
-    def uptake_cycle(self, duration_ms: int) -> None:
+    def uptake_cycle(self) -> None:
         """Get ready to take readings."""
-        # run the uptake cycle ---------------------------------------------------------
-        ms_step = round((duration_ms / 100))  # we will sleep for 100 steps
+        uptake = self.project.uptake_seconds.get()
+        step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
-
-        def cycle(start, i, step_ms) -> None:
+        rinse_start = time()
+        for i in range(100):
             if self.can_run:
-                if i < 100:
-                    i += 1
-                    self.progress.set(i)
-                    self.root.after(
-                        round(step_ms - ((time() - start) % step_ms)),
-                        cycle,
-                        start,
-                        i,
-                        step_ms,
-                    )
-                else:
-                    self.take_readings()
+                self.progress.set(i)
+                sleep(step - ((time() - rinse_start) % step))
             else:
                 self.stop_test(save=False)
+                break
+        # we use these in the loop
+        self.pool.submit(self.take_readings)
 
-        cycle(time(), 0, ms_step)
-
-    def take_readings(self, start_time: float = time(), interval: float = None) -> None:
-        if interval is None:
-            interval = self.project.interval_seconds.get() * 1000
+    def take_readings(self) -> None:
+        interval = self.project.interval_seconds.get()
+        start_time = time()
         # readings loop ----------------------------------------------------------------
-        if self.can_run:
+        while self.can_run:
             minutes_elapsed = (time() - start_time) / 60
 
             psi1 = self.pump1.pressure
@@ -162,14 +153,8 @@ class TestHandler:
 
             # TYSM https://stackoverflow.com/a/25251804
             self.logger.warn("%s", interval - ((time() - start_time) % interval))
-            self.root.after(
-                round(interval - ((time() - start_time) % interval)),
-                self.take_readings,
-                start_time,
-                interval,
-            )
+            sleep(interval - ((time() - start_time) % interval))
         else:
-            # end of readings loop -----------------------------------------------------
             self.stop_test(save=True)
 
     # logging stuff / methods that affect UI
