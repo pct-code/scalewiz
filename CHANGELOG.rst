@@ -9,7 +9,7 @@ adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
-[unreleased v0.5.7]
+[v0.5.7]
 --------------------
 
 Changed
@@ -24,7 +24,6 @@ User experience concerns
 
 Coding concerns
 
-- updated the :code:`TestHandler` to be single-threaded, collecting readings asynchronously
 - updated the :code:`TestHandler` to be more robust when generating log files
 - updated the :code:`Test` object model to handle the :code:`Reading` class
 - updated :code:`score` function to handle the :code:`Reading` class

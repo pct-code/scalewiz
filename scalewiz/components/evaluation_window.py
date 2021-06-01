@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from scalewiz.components.evaluation_data_view import EvaluationDataView
 from scalewiz.components.evaluation_plot_view import EvaluationPlotView
-from scalewiz.helpers.export_csv import export_csv
+from scalewiz.helpers.export import export
 from scalewiz.helpers.score import score
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
@@ -71,6 +71,7 @@ class EvaluationWindow(tk.Toplevel):
         # evaluation stuff ----------------------------------------------------
         self.log_frame = ttk.Frame(self.tab_control)
         self.log_frame.grid_columnconfigure(0, weight=1)
+        self.log_frame.grid_rowconfigure(0, weight=1)
         self.log_text = ScrolledText(
             self.log_frame, background="white", state="disabled"
         )
@@ -85,7 +86,7 @@ class EvaluationWindow(tk.Toplevel):
         export_btn = ttk.Button(
             button_frame,
             text="Export",
-            command=lambda: export_csv(self.editor_project),
+            command=lambda: export(self.editor_project),
             width=10,
         )
         export_btn.grid(row=0, column=1, padx=5)
@@ -138,7 +139,7 @@ class EvaluationWindow(tk.Toplevel):
         self.after(0, self.handler.rebuild_views)
 
     def export(self) -> None:
-        result, file = export_csv(self.editor_project)
+        result, file = export(self.editor_project)
         if result == 0:
             messagebox.showinfo("Export complete", f"Exported a report to {file}")
         else:

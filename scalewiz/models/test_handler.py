@@ -100,7 +100,7 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.uptake_cycle()
+            self.pool.submit(self.uptake_cycle)
 
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
@@ -117,7 +117,7 @@ class TestHandler:
                 self.stop_test(save=False)
                 break
         # we use these in the loop
-        self.pool.submit(self.take_readings)
+        self.take_readings()
 
     def take_readings(self) -> None:
         interval = self.project.interval_seconds.get()
@@ -142,7 +142,6 @@ class TestHandler:
             self.logger.debug(msg)
             self.readings.append(reading)
             self.elapsed_min = minutes_elapsed
-            self.logger.warn("%s / %s", len(self.readings), self.max_readings)
             prog = round((len(self.readings) / self.max_readings) * 100)
             self.progress.set(prog)
 
@@ -152,7 +151,6 @@ class TestHandler:
                 self.max_psi_2 = psi2
 
             # TYSM https://stackoverflow.com/a/25251804
-            self.logger.warn("%s", interval - ((time() - start_time) % interval))
             sleep(interval - ((time() - start_time) % interval))
         else:
             self.stop_test(save=True)
@@ -220,24 +218,18 @@ class TestHandler:
         if not rinsing:
             self.is_done = True
             self.is_running = False
-            self.logger.warn("Test for %s has been stopped", self.test.name.get())
             for _ in range(3):
                 self.views[0].bell()
         if save:
             self.save_test()
-
+        self.progress.set(100)
         self.rebuild_views()
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
-        self.logger.warn("TRYING TO SAVE")
         self.test.readings.extend(self.readings)
-        self.logger.warn(
-            "saved %s readings to %s", len(self.test.readings), self.test.name.get()
-        )
         self.project.tests.append(self.test)
         self.project.dump_json()
-
         # refresh data / UI
         self.load_project(path=self.project.path.get(), new_test=False)
 
@@ -248,9 +240,7 @@ class TestHandler:
                 self.logger.debug("Rebuilding %s", widget)
                 self.root.after_idle(widget.build, {"reload": True})
             else:
-                self.logger.debug(
-                    "Removing dead widget %s", widget
-                )  # clean up as we go
+                self.logger.debug("Removing dead widget %s", widget)
                 self.views.remove(widget)
 
         self.logger.debug("Rebuilt all view widgets")

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import time
 from pathlib import Path
 from typing import Tuple
 
@@ -15,9 +14,8 @@ from scalewiz.models.project import Project
 LOGGER = logging.getLogger("scalewiz")
 
 
-def export_csv(project: Project) -> Tuple[int, Path]:
+def export(project: Project) -> Tuple[int, Path]:
     """Generates a report for a Project in a flattened CSV format (or ugly JSON)."""
-    start_time = time.time()
     LOGGER.info("Beginning export of %s", project.name.get())
 
     output_dict = {
@@ -34,9 +32,11 @@ def export_csv(project: Project) -> Tuple[int, Path]:
         "baselinePsi": project.baseline.get(),
         "bicarbs": project.bicarbs.get(),
         "bicarbsIncreased": project.bicarbs_increased.get(),
+        "calcium": project.calcium.get(),
         "chlorides": project.chlorides.get(),
         "timeLimitMin": project.limit_minutes.get(),
         "limitPsi": project.limit_psi.get(),
+        "readingIntervalSecs": project.interval_seconds.get(),
         "name": [],
         "isBlank": [],
         "chemical": [],
@@ -85,10 +85,9 @@ def export_csv(project: Project) -> Tuple[int, Path]:
             json.dump(output_dict, output, indent=4)
 
     LOGGER.info(
-        "Finished export of %s as %s in %s s",
+        "Finished export of %s as %s",
         project.name.get(),
         project.output_format.get(),
-        round(time.time() - start_time, 3),
     )
 
     if out.is_file():

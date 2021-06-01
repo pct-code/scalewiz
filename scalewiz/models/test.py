@@ -27,7 +27,7 @@ class Test:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self) -> None:
+    def __init__(self, data: dict = None) -> None:
         self.is_blank = tk.BooleanVar()  # boolean for blank vs chemical trial
         self.name = tk.StringVar()  # identifier for the test
         self.chemical = tk.StringVar()  # chemical, if any, to be tested
@@ -45,6 +45,9 @@ class Test:
         self.pump_to_score.set("pump 1")
         self.is_blank.set(True)
         self.add_traces()  # will need to clean these up later for the GC
+
+        if isinstance(data, dict):
+            self.load_json(data)
 
     def add_traces(self) -> None:
         """Adds tkVar traces. Need to be removed with remove_traces."""

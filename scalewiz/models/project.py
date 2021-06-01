@@ -66,18 +66,18 @@ class Project:
             if not isinstance(value, str) and value < 0:
                 defaults[key] = value * (-1)
         # apply values
-        self.baseline.set(defaults.get("baseline"))
-        self.interval_seconds.set(defaults.get("reading_interval"))
-        self.limit_minutes.set(defaults.get("time_limit"))
-        self.limit_psi.set(defaults.get("pressure_limit"))
-        self.output_format.set(defaults.get("output_format"))
-        self.temperature.set(defaults.get("test_temperature"))
-        self.flowrate.set(defaults.get("flowrate"))
-        self.uptake_seconds.set(defaults.get("uptake_time"))
+        self.baseline.set(defaults["baseline"])
+        self.interval_seconds.set(defaults["reading_interval"])
+        self.limit_minutes.set(defaults["time_limit"])
+        self.limit_psi.set(defaults["pressure_limit"])
+        self.output_format.set(defaults["output_format"])
+        self.temperature.set(defaults["test_temperature"])
+        self.flowrate.set(defaults["flowrate"])
+        self.uptake_seconds.set(defaults["uptake_time"])
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:
             self.interval_seconds.set(1)
-        self.analyst.set(CONFIG.get("recents").get("analyst"))
+        self.analyst.set(CONFIG["recents"]["analyst"])
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
@@ -171,23 +171,23 @@ class Project:
             )
             obj["info"]["path"] = str(path)
 
-        info: dict = obj.get("info")
-        self.customer.set(info.get("customer"))
-        self.submitted_by.set(info.get("submittedBy"))
-        self.client.set(info.get("productionCo"))
-        self.field.set(info.get("field"))
-        self.sample.set(info.get("sample"))
-        self.sample_date.set(info.get("sampleDate"))
-        self.received_date.set(info.get("recDate"))
-        self.completed_date.set(info.get("compDate"))
-        self.name.set(info.get("name"))
-        self.numbers.set(info.get("numbers"))
-        self.analyst.set(info.get("analyst"))
-        self.path.set(str(Path(info.get("path")).resolve()))
-        self.notes.set(info.get("notes"))
+        info: dict = obj["info"]
+        self.customer.set(info["customer"])
+        self.submitted_by.set(info["submittedBy"])
+        self.client.set(info["productionCo"])
+        self.field.set(info["field"])
+        self.sample.set(info["sample"])
+        self.sample_date.set(info["sampleDate"])
+        self.received_date.set(info["recDate"])
+        self.completed_date.set(info["compDate"])
+        self.name.set(info["name"])
+        self.numbers.set(info["numbers"])
+        self.analyst.set(info["analyst"])
+        self.path.set(str(Path(info["path"]).resolve()))
+        self.notes.set(info["notes"])
 
         defaults = CONFIG["defaults"]
-        params: dict = obj.get("params")
+        params: dict = obj["params"]
         self.bicarbs.set(params.get("bicarbonates", 0))
         self.bicarbs_increased.set(params.get("bicarbsIncreased", False))
         self.calcium.set(params.get("calcium", 0))
@@ -200,15 +200,13 @@ class Project:
         self.flowrate.set(params.get("flowrate", defaults["flowrate"]))
         self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
 
-        self.plot.set(obj.get("plot"))
-        self.output_format.set(obj.get("outputFormat"))
+        self.plot.set(obj["plot"])
+        self.output_format.set(obj["outputFormat"])
 
         self.tests.clear()
-        for entry in obj.get("tests"):
-            test = Test()
-            test.load_json(entry)
+        for entry in obj["tests"]:
+            test = Test(data=entry)
             self.tests.append(test)
-        LOGGER.info("finished loading")
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""

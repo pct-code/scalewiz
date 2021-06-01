@@ -73,7 +73,7 @@ If you don't already have a project loaded, click 'Project' > 'Load
 existing' from the menu bar. If a project is currently loaded, it's name
 will be displayed as shown below.
 
-.. image:: ../img/main_menu(loaded).PNG
+.. image:: ../img/main_menu.PNG
    :alt: main menu with loaded project
 
 Use the 'Devices' dropdown boxes to select the serial ports the pumps
@@ -115,13 +115,6 @@ cycle will begin, and its status will be shown in the progress bar.
 You can interrupt the uptake cycle (or the test itself) at any time by
 clicking the 'Stop' button. This will stop the pumps, then attempt to
 save the data to file.
-
-While a test is running, you may click 'Toggle Details' to show/hide a
-more detailed view of the experiment state, including a live plot of the
-data as it is collected.
-
-.. image:: ../img/main_menu(details).PNG
-   :alt: live plot
 
 A test will automatically stop itself and the pumps when either the time
 limit or pressure limit has been reached. The 'Start' button will become
@@ -185,10 +178,25 @@ The 'Calculations' tab displays a text log of the evaluation of all
 tests with a ticked 'Include on Report' box. This log is automatically
 exported next to the report file when you click the 'Export' button.
 
+.. image:: ../img/evaluation(calcs).PNG
+   :alt: calculations frame with some data
+
 Generating a report
 ~~~~~~~~~~~~~~~~~~~
 
 You can export a report at any time by clicking the 'Export' button.
+This will output, next to the Project's .json file,
+
+- a .txt file copy of the most recent calculations log
+- a .jpeg file of the Project's plot
+- an either .csv or .json file with a summary of the results
+
+.. note::
+
+   The results are typically exported to CSV for easier parsing in Excel or similar.
+   Support for JSON reports are more or less accidental at time of writing.
+   If you are able and or willing to parse the JSON, it may be more useful to just work with the Project's JSON file directly.
+
 
 Running tests concurrently
 --------------------------
@@ -200,5 +208,4 @@ tab will appear on the main menu, and can be used normally.
    :alt: two systems
 
 At the time of writing, a particular project may only be loaded to one
-system at a time. Loading the same project to more than one system may
-result in data loss.
+'System' at a time.

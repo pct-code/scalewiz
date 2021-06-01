@@ -1,28 +1,29 @@
 todo
 ----
 
-- new screenshots of eval window / plot for docs
+- try to clean up export code / VBA import code
 
 bugs
 ----
 
+- none! I'm pretty sure ...
+
 refactoring
 -----------
 
-- we have a dep. on Pandas for one little call in export_csv -- could be worked around
+- we have a dep. on Pandas for one little call in export helper - could be worked around
 
 updates / new features
 ----------------------
 
-- menubar:
-    - 'add system' -> 'system' > 'add new', 'remove current'
-    - this will be a little awkward since we'd have to update/rebuild the menubar
-    each time a system is added / removed
+- none!
 
 low prio
 --------
 
 - port over the old chlorides / ppm calculators
 - check for config missing keys ?
-- color cycle for config / projects
-- the score function could be hooked up to poll from a logging queue, perhaps overkill
+- menubar:
+    - 'add system' -> 'system' > 'add new', 'remove current'
+    - this will be a little awkward since we'd have to update/rebuild the menubar
+    each time a system is added / removed

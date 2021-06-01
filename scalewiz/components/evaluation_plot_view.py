@@ -8,7 +8,6 @@ from tkinter import Canvas, ttk
 from tkinter.font import Font
 from typing import TYPE_CHECKING
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure, SubplotParams
@@ -20,19 +19,6 @@ if TYPE_CHECKING:
     from scalewiz.models.project import Project
 
 LOGGER: Logger = getLogger("scalewiz")
-
-COLORS = (
-    "orange",
-    "blue",
-    "red",
-    "mediumseagreen",
-    "darkgoldenrod",
-    "indigo",
-    "mediumvioletred",
-    "darkcyan",
-    "maroon",
-    "darkslategrey",
-)
 
 
 class EvaluationPlotView(ttk.Frame):
@@ -102,7 +88,6 @@ class EvaluationPlotView(ttk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
         with plt.style.context("bmh"):
-            mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLORS)
             self.axis.grid(color="darkgrey", alpha=0.65, linestyle="-")
             self.axis.set_facecolor("w")  # white
 
