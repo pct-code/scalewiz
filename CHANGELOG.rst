@@ -13,11 +13,6 @@ Versioning <https://semver.org/spec/v2.0.0.html>`_.
 [v0.5.7]
 --------
 
-Added
-~~~~~
-
-- the :code:`Project` data model now records calcium concentration
-
 Changed
 ~~~~~~~
 
@@ -37,10 +32,12 @@ Performance
 - updated the :code:`TestHandler` to be more robust when generating log files
 - minor performance buff to the :code:`LivePlot` component
 - minor performance buff to :code:`Project` serialization
+- minor performance buff to reading user configuration file
 
 Data handling
 =============
 
+- the :code:`Project` data model now records calcium concentration
 - updated the :code:`Test` object model to handle the :code:`Reading` class
 - updated the :code:`Project` object model to be more backwards compatible
 - refactored data analysis out of the :code:`EvaluationWindow` and into its own :code:`score` function
