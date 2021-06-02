@@ -67,6 +67,22 @@ class TestHandler:
             and not self.stop_requested
         )
 
+    def new_test(self) -> None:
+        """Initialize a new test."""
+        self.logger.info("Initializing a new test")
+        if isinstance(self.test, Test):
+            self.test.remove_traces()
+        self.test = Test()
+        self.limit_psi = self.project.limit_psi.get()
+        self.limit_minutes = self.project.limit_minutes.get()
+        self.max_psi_1, self.max_psi_2 = 0, 0
+        self.is_running, self.is_done = False, False
+        self.progress.set(0)
+        self.max_readings = round(
+            self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
+        )
+        self.rebuild_views()
+
     def start_test(self) -> None:
         """Perform a series of checks to make sure the test can run, then start it."""
         issues = []
@@ -86,10 +102,9 @@ class TestHandler:
             msg = "Water clarity cannot be blank"
             issues.append(msg)
 
+        # these methods will append issue messages if any occur
         self.update_log_handler(issues)
-
-        # this method will append issue msgs if any occur
-        self.setup_pumps(issues)  # hooray for pointers
+        self.setup_pumps(issues)
         if len(issues) > 0:
             messagebox.showwarning("Couldn't start the test", "\n".join(issues))
             for pump in (self.pump1, self.pump2):
@@ -116,8 +131,7 @@ class TestHandler:
             else:
                 self.stop_test(save=False)
                 break
-        # we use these in the loop
-        self.take_readings()
+        self.take_readings()  # still in the Future's thread
 
     def take_readings(self) -> None:
         def get_pressure(pump: NextGenPump) -> Any:
@@ -160,49 +174,6 @@ class TestHandler:
         else:
             self.stop_test(save=True)
 
-    # logging stuff / methods that affect UI
-    def new_test(self) -> None:
-        """Initialize a new test."""
-        self.logger.info("Initializing a new test")
-        if isinstance(self.test, Test):
-            self.test.remove_traces()
-        self.test = Test()
-        self.limit_psi = self.project.limit_psi.get()
-        self.limit_minutes = self.project.limit_minutes.get()
-        self.max_psi_1, self.max_psi_2 = 0, 0
-        self.is_running, self.is_done = False, False
-        self.progress.set(0)
-        self.max_readings = round(
-            self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
-        )
-        self.rebuild_views()
-
-    def setup_pumps(self, issues: List[str] = None) -> None:
-        """Set up the pumps with some default values.
-        Appends errors to the passed list
-        """
-        if issues is None:
-            issues = []
-
-        if self.dev1.get() in ("", "None found"):
-            issues.append("Select a port for pump 1")
-
-        if self.dev2.get() in ("", "None found"):
-            issues.append("Select a port for pump 2")
-
-        if self.dev1.get() == self.dev2.get():
-            issues.append("Select two unique ports")
-        else:
-            self.pump1 = NextGenPump(self.dev1.get(), self.logger)
-            self.pump2 = NextGenPump(self.dev2.get(), self.logger)
-
-        for pump in (self.pump1, self.pump2):
-            if pump is None or not pump.is_open:
-                issues.append(f"Couldn't connect to {pump.serial.name}")
-                continue
-            pump.flowrate = self.project.flowrate.get()
-            self.logger.info("Set flowrates to %s", pump.flowrate)
-
     def request_stop(self) -> None:
         """Requests that the Test stop."""
         if self.is_running:
@@ -244,40 +215,31 @@ class TestHandler:
         # refresh data / UI
         self.load_project(path=self.project.path.get(), new_test=False)
 
-    def rebuild_views(self) -> None:
-        """Rebuild all open Widgets that display or modify the Project file."""
-        for widget in self.views:
-            if widget.winfo_exists():
-                self.logger.debug("Rebuilding %s", widget)
-                self.root.after_idle(widget.build, {"reload": True})
-            else:
-                self.logger.debug("Removing dead widget %s", widget)
-                self.views.remove(widget)
+    def setup_pumps(self, issues: List[str] = None) -> None:
+        """Set up the pumps with some default values.
+        Appends errors to the passed list
+        """
+        if issues is None:
+            issues = []
 
-        self.logger.debug("Rebuilt all view widgets")
+        if self.dev1.get() in ("", "None found"):
+            issues.append("Select a port for pump 1")
 
-    def update_log_handler(self, issues: List[str]) -> None:
-        """Sets up the logging FileHandler to the passed path."""
-        id = "".join(char for char in self.test.name.get() if char.isalnum())
-        log_file = f"{time():.0f}_{id}_{date.today()}.txt"
-        parent_dir = Path(self.project.path.get()).parent.resolve()
-        logs_dir = parent_dir.joinpath("logs").resolve()
-        if not logs_dir.is_dir():
-            logs_dir.mkdir()
-        log_path = Path(logs_dir).joinpath(log_file).resolve()
-        self.log_handler = FileHandler(log_path)
+        if self.dev2.get() in ("", "None found"):
+            issues.append("Select a port for pump 2")
 
-        formatter = Formatter(
-            "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
-            "%Y-%m-%d %H:%M:%S",
-        )
-        if self.log_handler in self.logger.handlers:  # remove the old one
-            self.logger.removeHandler(self.log_handler)
-        self.log_handler.setFormatter(formatter)
-        self.log_handler.setLevel(DEBUG)
-        self.logger.addHandler(self.log_handler)
-        self.logger.info("Set up a log file at %s", log_file)
-        self.logger.info("Starting a test for %s", self.project.name.get())
+        if self.dev1.get() == self.dev2.get():
+            issues.append("Select two unique ports")
+        else:
+            self.pump1 = NextGenPump(self.dev1.get(), self.logger)
+            self.pump2 = NextGenPump(self.dev2.get(), self.logger)
+
+        for pump in (self.pump1, self.pump2):
+            if pump is None or not pump.is_open:
+                issues.append(f"Couldn't connect to {pump.serial.name}")
+                continue
+            pump.flowrate = self.project.flowrate.get()
+            self.logger.info("Set flowrates to %s", pump.flowrate)
 
     def load_project(
         self,
@@ -312,3 +274,38 @@ class TestHandler:
                     self.new_test()
                 self.logger.info("Loaded %s", self.project.name.get())
                 self.rebuild_views()
+
+    def rebuild_views(self) -> None:
+        """Rebuild all open Widgets that display or modify the Project file."""
+        for widget in self.views:
+            if widget.winfo_exists():
+                self.logger.debug("Rebuilding %s", widget)
+                self.root.after_idle(widget.build, {"reload": True})
+            else:
+                self.logger.debug("Removing dead widget %s", widget)
+                self.views.remove(widget)
+
+        self.logger.debug("Rebuilt all view widgets")
+
+    def update_log_handler(self, issues: List[str]) -> None:
+        """Sets up the logging FileHandler to the passed path."""
+        id = "".join(char for char in self.test.name.get() if char.isalnum())
+        log_file = f"{time():.0f}_{id}_{date.today()}.txt"
+        parent_dir = Path(self.project.path.get()).parent.resolve()
+        logs_dir = parent_dir.joinpath("logs").resolve()
+        if not logs_dir.is_dir():
+            logs_dir.mkdir()
+        log_path = Path(logs_dir).joinpath(log_file).resolve()
+        self.log_handler = FileHandler(log_path)
+
+        formatter = Formatter(
+            "%(asctime)s - %(thread)d - %(levelname)s - %(message)s",
+            "%Y-%m-%d %H:%M:%S",
+        )
+        if self.log_handler in self.logger.handlers:  # remove the old one
+            self.logger.removeHandler(self.log_handler)
+        self.log_handler.setFormatter(formatter)
+        self.log_handler.setLevel(DEBUG)
+        self.logger.addHandler(self.log_handler)
+        self.logger.info("Set up a log file at %s", log_file)
+        self.logger.info("Starting a test for %s", self.project.name.get())
