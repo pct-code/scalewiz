@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Union
+    from typing import List, Tuple, Union
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -110,7 +110,7 @@ class Test:
             )
         self.update_obs_baseline()
 
-    def get_readings(self) -> List[int]:
+    def get_readings(self) -> Tuple[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         pump = self.pump_to_score.get()
         pump = pump.replace(" ", "")  # legacy accomodation for spaces in keys

@@ -7,10 +7,10 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
-from queue import Queue
+from queue import Empty, Queue
 from time import sleep, time
 from tkinter import filedialog, messagebox
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from py_hplc import NextGenPump
 
@@ -34,23 +34,22 @@ class TestHandler:
         self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.project: Project = Project()
         self.test: Test = None
-        self.readings: List[Reading] = []
+        self.readings: Queue = Queue()
         self.max_readings: int = None  # max # of readings to collect
         self.limit_psi: int = None
         self.max_psi_1: int = None
         self.max_psi_2: int = None
         self.limit_minutes: float = None
         self.log_handler: FileHandler = None  # handles logging to log window
-        # test handler view overwrites this attribute in the view's build()
         self.log_queue: Queue[str] = Queue()  # view pulls from this queue
         self.dev1 = tk.StringVar()
         self.dev2 = tk.StringVar()
         self.stop_requested: bool = bool()
         self.progress = tk.IntVar()
-        self.elapsed_min: float = float()  # used for evaluations
+        self.elapsed_min: float = float()  # current duration
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
-        self.pool = ThreadPoolExecutor(max_workers=1)
+        self.pool = ThreadPoolExecutor(max_workers=3)
 
         # UI concerns
         self.views: List[tk.Widget] = []  # list of views displaying the project
@@ -64,7 +63,7 @@ class TestHandler:
         return (
             (self.max_psi_1 < self.limit_psi or self.max_psi_2 < self.limit_psi)
             and self.elapsed_min < self.limit_minutes
-            and len(self.readings) < self.max_readings
+            and self.readings.qsize() < self.max_readings
             and not self.stop_requested
         )
 
@@ -100,7 +99,8 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.pool.submit(self.uptake_cycle)
+            with self.pool as executor:
+                executor.submit(self.uptake_cycle)
 
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
@@ -120,29 +120,34 @@ class TestHandler:
         self.take_readings()
 
     def take_readings(self) -> None:
+        def get_pressure(pump: NextGenPump) -> Any:
+            return pump.pressure
+
         interval = self.project.interval_seconds.get()
+        timeout = interval / 3
         start_time = time()
         # readings loop ----------------------------------------------------------------
         while self.can_run:
-            minutes_elapsed = (time() - start_time) / 60
+            self.elapsed_min = (time() - start_time) / 60
+            with self.pool as executor:
+                psi1 = executor.submit(get_pressure, self.pump1)
+                psi2 = executor.submit(get_pressure, self.pump2)
 
-            psi1 = self.pump1.pressure
-            psi2 = self.pump2.pressure
+            psi1, psi2 = psi1.result(timeout=timeout), psi2.result(timeout=timeout)
             average = round(((psi1 + psi2) / 2))
 
             reading = Reading(
-                elapsedMin=minutes_elapsed, pump1=psi1, pump2=psi2, average=average
+                elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
             )
 
             # make a message for the log in the test handler view
             msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
-                minutes_elapsed, psi1, psi2, average
+                self.elapsed_min, psi1, psi2, average
             )
             self.log_queue.put(msg)
             self.logger.debug(msg)
-            self.readings.append(reading)
-            self.elapsed_min = minutes_elapsed
-            prog = round((len(self.readings) / self.max_readings) * 100)
+            self.readings.put(reading)
+            prog = round((self.readings.qsize() / self.max_readings) * 100)
             self.progress.set(prog)
 
             if psi1 > self.max_psi_1:
@@ -162,7 +167,6 @@ class TestHandler:
         if isinstance(self.test, Test):
             self.test.remove_traces()
         self.test = Test()
-        self.readings.clear()
         self.limit_psi = self.project.limit_psi.get()
         self.limit_minutes = self.project.limit_minutes.get()
         self.max_psi_1, self.max_psi_2 = 0, 0
@@ -227,7 +231,14 @@ class TestHandler:
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
-        self.test.readings.extend(self.readings)
+        while True:
+            try:
+                reading = self.readings.get(block=False)
+            except Empty:
+                break
+            else:
+                self.test.readings.append(reading)
+
         self.project.tests.append(self.test)
         self.project.dump_json()
         # refresh data / UI
