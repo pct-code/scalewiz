@@ -199,7 +199,7 @@ class Project:
         self.interval_seconds.set(params.get("interval", defaults["reading_interval"]))
         self.flowrate.set(params.get("flowrate", defaults["flowrate"]))
         self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
-        self.output_format.set(obj.get("outputFormat"), defaults["outputFormat"])
+        self.output_format.set(obj.get("outputFormat", defaults["output_format"]))
 
         self.plot.set(obj["plot"])
 

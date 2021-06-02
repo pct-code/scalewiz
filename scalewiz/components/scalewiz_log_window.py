@@ -46,12 +46,13 @@ class LogWindow(tk.Toplevel):
 
     def poll_log_queue(self) -> None:
         """Checks every 100ms if there is a new message in the queue to display."""
-        try:
-            record = self.log_queue.get(block=False)
-        except Empty:
-            pass
-        else:
-            self.display(record)
+        while True:
+            try:
+                record = self.log_queue.get(block=False)
+            except Empty:
+                break
+            else:
+                self.display(record)
         self.after(100, self.poll_log_queue)
 
     def display(self, record: LogRecord) -> None:

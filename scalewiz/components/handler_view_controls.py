@@ -59,13 +59,14 @@ class TestControls(ttk.Frame):
 
     def poll_log_queue(self) -> None:
         """Checks on an interval if there is a new message in the queue to display."""
-        try:
-            record = self.handler.log_queue.get(block=False)
-        except Empty:
-            pass
-        else:
-            self.display(record)
-        self.after_idle(self.poll_log_queue)
+        while True:
+            try:
+                record = self.handler.log_queue.get(block=False)
+            except Empty:
+                break
+            else:
+                self.display(record)
+        self.after(self.interval, self.poll_log_queue)
 
     def display(self, msg: str) -> None:
         """Displays a message in the log."""
