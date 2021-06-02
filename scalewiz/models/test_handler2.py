@@ -8,7 +8,7 @@ from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
 from queue import Empty, Queue
-from time import sleep, time
+from time import time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
 
@@ -114,36 +114,44 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.pool.submit(self.uptake_cycle)
+            self.uptake_cycle(self.project.uptake_seconds.get() * 1000)
 
-    def uptake_cycle(self) -> None:
+    def uptake_cycle(self, duration_ms: int) -> None:
         """Get ready to take readings."""
-        uptake = self.project.uptake_seconds.get()
-        step = uptake / 100  # we will sleep for 100 steps
+        # run the uptake cycle ---------------------------------------------------------
+        ms_step = round((duration_ms / 100))  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
-        rinse_start = time()
-        for i in range(100):
+
+        def cycle(start, i, step_ms) -> None:
             if self.can_run:
-                self.progress.set(i)
-                sleep(step - ((time() - rinse_start) % step))
+                if i < 100:
+                    i += 1
+                    self.progress.set(i)
+                    self.root.after(
+                        round(step_ms - (((time() - start) * 1000) % step_ms)),
+                        cycle,
+                        start,
+                        i,
+                        step_ms,
+                    )
+                else:
+                    self.take_readings()
             else:
                 self.stop_test(save=False)
-                break
-        self.take_readings()  # still in the Future's thread
 
-    def take_readings(self) -> None:
-        def get_pressure(pump: NextGenPump) -> Union[float, int]:
-            return pump.pressure
+        cycle(time(), 0, ms_step)
 
-        interval = self.project.interval_seconds.get()
-        start_time = time()
+    def take_readings(self, start_time: float = None, interval: float = None) -> None:
+        if start_time is None:
+            start_time = time()
+        if interval is None:
+            interval = self.project.interval_seconds.get() * 1000
         # readings loop ----------------------------------------------------------------
-        while self.can_run:
-            self.elapsed_min = (time() - start_time) / 60
-            psi1 = self.pool.submit(get_pressure, self.pump1)
-            psi2 = self.pool.submit(get_pressure, self.pump2)
-            psi1, psi2 = psi1.result(), psi2.result()
+        if self.can_run:
+            self.elapsed_min = round((time() - start_time) / 60, 2)
+
+            psi1, psi2 = self.pump1.pressure, self.pump2.pressure
             average = round(((psi1 + psi2) / 2))
 
             reading = Reading(
@@ -166,8 +174,15 @@ class TestHandler:
                 self.max_psi_2 = psi2
 
             # TYSM https://stackoverflow.com/a/25251804
-            sleep(interval - ((time() - start_time) % interval))
+            self.root.after(
+                round(interval - (((time() - start_time) * 1000) % interval)),
+                self.take_readings,
+                start_time,
+                interval,
+            )
         else:
+            # end of readings loop -----------------------------------------------------
+            self.logger.warn("about to request saving")
             self.stop_test(save=True)
 
     def request_stop(self) -> None:
