@@ -21,6 +21,10 @@ Installation
 ::
 
     python -m pip install --user scalewiz
+    
+Or, if you use :code:`pipx` (`try it!`_ 😉) ::
+    
+    pipx install scalewiz
 
 Usage
 =====
@@ -29,9 +33,10 @@ Usage
 
     python -m scalewiz
 
-Or, if Python is on your PATH, simply ::
+If Python is on your PATH (or you used :code:`pipx` 😎), simply ::
 
     scalewiz
+
 
 Further instructions can be viewed in the `docs`_ section of this repo or with the Help button in the main
 menu.
@@ -74,3 +79,5 @@ Acknowledgements
 .. _`py-hplc`: https://github.com/teauxfu/py-hplc
 .. _`docs`: https://github.com/teauxfu/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
 .. _`issue`: https://github.com/teauxfu/scalewiz/issues
+.. _`try it!`: https://pypa.github.io/pipx/
+
