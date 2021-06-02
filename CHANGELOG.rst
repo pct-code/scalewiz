@@ -13,6 +13,11 @@ Versioning <https://semver.org/spec/v2.0.0.html>`_.
 [v0.5.7]
 --------
 
+Added
+~~~~~
+
+- the :code:`Project` data model now records calcium concentration
+
 Changed
 ~~~~~~~
 
@@ -26,7 +31,7 @@ User experience
 - ensured exported plot dimensions are always uniform
 
 Performance
-====================
+===========
 
 - updated the :code:`TestHandler` to poll for readings asynchronously
 - updated the :code:`TestHandler` to be more robust when generating log files
@@ -36,11 +41,10 @@ Performance
 Data handling
 =============
 
-- :code:`Project` data model now records calcium concentration for brines
 - updated the :code:`Test` object model to handle the :code:`Reading` class
-- updated :code:`score` function to handle the :code:`Reading` class
 - updated the :code:`Project` object model to be more backwards compatible
 - refactored data analysis out of the :code:`EvaluationWindow` and into its own :code:`score` function
+- updated :code:`score` function to handle the :code:`Reading` class
 
 Misc
 ====
