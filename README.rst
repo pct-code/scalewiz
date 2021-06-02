@@ -21,9 +21,9 @@ Installation
 ::
 
     python -m pip install --user scalewiz
-    
+
 Or, if you use :code:`pipx` (`try it!`_ 😉) ::
-    
+
     pipx install scalewiz
 
 Usage
@@ -80,4 +80,3 @@ Acknowledgements
 .. _`docs`: https://github.com/teauxfu/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
 .. _`issue`: https://github.com/teauxfu/scalewiz/issues
 .. _`try it!`: https://pypa.github.io/pipx/
-
