@@ -53,12 +53,14 @@ class LivePlot(ttk.Frame):
         The interval argument is used by matplotlib internally.
         """
         # # we can just skip this if the test isn't running
-        if len(self.handler.readings) > 0:
+        if self.handler.readings.qsize() > 0:
             if self.handler.is_running and not self.handler.is_done:
+                with self.handler.readings.mutex:
+                    readings = tuple(self.handler.readings.queue)
                 pump1 = []
                 pump2 = []
                 elapsed = []  # we will share this series as an axis
-                for reading in self.handler.readings:
+                for reading in readings:
                     pump1.append(reading.pump1)
                     pump2.append(reading.pump2)
                     elapsed.append(reading.elapsedMin)

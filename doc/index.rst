@@ -30,7 +30,7 @@ If you need to clear a date field, just click its label.
 Experiment parameters
 ~~~~~~~~~~~~~~~~~~~~~
 
-This is the most important one. The first two fields only affect the
+This is the most important one. The first few fields only affect the
 final report. The last five fields affect how the tests are conducted
 and scored.
 

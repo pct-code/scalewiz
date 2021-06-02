@@ -1,3 +1,4 @@
+=========
 Changelog
 =========
 
@@ -10,27 +11,44 @@ Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
 [v0.5.7]
---------------------
+--------
+
+Added
+~~~~~
+
+- the :code:`Project` data model now records calcium concentration
 
 Changed
 ~~~~~~~
 
-User experience concerns
+User experience
+===============
 
-- overhaul the :code:`TestHandlerView` to be better oragnized and less bad
-- overhaul the :code:`EvaluationWindow` to be better oragnized and less bad
+- overhaul the :code:`TestHandlerView` to be better oragnized
+- overhaul the :code:`EvaluationWindow` to be better oragnized
 - setting labels for each :code:`Test` is now handled in the :code:`EvaluationWindow`s' "Plot" tab
-- updated docs to reflect the above
-
-Coding concerns
-
-- updated the :code:`TestHandler` to be more robust when generating log files
-- updated the :code:`Test` object model to handle the :code:`Reading` class
-- updated :code:`score` function to handle the :code:`Reading` class
-- updated the :code:`Project` object model to be more backwards compatible
+- updated docs
 - ensured exported plot dimensions are always uniform
+
+Performance
+===========
+
+- updated the :code:`TestHandler` to poll for readings asynchronously
+- updated the :code:`TestHandler` to be more robust when generating log files
 - minor performance buff to the :code:`LivePlot` component
-- minor performance buffs generally
+- minor performance buff to :code:`Project` serialization
+
+Data handling
+=============
+
+- updated the :code:`Test` object model to handle the :code:`Reading` class
+- updated the :code:`Project` object model to be more backwards compatible
+- refactored data analysis out of the :code:`EvaluationWindow` and into its own :code:`score` function
+- updated :code:`score` function to handle the :code:`Reading` class
+
+Misc
+====
+
 - update all :code:`os.path` operations to fancy :code:`pathlib.Path` operations
 - update all :code:`matplotlib` code to use the object oriented API
 - lots of misc. code cleanup / reorganizing
