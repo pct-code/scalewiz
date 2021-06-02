@@ -1,9 +1,9 @@
 """Simple frame that starts and stops the pumps on a timer."""
 
 import logging
-import time
 import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 from tkinter import ttk
 
 from scalewiz.helpers.set_icon import set_icon
@@ -41,7 +41,7 @@ class RinseWindow(tk.Toplevel):
 
     def request_rinse(self) -> None:
         """Try to start a rinse cycle if a test isn't running."""
-        if not self.handler.is_running.get() or self.handler.is_done.get():
+        if self.handler.is_done or not self.handler.is_running:
             self.pool.submit(self.rinse)
 
     def rinse(self) -> None:
@@ -51,11 +51,11 @@ class RinseWindow(tk.Toplevel):
         self.handler.pump2.run()
 
         self.button.configure(state="disabled")
-        duration = self.rinse_minutes.get() * 60
+        duration = round(self.rinse_minutes.get() * 60)
         for i in range(duration):
             if not self.stop:
                 self.button.configure(text=f"{i+1}/{duration} s")
-                time.sleep(1)
+                sleep(1)
             else:
                 break
         self.bell()

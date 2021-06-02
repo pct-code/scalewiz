@@ -114,8 +114,7 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            with self.pool as executor:
-                executor.submit(self.uptake_cycle)
+            self.pool.submit(self.uptake_cycle)
 
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
@@ -138,16 +137,13 @@ class TestHandler:
             return pump.pressure
 
         interval = self.project.interval_seconds.get()
-        timeout = interval / 3
         start_time = time()
         # readings loop ----------------------------------------------------------------
         while self.can_run:
             self.elapsed_min = (time() - start_time) / 60
-            with self.pool as executor:
-                psi1 = executor.submit(get_pressure, self.pump1)
-                psi2 = executor.submit(get_pressure, self.pump2)
-
-            psi1, psi2 = psi1.result(timeout=timeout), psi2.result(timeout=timeout)
+            psi1 = self.pool.submit(get_pressure, self.pump1)
+            psi2 = self.pool.submit(get_pressure, self.pump2)
+            psi1, psi2 = psi1.result(), psi2.result()
             average = round(((psi1 + psi2) / 2))
 
             reading = Reading(
@@ -234,12 +230,13 @@ class TestHandler:
             self.pump1 = NextGenPump(self.dev1.get(), self.logger)
             self.pump2 = NextGenPump(self.dev2.get(), self.logger)
 
+        flowrate = self.project.flowrate.get()
         for pump in (self.pump1, self.pump2):
             if pump is None or not pump.is_open:
                 issues.append(f"Couldn't connect to {pump.serial.name}")
                 continue
-            pump.flowrate = self.project.flowrate.get()
-            self.logger.info("Set flowrates to %s", pump.flowrate)
+            pump.flowrate = flowrate
+        self.logger.info("Set flowrates to %s", pump.flowrate)
 
     def load_project(
         self,
