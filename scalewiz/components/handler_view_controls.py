@@ -65,7 +65,7 @@ class TestControls(ttk.Frame):
             pass
         else:
             self.display(record)
-        self.after(self.interval, self.poll_log_queue)
+        self.after_idle(self.poll_log_queue)
 
     def display(self, msg: str) -> None:
         """Displays a message in the log."""
