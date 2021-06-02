@@ -11,7 +11,7 @@ If you are working with Teledyne SSI Next Generation pumps generally, please che
 This project is stable and usable in a production environment, but listed as in beta due to the lack of a test suite (yet!).
 If you notice something weird, fragile, or otherwise encounter a bug, please open an `issue`_.
 
-.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/main_menu(details).PNG
+.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/main_menu.PNG
 
 .. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/evaluation(plot).PNG
 
@@ -28,6 +28,10 @@ Usage
 ::
 
     python -m scalewiz
+
+Or, if Python is on your PATH, simply ::
+
+    scalewiz
 
 Further instructions can be viewed in the `docs`_ section of this repo or with the Help button in the main
 menu.
