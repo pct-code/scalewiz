@@ -51,6 +51,7 @@ Misc
 
 - update all :code:`os.path` operations to fancy :code:`pathlib.Path` operations
 - update all :code:`matplotlib` code to use the object oriented API
+- fixed some lag that would accumulate when displaying log messages in the main menu
 - lots of misc. code cleanup / reorganizing
 
 
