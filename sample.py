@@ -8,6 +8,11 @@ class App(tk.Frame):
 
         self.count = tk.IntVar()
         self.delay = tk.DoubleVar()
+        self.text = tk.StringVar()
+
+        for variable in (self.count, self.delay, self.text):
+            variable.set(None)
+
         tk.Label(self, textvariable=self.delay).pack(padx=20, pady=20)
         tk.Label(self, textvariable=self.count).pack(padx=20, pady=20)
         self.cycle(1000)

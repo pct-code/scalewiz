@@ -145,18 +145,16 @@ class TestHandler:
             psi2 = self.pool.submit(get_pressure, self.pump2)
             psi1, psi2 = psi1.result(), psi2.result()
             average = round(((psi1 + psi2) / 2))
-
             reading = Reading(
                 elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
             )
-
             # make a message for the log in the test handler view
             msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
                 self.elapsed_min, psi1, psi2, average
             )
+            self.readings.put(reading)
             self.log_queue.put(msg)
             self.logger.debug(msg)
-            self.readings.put(reading)
             prog = round((self.readings.qsize() / self.max_readings) * 100)
             self.progress.set(prog)
 

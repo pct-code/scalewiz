@@ -199,9 +199,9 @@ class Project:
         self.interval_seconds.set(params.get("interval", defaults["reading_interval"]))
         self.flowrate.set(params.get("flowrate", defaults["flowrate"]))
         self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
+        self.output_format.set(obj.get("outputFormat"), defaults["outputFormat"])
 
         self.plot.set(obj["plot"])
-        self.output_format.set(obj["outputFormat"])
 
         self.tests.clear()
         for entry in obj["tests"]:

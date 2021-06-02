@@ -1,4 +1,7 @@
-"""Handles a test."""
+"""Handles a test. Experimental / not currently used.
+
+Readings are collected using a combination of multithreading and tk.after calls.
+"""
 
 from __future__ import annotations
 
@@ -21,6 +24,10 @@ from scalewiz.models.test import Reading, Test
 if TYPE_CHECKING:
     from logging import Logger
     from typing import List, Set, Union
+
+
+def get_pressure(pump: NextGenPump) -> Union[float, int]:
+    return pump.pressure
 
 
 class TestHandler:
@@ -122,6 +129,7 @@ class TestHandler:
         ms_step = round((duration_ms / 100))  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
+        print("starting rinse for", duration_ms, "with 100 steps of", ms_step)
 
         def cycle(start, i, step_ms) -> None:
             if self.can_run:
@@ -136,7 +144,7 @@ class TestHandler:
                         step_ms,
                     )
                 else:
-                    self.take_readings()
+                    self.pool.submit(self.take_readings)
             else:
                 self.stop_test(save=False)
 
@@ -149,9 +157,12 @@ class TestHandler:
             interval = self.project.interval_seconds.get() * 1000
         # readings loop ----------------------------------------------------------------
         if self.can_run:
+
             self.elapsed_min = round((time() - start_time) / 60, 2)
 
-            psi1, psi2 = self.pump1.pressure, self.pump2.pressure
+            psi1 = self.pool.submit(get_pressure, self.pump1)
+            psi2 = self.pool.submit(get_pressure, self.pump2)
+            psi1, psi2 = psi1.result(), psi2.result()
             average = round(((psi1 + psi2) / 2))
 
             reading = Reading(
@@ -172,7 +183,6 @@ class TestHandler:
                 self.max_psi_1 = psi1
             if psi2 > self.max_psi_2:
                 self.max_psi_2 = psi2
-
             # TYSM https://stackoverflow.com/a/25251804
             self.root.after(
                 round(interval - (((time() - start_time) * 1000) % interval)),
@@ -182,7 +192,6 @@ class TestHandler:
             )
         else:
             # end of readings loop -----------------------------------------------------
-            self.logger.warn("about to request saving")
             self.stop_test(save=True)
 
     def request_stop(self) -> None:
