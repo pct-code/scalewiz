@@ -122,7 +122,7 @@ class TestHandler:
 
         Meant to be run from a worker thread.
         """
-        self.logger.debug("Starting an uptake cycle")
+        self.logger.info("Starting an uptake cycle")
         uptake = self.project.uptake_seconds.get()
         step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
@@ -142,10 +142,10 @@ class TestHandler:
 
         Meant to be run from a worker thread.
         """
-        self.logger.debug("Starting readings collection")
+        self.logger.info("Starting readings collection")
 
         def get_pressure(pump: NextGenPump) -> Union[float, int]:
-            self.logger.debug("collecting a reading from %s", pump.serial.name)
+            self.logger.info("collecting a reading from %s", pump.serial.name)
             return pump.pressure
 
         interval = self.project.interval_seconds.get()
@@ -153,9 +153,12 @@ class TestHandler:
         # readings loop ----------------------------------------------------------------
         while self.can_run:
             self.elapsed_min = (time() - start_time) / 60
+            t0 = time()
             psi1 = self.pool.submit(get_pressure, self.pump1)
             psi2 = self.pool.submit(get_pressure, self.pump2)
             psi1, psi2 = psi1.result(), psi2.result()
+            t1 = time()
+            self.logger.warn("got both in %s s", t1 - t0)
             average = round(((psi1 + psi2) / 2))
             reading = Reading(
                 elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
@@ -178,7 +181,7 @@ class TestHandler:
             # TYSM https://stackoverflow.com/a/25251804
             sleep(interval - ((time() - start_time) % interval))
         else:
-            self.stop_test(save=True)
+            self.root.after(0, self.stop_test, {"save": True})
 
     def request_stop(self) -> None:
         """Requests that the Test stop."""

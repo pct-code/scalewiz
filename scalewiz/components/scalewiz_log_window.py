@@ -22,7 +22,7 @@ class LogWindow(tk.Toplevel):
     """A Toplevel with a ScrolledText. Displays messages from a Logger."""
 
     def __init__(self, core: ScaleWiz) -> None:
-        tk.Toplevel.__init__(self)
+        super().__init__()
         self.log_queue = core.log_queue
         self.title("Log Window")
         # replace the window closing behavior with withdrawing instead 🐱‍👤
