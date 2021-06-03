@@ -117,7 +117,10 @@ class TestHandler:
             self.pool.submit(self.uptake_cycle)
 
     def uptake_cycle(self) -> None:
-        """Get ready to take readings."""
+        """Get ready to take readings.
+
+        Meant to be called in a child thread.
+        """
         uptake = self.project.uptake_seconds.get()
         step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
