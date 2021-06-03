@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import tkinter as tk
 from pathlib import Path
+from time import time
 from tkinter.messagebox import showinfo
 from typing import TYPE_CHECKING
 
@@ -98,7 +99,14 @@ class MenuBar:
     def _debug(self) -> None:
         """Used for debugging."""
         LOGGER.warn("DEBUGGING")
+
         current_tab = self.parent.tab_control.select()
         widget: TestHandlerView = self.parent.nametowidget(current_tab)
-        widget.handler.rebuild_views()
-        widget.bell()
+        widget.handler.setup_pumps()
+        t0 = time()
+        p1 = widget.handler.pump1.pressure
+        t1 = time()
+        widget.handler.close_pumps()
+        LOGGER.warn("collected a pressure %s in %s", p1, t0 - t1)
+        # widget.handler.rebuild_views()
+        # widget.bell()

@@ -39,11 +39,11 @@ class ScaleWiz(ttk.Frame):
         self.log_queue = Queue()
         queue_handler = QueueHandler(self.log_queue)
         # this is for inspecting the multithreading
-        # fmt = (
-        #     "%(asctime)s - %(func)s - %(thread)d "
-        #     "- %(levelname)s - %(name)s - %(message)s"
-        # )
-        fmt = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+        fmt = (
+            "%(asctime)s - %(func)s - %(thread)d "
+            "- %(levelname)s - %(name)s - %(message)s"
+        )
+        # fmt = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
         date_fmt = "%Y-%m-%d %H:%M:%S"
         formatter = logging.Formatter(
             fmt,
