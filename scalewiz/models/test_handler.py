@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
-from queue import Empty, Queue
+from queue import Queue
 from time import sleep, time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
@@ -34,7 +34,7 @@ class TestHandler:
         self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.project: Project = Project()
         self.test: Test = None
-        self.readings: Queue = Queue()
+        self.readings: List[Reading] = []
         self.max_readings: int = None  # max # of readings to collect
         self.limit_psi: int = None
         self.max_psi_1: int = None
@@ -63,7 +63,7 @@ class TestHandler:
         return (
             (self.max_psi_1 < self.limit_psi or self.max_psi_2 < self.limit_psi)
             and self.elapsed_min < self.limit_minutes
-            and self.readings.qsize() < self.max_readings
+            and len(self.readings) < self.max_readings
             and not self.stop_requested
         )
 
@@ -117,7 +117,11 @@ class TestHandler:
             self.pool.submit(self.uptake_cycle)
 
     def uptake_cycle(self) -> None:
-        """Get ready to take readings."""
+        """Get ready to take readings.
+
+        Meant to be run from a worker thread.
+        """
+        self.logger.debug("Starting an uptake cycle")
         uptake = self.project.uptake_seconds.get()
         step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
@@ -133,7 +137,14 @@ class TestHandler:
         self.take_readings()  # still in the Future's thread
 
     def take_readings(self) -> None:
+        """Collects Readings by messaging the pumps.
+
+        Meant to be run from a worker thread.
+        """
+        self.logger.debug("Starting readings collection")
+
         def get_pressure(pump: NextGenPump) -> Union[float, int]:
+            self.logger.debug("collecting a reading from %s", pump.serial.name)
             return pump.pressure
 
         interval = self.project.interval_seconds.get()
@@ -152,7 +163,7 @@ class TestHandler:
             msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
                 self.elapsed_min, psi1, psi2, average
             )
-            self.readings.put(reading)
+            self.readings.append(reading)
             self.log_queue.put(msg)
             self.logger.debug(msg)
             prog = round((self.readings.qsize() / self.max_readings) * 100)
@@ -175,15 +186,7 @@ class TestHandler:
 
     def stop_test(self, save: bool = False, rinsing: bool = False) -> None:
         """Stops the pumps, closes their ports."""
-        for pump in (self.pump1, self.pump2):
-            if pump.is_open:
-                pump.stop()
-                pump.close()
-                self.logger.info(
-                    "Stopped and closed the device @ %s",
-                    pump.serial.name,
-                )
-
+        self.close_pumps()
         if not rinsing:
             self.is_done = True
             self.is_running = False
@@ -196,14 +199,10 @@ class TestHandler:
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
-        while True:
-            try:
-                reading = self.readings.get(block=False)
-            except Empty:
-                break
-            else:
-                self.test.readings.append(reading)
-
+        self.logger.info(
+            "Saving %s to %s", self.test.name.get(), self.project.name.get()
+        )
+        self.test.readings.extend(self.readings)
         self.project.tests.append(self.test)
         self.project.dump_json()
         # refresh data / UI
@@ -235,6 +234,17 @@ class TestHandler:
                 continue
             pump.flowrate = flowrate
         self.logger.info("Set flowrates to %s", pump.flowrate)
+
+    def close_pumps(self) -> None:
+        """Tears down the pumps."""
+        for pump in (self.pump1, self.pump2):
+            if pump.is_open:
+                pump.stop()
+                pump.close()
+                self.logger.info(
+                    "Stopped and closed the device @ %s",
+                    pump.serial.name,
+                )
 
     def load_project(
         self,
