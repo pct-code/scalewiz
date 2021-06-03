@@ -110,6 +110,7 @@ class TestHandler:
             for pump in (self.pump1, self.pump2):
                 pump.close()
         else:
+            self.readings.clear()
             self.stop_requested = False
             self.is_done = False
             self.is_running = True
