@@ -167,7 +167,7 @@ class TestHandler:
             self.readings.append(reading)
             self.log_queue.put(msg)
             self.logger.debug(msg)
-            prog = round((self.readings.qsize() / self.max_readings) * 100)
+            prog = round((len(self.readings) / self.max_readings) * 100)
             self.progress.set(prog)
 
             if psi1 > self.max_psi_1:
