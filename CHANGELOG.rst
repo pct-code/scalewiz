@@ -42,6 +42,7 @@ Data handling
 - updated the :code:`Test` object model to handle the :code:`Reading` class
 - updated the :code:`Project` object model to be more backwards compatible
 - refactored data analysis out of the :code:`EvaluationWindow` and into its own :code:`score` function
+- calculations log is a bit more verbose now
 - updated :code:`score` function to handle the :code:`Reading` class
 
 Misc
