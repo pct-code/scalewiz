@@ -58,15 +58,21 @@ class ProjectWindow(tk.Toplevel):
         )
 
         button_frame = ttk.Frame(self)
-        ttk.Button(button_frame, text="Save", width=7, command=self.save).grid(
-            row=0, column=0, padx=5
-        )
-        ttk.Button(button_frame, text="Save as", width=7, command=self.save_as).grid(
-            row=0, column=1, padx=10
-        )
-        ttk.Button(button_frame, text="New", width=7, command=self.new).grid(
-            row=0, column=2, padx=5
-        )
+
+        if self.handler.is_running:
+            state = "disabled"
+        else:
+            state = "normal"
+
+        ttk.Button(
+            button_frame, text="Save", width=7, command=self.save, state=state
+        ).grid(row=0, column=0, padx=5)
+        ttk.Button(
+            button_frame, text="Save as", width=7, command=self.save_as, state=state
+        ).grid(row=0, column=1, padx=10)
+        ttk.Button(
+            button_frame, text="New", width=7, command=self.new, state=state
+        ).grid(row=0, column=2, padx=5)
         ttk.Button(
             button_frame, text="Edit defaults", width=10, command=self.edit
         ).grid(row=0, column=3, padx=5)
