@@ -104,9 +104,10 @@ class MenuBar:
         widget: TestHandlerView = self.parent.nametowidget(current_tab)
         widget.handler.setup_pumps()
         t0 = time()
-        p1 = widget.handler.pump1.pressure
+        widget.handler.pump1.pressure
+        widget.handler.pump2.pressure
         t1 = time()
         widget.handler.close_pumps()
-        LOGGER.warn("collected a pressure %s in %s", p1, t0 - t1)
+        LOGGER.warn("collected 2 pressures in %s", t1 - t0)
         # widget.handler.rebuild_views()
         # widget.bell()

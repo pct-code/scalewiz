@@ -79,6 +79,7 @@ class ProjectWindow(tk.Toplevel):
 
     def save(self) -> None:
         """Save the current Project to file as JSON."""
+        # todo don't allow saving if saving to current project - otherwise fine
         if not self.handler.is_running:
             if self.editor_project.path.get() == "":
                 self.save_as()
