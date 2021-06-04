@@ -5,7 +5,8 @@ from __future__ import annotations
 import logging
 import tkinter as tk
 from pathlib import Path
-from time import time
+
+# from time import time
 from tkinter.messagebox import showinfo
 from typing import TYPE_CHECKING
 
@@ -46,7 +47,7 @@ class MenuBar:
         menubar.add_command(label="Help", command=show_help)
         menubar.add_command(label="About", command=self.about)
 
-        menubar.add_command(label="Debug", command=self._debug)
+        # menubar.add_command(label="Debug", command=self._debug)
         self.menubar = menubar
 
     def spawn_editor(self) -> None:
@@ -98,16 +99,17 @@ class MenuBar:
 
     def _debug(self) -> None:
         """Used for debugging."""
-        LOGGER.warn("DEBUGGING")
+        pass
+        # LOGGER.warn("DEBUGGING")
 
-        current_tab = self.parent.tab_control.select()
-        widget: TestHandlerView = self.parent.nametowidget(current_tab)
-        widget.handler.setup_pumps()
-        t0 = time()
-        widget.handler.pump1.pressure
-        widget.handler.pump2.pressure
-        t1 = time()
-        widget.handler.close_pumps()
-        LOGGER.warn("collected 2 pressures in %s", t1 - t0)
+        # current_tab = self.parent.tab_control.select()
+        # widget: TestHandlerView = self.parent.nametowidget(current_tab)
+        # widget.handler.setup_pumps()
+        # t0 = time()
+        # widget.handler.pump1.pressure
+        # widget.handler.pump2.pressure
+        # t1 = time()
+        # widget.handler.close_pumps()
+        # LOGGER.warn("collected 2 pressures in %s", t1 - t0)
         # widget.handler.rebuild_views()
         # widget.bell()
