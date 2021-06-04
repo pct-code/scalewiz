@@ -30,7 +30,7 @@ If you need to clear a date field, just click its label.
 Experiment parameters
 ~~~~~~~~~~~~~~~~~~~~~
 
-This is the most important one. The first two fields only affect the
+This is the most important one. The first few fields only affect the
 final report. The last five fields affect how the tests are conducted
 and scored.
 
@@ -73,7 +73,7 @@ If you don't already have a project loaded, click 'Project' > 'Load
 existing' from the menu bar. If a project is currently loaded, it's name
 will be displayed as shown below.
 
-.. image:: ../img/main_menu(loaded).PNG
+.. image:: ../img/main_menu.PNG
    :alt: main menu with loaded project
 
 Use the 'Devices' dropdown boxes to select the serial ports the pumps
@@ -87,7 +87,10 @@ Blanks
 ~~~~~~
 
 If you are running a blank, enter a name for it. The notes field may be
-used to store any other relevant information. |trial entry|
+used to store any other relevant information.
+
+ .. image:: ../img/main_menu(blank).PNG
+    :alt: blank entry
 
 Trials
 ~~~~~~
@@ -113,13 +116,6 @@ You can interrupt the uptake cycle (or the test itself) at any time by
 clicking the 'Stop' button. This will stop the pumps, then attempt to
 save the data to file.
 
-While a test is running, you may click 'Toggle Details' to show/hide a
-more detailed view of the experiment state, including a live plot of the
-data as it is collected.
-
-.. image:: ../img/main_menu(details).PNG
-   :alt: live plot
-
 A test will automatically stop itself and the pumps when either the time
 limit or pressure limit has been reached. The 'Start' button will become
 a 'New' button, which you can use to initialize a new test.
@@ -130,9 +126,11 @@ Rinses
 Between each test, it is necessary to rinse the system. Clicking 'Rinse'
 from the menu bar will create a small dialog that can do this for you.
 
-|rinse dialog|
+.. image:: ../img/rinse_dialog.PNG
+   :alt: rinse dialog
 
-|rinse dialog in progress|
+.. image:: ../img/rinse_dialog(rinsing).PNG
+   :alt: rinse dialog in progress
 
 The button will temporarily disable while acting as a status label to
 show the progression of the rinse. Closing the dialog will terminate the
@@ -149,23 +147,25 @@ Click 'Evaluation' from the menu bar to open the Evalutaion Window.
 The data for each test in the project will be displayed horizontally as
 a row.
 
--  Report As: what to call the test on the plot
--  Minutes: the duration of the test, (# of measurements)
+-  Minutes: the duration of the test
 -  Pump: which series of pressure measurements to use for scoring
--  Baseline: the observed baseline pressure for the selected Pump
--  Max: the highest pressure observed for the selected Pump
+-  Baseline PSI: the observed baseline pressure for the selected Pump
+-  Max PSI: the highest pressure observed for the selected Pump
 -  Clarity: the observed water clarity
--  Notes: any misc. info associated with the test. may be edited at any
-   time
--  Result: the test's score, considering the selected Pump
--  Report: a checkbox for indicating whether or not a test should be
-   included on the report
+-  Notes: any misc. info associated with the test.
+-  Result: the test's score, considering the selected Pump and blanks on report
+-  Report: a checkbox for indicating whether or not a test should be included on the report
+
+.. note::
+
+   Blanks will only be factored into the scoring process if marked as 'On Report'
+
 
 Plot
 ~~~~
 
-The 'Plot' tab displays the most recent plot of all tests with a ticked
-'Include on Report' box.
+The 'Plot' tab displays the most recent plot of all tests with a ticked 'Include on Report' box.
+You can change the Label associated with each test using the entries on the right.
 
 .. image:: ../img/evaluation(plot).PNG
    :alt: plot frame with some data
@@ -178,10 +178,25 @@ The 'Calculations' tab displays a text log of the evaluation of all
 tests with a ticked 'Include on Report' box. This log is automatically
 exported next to the report file when you click the 'Export' button.
 
+.. image:: ../img/evaluation(calcs).PNG
+   :alt: calculations frame with some data
+
 Generating a report
 ~~~~~~~~~~~~~~~~~~~
 
 You can export a report at any time by clicking the 'Export' button.
+This will output, next to the Project's .json file,
+
+- a .txt file copy of the most recent calculations log
+- a .jpeg file of the Project's plot
+- an either .csv or .json file with a summary of the results
+
+.. note::
+
+   The results are typically exported to CSV for easier parsing in Excel or similar.
+   Support for JSON reports are more or less accidental at time of writing.
+   If you are able and or willing to parse the JSON, it may be more useful to just work with the Project's JSON file directly.
+
 
 Running tests concurrently
 --------------------------
@@ -193,9 +208,4 @@ tab will appear on the main menu, and can be used normally.
    :alt: two systems
 
 At the time of writing, a particular project may only be loaded to one
-system at a time. Loading the same project to more than one system may
-result in data loss.
-
-.. |trial entry| image:: ../img/main_menu(blank).PNG
-.. |rinse dialog| image:: ../img/rinse_dialog.PNG
-.. |rinse dialog in progress| image:: ../img/rinse_dialog(rinsing).PNG
+'System' at a time.

@@ -1,9 +1,9 @@
 """Simple frame that starts and stops the pumps on a timer."""
 
 import logging
-import time
 import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 from tkinter import ttk
 
 from scalewiz.helpers.set_icon import set_icon
@@ -18,7 +18,7 @@ class RinseWindow(tk.Toplevel):
     def __init__(self, handler: TestHandler) -> None:
         tk.Toplevel.__init__(self)
         self.winfo_toplevel().protocol("WM_DELETE_WINDOW", self.close)
-        self.handler = handler
+        self.handler: TestHandler = handler
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.stop = False
 
@@ -36,14 +36,12 @@ class RinseWindow(tk.Toplevel):
         ent = ttk.Spinbox(self, textvariable=self.rinse_minutes, from_=3, to=60)
         ent.grid(row=0, column=1)
 
-        self.button = ttk.Button(
-            self, textvariable=self.txt, command=self.request_rinse
-        )
+        self.button = ttk.Button(self, text="Rinse", command=self.request_rinse)
         self.button.grid(row=2, column=0, columnspan=2)
 
     def request_rinse(self) -> None:
         """Try to start a rinse cycle if a test isn't running."""
-        if not self.handler.is_running.get() or self.handler.is_done.get():
+        if self.handler.is_done or not self.handler.is_running:
             self.pool.submit(self.rinse)
 
     def rinse(self) -> None:
@@ -53,16 +51,16 @@ class RinseWindow(tk.Toplevel):
         self.handler.pump2.run()
 
         self.button.configure(state="disabled")
-        duration = self.rinse_minutes.get() * 60
+        duration = round(self.rinse_minutes.get() * 60)
         for i in range(duration):
             if not self.stop:
-                self.txt.set(f"{i+1}/{duration} s")
-                time.sleep(1)
+                self.button.configure(text=f"{i+1}/{duration} s")
+                sleep(1)
             else:
                 break
         self.bell()
         self.end_rinse()
-        self.button.configure(state="normal")
+        self.button.configure(state="normal", text="Rinse")
 
     def end_rinse(self) -> None:
         """Stop the pumps if they are running, then close their ports."""

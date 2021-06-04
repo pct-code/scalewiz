@@ -1,9 +1,11 @@
 """A function for exporting a representation of a Project as CSV."""
 
+from __future__ import annotations
+
 import json
 import logging
-import os
-import time
+from pathlib import Path
+from typing import Tuple
 
 from pandas import DataFrame
 
@@ -12,9 +14,8 @@ from scalewiz.models.project import Project
 LOGGER = logging.getLogger("scalewiz")
 
 
-def export_csv(project: Project) -> None:
+def export(project: Project) -> Tuple[int, Path]:
     """Generates a report for a Project in a flattened CSV format (or ugly JSON)."""
-    start_time = time.time()
     LOGGER.info("Beginning export of %s", project.name.get())
 
     output_dict = {
@@ -31,9 +32,11 @@ def export_csv(project: Project) -> None:
         "baselinePsi": project.baseline.get(),
         "bicarbs": project.bicarbs.get(),
         "bicarbsIncreased": project.bicarbs_increased.get(),
+        "calcium": project.calcium.get(),
         "chlorides": project.chlorides.get(),
         "timeLimitMin": project.limit_minutes.get(),
         "limitPsi": project.limit_psi.get(),
+        "readingIntervalSecs": project.interval_seconds.get(),
         "name": [],
         "isBlank": [],
         "chemical": [],
@@ -56,7 +59,7 @@ def export_csv(project: Project) -> None:
         if test.include_on_report.get() and not test.is_blank.get()
     ]
     tests = blanks + trials
-
+    # we use lists here instead of sets since sets aren't JSON serializable
     output_dict["name"] = [test.name.get() for test in tests]
     output_dict["isBlank"] = [test.is_blank.get() for test in tests]
     output_dict["chemical"] = [test.chemical.get() for test in tests]
@@ -69,20 +72,25 @@ def export_csv(project: Project) -> None:
     output_dict["result"] = [test.result.get() for test in tests]
     output_dict["clarity"] = [test.clarity.get() for test in tests]
 
-    pre = f"{project.numbers.get().replace(' ', '')} {project.name.get()}"
-    out = f"{pre} - CaCO3 Scale Block Analysis.{project.output_format.get()}"
-    out = os.path.join(os.path.dirname(project.path.get()), out.strip())
+    fmt = project.output_format.get()
+    out = f"{project.numbers.get().replace(' ', '')} {project.name.get()}"
+    out = f"{out} - CaCO3 Scale Block Analysis.{fmt}".strip()
+    out = Path(Path(project.path.get()).parent).joinpath(out).resolve()
 
-    with open(out, "w") as output:
-        if project.output_format.get() == "CSV":
+    with out.open("w") as output:
+        if fmt == "CSV":
             data = DataFrame.from_dict(output_dict)
             data.to_csv(out, encoding="utf-8")
-        elif project.output_format.get() == "JSON":
+        elif fmt == "JSON":
             json.dump(output_dict, output, indent=4)
 
     LOGGER.info(
-        "Finished export of %s as %s in %s s",
+        "Finished export of %s as %s",
         project.name.get(),
         project.output_format.get(),
-        round(time.time() - start_time, 3),
     )
+
+    if out.is_file():
+        return 0, out
+    else:
+        return 1, out

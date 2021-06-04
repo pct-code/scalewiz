@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import tkinter as tk
+from pathlib import Path
+from typing import TYPE_CHECKING
 
-from scalewiz.helpers.configuration import get_config, update_config
+from scalewiz import CONFIG
+from scalewiz.helpers.configuration import update_config
 from scalewiz.helpers.sort_nicely import sort_nicely
 from scalewiz.models.test import Test
+
+if TYPE_CHECKING:
+    from typing import List
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -20,7 +25,7 @@ class Project:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self) -> None:
-        self.tests: list[Test] = []
+        self.tests: List[Test] = []
         # experiment parameters that affect score
         self.baseline = tk.IntVar()
         self.limit_minutes = tk.DoubleVar()
@@ -55,25 +60,24 @@ class Project:
 
     def set_defaults(self) -> None:
         """Sets project parameters to the defaults read from the config file."""
-        config = get_config()  # load from cofig toml
-        defaults = config["defaults"]
+        defaults = CONFIG["defaults"]
         # make sure we are seeing reasonable values
         for key, value in defaults.items():
             if not isinstance(value, str) and value < 0:
                 defaults[key] = value * (-1)
         # apply values
-        self.baseline.set(defaults.get("baseline"))
-        self.interval_seconds.set(defaults.get("reading_interval"))
-        self.limit_minutes.set(defaults.get("time_limit"))
-        self.limit_psi.set(defaults.get("pressure_limit"))
-        self.output_format.set(defaults.get("output_format"))
-        self.temperature.set(defaults.get("test_temperature"))
-        self.flowrate.set(defaults.get("flowrate"))
-        self.uptake_seconds.set(defaults.get("uptake_time"))
+        self.baseline.set(defaults["baseline"])
+        self.interval_seconds.set(defaults["reading_interval"])
+        self.limit_minutes.set(defaults["time_limit"])
+        self.limit_psi.set(defaults["pressure_limit"])
+        self.output_format.set(defaults["output_format"])
+        self.temperature.set(defaults["test_temperature"])
+        self.flowrate.set(defaults["flowrate"])
+        self.uptake_seconds.set(defaults["uptake_time"])
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:
             self.interval_seconds.set(1)
-        self.analyst.set(config["recents"].get("analyst"))
+        self.analyst.set(CONFIG["recents"]["analyst"])
 
     def add_traces(self) -> None:
         """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
@@ -85,26 +89,30 @@ class Project:
     def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
         if path is None:
-            path = self.path.get()
+            path = Path(self.path.get())
 
-        blanks = [test for test in self.tests if test.is_blank.get()]
-        trials = [test for test in self.tests if not test.is_blank.get()]
-        blank_labels = sort_nicely([test.label.get().lower() for test in blanks])
-        trial_labels = sort_nicely([test.label.get().lower() for test in trials])
+        blanks = {}
+        trials = {}
+        for test in self.tests:
+            label = test.label.get().lower()
+            while label in blanks or label in trials:  # make sure we don't overwrite
+                label = "".join((label, " - copy"))
+            if test.is_blank.get():
+                blanks[label] = test
+            else:
+                trials[label] = test
+
+        blank_labels = sort_nicely(list(blanks.keys()))
+        trial_labels = sort_nicely(list(trials.keys()))
+
         tests = []
         for label in blank_labels:
-            for test in self.tests:
-                if test.label.get().lower() == label:
-                    tests.append(test)
-
+            tests.append(blanks.pop(label))
         for label in trial_labels:
-            for test in self.tests:
-                if test.label.get().lower() == label:
-                    tests.append(test)
+            tests.append(trials.pop(label))
 
         self.tests.clear()
-        for test in tests:
-            self.tests.append(test)
+        self.tests = [test for test in tests]
 
         this = {
             "info": {
@@ -119,7 +127,7 @@ class Project:
                 "name": self.name.get(),
                 "analyst": self.analyst.get(),
                 "numbers": self.numbers.get(),
-                "path": os.path.abspath(self.path.get()),
+                "path": str(Path(self.path.get()).resolve()),
                 "notes": self.notes.get(),
             },
             "params": {
@@ -137,64 +145,67 @@ class Project:
             },
             "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
-            "plot": os.path.abspath(self.plot.get()),
+            "plot": str(Path(self.plot.get()).resolve()),
         }
-
-        with open(path, "w") as file:
-            json.dump(this, file, indent=4)
-        LOGGER.info("Saved %s to %s", self.name.get(), path)
-        update_config("recents", "analyst", self.analyst.get())
-        update_config("recents", "project", self.path.get())
+        try:
+            with Path(path).open("w") as file:
+                json.dump(this, file, indent=4)
+            LOGGER.info("Saved %s to %s", self.name.get(), path)
+            update_config("recents", "analyst", self.analyst.get())
+            update_config("recents", "project", str(Path(self.path.get()).resolve()))
+        except Exception as err:
+            LOGGER.exception(err)
 
     def load_json(self, path: str) -> None:
         """Return a Project from a passed path to a JSON dump."""
-        path = os.path.abspath(path)
-        if os.path.isfile(path):
+        path = Path(path).resolve()
+        if path.is_file():
             LOGGER.info("Loading from %s", path)
-            with open(path, "r") as file:
+            with path.open("r") as file:
                 obj = json.load(file)
 
         # we expect the data files to be shared over Dropbox, etc.
-        if path != obj.get("info").get("path"):
+        if str(path) != obj["info"]["path"]:
             LOGGER.warning(
                 "Opened a Project whose actual path didn't match its path property"
             )
-            obj["info"]["path"] = path
+            obj["info"]["path"] = str(path)
 
-        info = obj.get("info")
-        self.customer.set(info.get("customer"))
-        self.submitted_by.set(info.get("submittedBy"))
-        self.client.set(info.get("productionCo"))
-        self.field.set(info.get("field"))
-        self.sample.set(info.get("sample"))
-        self.sample_date.set(info.get("sampleDate"))
-        self.received_date.set(info.get("recDate"))
-        self.completed_date.set(info.get("compDate"))
-        self.name.set(info.get("name"))
-        self.numbers.set(info.get("numbers"))
-        self.analyst.set(info.get("analyst"))
-        self.path.set(info.get("path"))
-        self.notes.set(info.get("notes"))
+        info: dict = obj["info"]
+        self.customer.set(info["customer"])
+        self.submitted_by.set(info["submittedBy"])
+        self.client.set(info["productionCo"])
+        self.field.set(info["field"])
+        self.sample.set(info["sample"])
+        self.sample_date.set(info["sampleDate"])
+        self.received_date.set(info["recDate"])
+        self.completed_date.set(info["compDate"])
+        self.name.set(info["name"])
+        self.numbers.set(info["numbers"])
+        self.analyst.set(info["analyst"])
+        self.path.set(str(Path(info["path"]).resolve()))
+        self.notes.set(info["notes"])
 
-        params = obj.get("params")
-        self.bicarbs.set(params.get("bicarbonates"))
-        self.bicarbs_increased.set(params.get("bicarbsIncreased"))
-        self.calcium.set(params.get("calcium"))
-        self.chlorides.set(params.get("chlorides"))
-        self.baseline.set(params.get("baseline"))
-        self.temperature.set(params.get("temperature"))
-        self.limit_psi.set(params.get("limitPSI"))
-        self.limit_minutes.set(params.get("limitMin"))
-        self.interval_seconds.set(params.get("interval"))
-        self.flowrate.set(params.get("flowrate"))
-        self.uptake_seconds.set(params.get("uptake"))
+        defaults = CONFIG["defaults"]
+        params: dict = obj["params"]
+        self.bicarbs.set(params.get("bicarbonates", 0))
+        self.bicarbs_increased.set(params.get("bicarbsIncreased", False))
+        self.calcium.set(params.get("calcium", 0))
+        self.chlorides.set(params.get("chlorides", 0))
+        self.baseline.set(params.get("baseline", defaults["baseline"]))
+        self.temperature.set(params.get("temperature", defaults["test_temperature"]))
+        self.limit_psi.set(params.get("limitPSI", defaults["pressure_limit"]))
+        self.limit_minutes.set(params.get("limitMin", defaults["time_limit"]))
+        self.interval_seconds.set(params.get("interval", defaults["reading_interval"]))
+        self.flowrate.set(params.get("flowrate", defaults["flowrate"]))
+        self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
+        self.output_format.set(obj.get("outputFormat", defaults["output_format"]))
 
-        self.plot.set(obj.get("plot"))
-        self.output_format.set(obj.get("outputFormat"))
+        self.plot.set(obj["plot"])
 
-        for entry in obj.get("tests"):
-            test = Test()
-            test.load_json(entry)
+        self.tests.clear()
+        for entry in obj["tests"]:
+            test = Test(data=entry)
             self.tests.append(test)
 
     def remove_traces(self) -> None:
@@ -205,17 +216,18 @@ class Project:
                 var.trace_remove("write", var.trace_info()[0][1])
             except IndexError:  # sometimes this spaghets when loading empty projects...
                 pass
+        for test in self.tests:
+            test.remove_traces()
 
     def update_proj_name(self, *args) -> None:
         """Constructs a default name for the Project."""
         # extra unused args are passed in by tkinter
-        name = ""
         if self.client.get() != "":
             name = self.client.get().strip()
         else:
             name = self.customer.get().strip()
         if self.field.get() != "":
-            name = f"{name} - {self.field.get()}".strip()
+            name = f"{name} - {self.field.get().strip()}"
         if self.sample.get() != "":
-            name = f"{name} ({self.sample.get()})".strip()
+            name = f"{name} ({self.sample.get().strip()})"
         self.name.set(name)

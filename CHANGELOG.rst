@@ -1,12 +1,57 @@
+=========
 Changelog
 =========
 
 All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a
-Changelog <https://keepachangelog.com/en/1.0.0/>`__, and this project
+Changelog <https://keepachangelog.com/en/1.0.0/>`_, and this project
 adheres to `Semantic
-Versioning <https://semver.org/spec/v2.0.0.html>`__.
+Versioning <https://semver.org/spec/v2.0.0.html>`_.
+
+
+[v0.5.7]
+--------
+
+Changed
+~~~~~~~
+
+User experience
+===============
+
+- overhaul the :code:`TestHandlerView` to be better oragnized
+- overhaul the :code:`EvaluationWindow` to be better oragnized
+- setting labels for each :code:`Test` is now handled in the :code:`EvaluationWindow`s' "Plot" tab
+- updated docs
+- ensured exported plot dimensions are always uniform
+
+Performance
+===========
+
+- updated the :code:`TestHandler` to poll for readings asynchronously
+- updated the :code:`TestHandler` to be more robust when generating log files
+- minor performance buff to log processing
+- minor performance buff to the :code:`LivePlot` component
+- minor performance buff to :code:`Project` serialization
+- minor performance buff to reading user configuration file
+
+Data handling
+=============
+
+- the :code:`Project` data model now records calcium concentration
+- updated the :code:`Test` object model to handle the :code:`Reading` class
+- updated the :code:`Project` object model to be more backwards compatible
+- refactored data analysis out of the :code:`EvaluationWindow` and into its own :code:`score` function
+- updated :code:`score` function to handle the :code:`Reading` class
+
+Misc
+====
+
+- update all :code:`os.path` operations to fancy :code:`pathlib.Path` operations
+- update all :code:`matplotlib` code to use the object oriented API
+- fixed some lag that would accumulate when displaying log messages in the main menu
+- lots of misc. code cleanup / reorganizing
+
 
 [v0.5.6]
 --------
@@ -129,7 +174,7 @@ Added
 - report export as CSV (default)
 - report export as flattened JSON (not human readable)
 - more descriptive window titles, all windows get the app icon ###
- 
+
 Changed
 ~~~~~~~
 
@@ -143,7 +188,7 @@ Changed
 - general linting and cleanup ### Fixed
 - bug in observed baseline pressure reporting
 - the Live Plot stops updating (clearing itself) at the end of a test
- 
+
 Removed
 ~~~~~~~
 
@@ -159,6 +204,9 @@ Added
 
 - rinse dialog, accessible from the menu bar
 - help text, accessible from the menu bar
-- get\_resource function for getting resource files. can be used for resources with bundled executables later ### Changed
+- get_resource function for getting resource files. can be used for resources with bundled executables later
+
+Changed
+~~~~~~~
 - reset versioning to v0.1.0
 - moved project loading functionality to menu bar

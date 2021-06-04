@@ -1,7 +1,5 @@
 """This module defines functions that deal with program configuration."""
 
-# todo color cycle for reports
-
 from __future__ import annotations
 
 import os
@@ -12,10 +10,12 @@ from typing import Union
 from appdirs import user_config_dir
 from tomlkit import comment, document, dumps, loads, table
 
+import scalewiz
+
 LOGGER = getLogger("scalewiz.config")
 
 CONFIG_DIR = Path(user_config_dir("ScaleWiz", "teauxfu"))
-CONFIG_FILE = Path(os.path.join(CONFIG_DIR, "config.toml"))
+CONFIG_FILE = Path(CONFIG_DIR, "config.toml")
 
 
 def ensure_config() -> None:
@@ -34,7 +34,6 @@ def ensure_config() -> None:
             "No config file found in %s. Making one now at %s", CONFIG_DIR, CONFIG_FILE
         )
         init_config()
-    # todo #19 make sure the config isn't missing keys
 
 
 def init_config() -> None:
@@ -134,8 +133,8 @@ def get_config() -> dict[str, Union[float, int, str]]:
     """Returns the current configuration as a dict."""
     ensure_config()
     with CONFIG_FILE.open("r") as file:
-        defaults = loads(file.read())
-    return defaults
+        config = loads(file.read())
+    return config
 
 
 def update_config(table: str, key: str, value: Union[float, int, str]) -> None:
@@ -152,5 +151,6 @@ def update_config(table: str, key: str, value: Union[float, int, str]) -> None:
         doc[table][key] = value
         CONFIG_FILE.write_text(dumps(doc))
         LOGGER.info("Updated %s.%s to %s", table, key, value)
+        scalewiz.CONFIG = get_config()
     else:
         LOGGER.info("Failed to update %s.%s to %s", table, key, value)

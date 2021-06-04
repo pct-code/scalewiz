@@ -5,9 +5,21 @@ from __future__ import annotations
 # util
 import logging
 import tkinter as tk
-from typing import Any, Union
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import List, Tuple, Union
 
 LOGGER = logging.getLogger("scalewiz")
+
+
+@dataclass
+class Reading:
+    elapsedMin: float
+    pump1: int
+    pump2: int
+    average: int
 
 
 class Test:
@@ -15,7 +27,7 @@ class Test:
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self) -> None:
+    def __init__(self, data: dict = None) -> None:
         self.is_blank = tk.BooleanVar()  # boolean for blank vs chemical trial
         self.name = tk.StringVar()  # identifier for the test
         self.chemical = tk.StringVar()  # chemical, if any, to be tested
@@ -26,13 +38,16 @@ class Test:
         self.pump_to_score = tk.StringVar()  # which series of PSIs to use
         self.result = tk.DoubleVar()  # represents the test's performance vs the blank
         self.include_on_report = tk.BooleanVar()  # condition for scoring
-        self.readings: list[dict] = []  # list of flat reading dicts
+        self.readings: List[Reading] = []  # list of flat reading dicts
         self.max_psi = tk.IntVar()  # the highest psi of the test
         self.observed_baseline = tk.IntVar()  # a guess at the baseline for the test
         # set defaults
         self.pump_to_score.set("pump 1")
         self.is_blank.set(True)
         self.add_traces()  # will need to clean these up later for the GC
+
+        if isinstance(data, dict):
+            self.load_json(data)
 
     def add_traces(self) -> None:
         """Adds tkVar traces. Need to be removed with remove_traces."""
@@ -43,6 +58,19 @@ class Test:
 
     def to_dict(self) -> dict[str, Union[bool, float, int, str]]:
         """Returns a dict representation of a Test."""
+        self.clean_test()  # strip whitespaces from relevant fields
+        # cast all readings from dataclasses to dicts
+        readings = []
+        for reading in self.readings:
+            readings.append(
+                {
+                    "pump 1": reading.pump1,
+                    "pump 2": reading.pump2,
+                    "average": reading.average,
+                    "elapsedMin": reading.elapsedMin,
+                }
+            )
+
         return {
             "name": self.name.get(),
             "isBlank": self.is_blank.get(),
@@ -55,28 +83,38 @@ class Test:
             "includeOnRep": self.include_on_report.get(),
             "result": self.result.get(),
             "obsBaseline": self.observed_baseline.get(),
-            "readings": self.readings,
+            "readings": readings,
         }
 
     def load_json(self, obj: dict[str, Union[bool, float, int, str]]) -> None:
         """Load a Test with values from a JSON object."""
-        self.name.set(obj.get("name"))
-        self.is_blank.set(obj.get("isBlank"))
-        self.chemical.set(obj.get("chemical"))
-        self.rate.set(obj.get("rate"))
-        self.label.set(obj.get("reportAs"))
-        self.clarity.set(obj.get("clarity"))
-        self.notes.set(obj.get("notes"))
-        self.pump_to_score.set(obj.get("toConsider"))
-        self.include_on_report.set(obj.get("includeOnRep"))
-        self.result.set(obj.get("result"))
-        self.readings = obj.get("readings")
+        self.name.set(obj["name"])
+        self.is_blank.set(obj["isBlank"])
+        self.chemical.set(obj["chemical"])
+        self.rate.set(obj["rate"])
+        self.label.set(obj["reportAs"])
+        self.clarity.set(obj["clarity"])
+        self.notes.set(obj["notes"])
+        self.pump_to_score.set(obj["toConsider"])
+        self.include_on_report.set(obj["includeOnRep"])
+        self.result.set(obj["result"])
+        readings = obj["readings"]
+        for reading in readings:
+            self.readings.append(
+                Reading(
+                    pump1=reading["pump 1"],
+                    pump2=reading["pump 2"],
+                    average=reading["average"],
+                    elapsedMin=reading["elapsedMin"],
+                )
+            )
         self.update_obs_baseline()
 
-    def get_readings(self) -> list[int]:
+    def get_readings(self) -> Tuple[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         pump = self.pump_to_score.get()
-        return [reading[pump] for reading in self.readings]
+        pump = pump.replace(" ", "")  # legacy accomodation for spaces in keys
+        return [getattr(reading, pump) for reading in self.readings]
 
     def update_test_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""
@@ -86,8 +124,12 @@ class Test:
             else:
                 self.name.set(f"{self.chemical.get()} {self.rate.get():.2f} ppm")
 
-        if self.chemical.get().strip() != self.chemical.get():
-            self.chemical.set(self.chemical.get().strip())
+    def clean_test(self) -> None:
+        """Do some formatting on the test to clean it up for storing."""
+        strippables = (self.chemical, self.name, self.label, self.clarity, self.notes)
+        for attr in strippables:
+            if attr.get().strip() != attr.get():
+                attr.set(attr.get().strip())
 
     def update_label(self, *args) -> None:
         """Sets the label to the current name as a default value."""
@@ -107,5 +149,5 @@ class Test:
         for var in variables:
             try:
                 var.trace_remove("write", var.trace_info()[0][1])
-            except IndexError:  # sometimes this spaghets when loading empty projects...
+            except IndexError:  # sometimes this spaghets on empty projects...
                 pass

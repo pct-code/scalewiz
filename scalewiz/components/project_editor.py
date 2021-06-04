@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-import os.path
 import tkinter as tk
-import typing
-from tkinter import filedialog, ttk
+from pathlib import Path
+from tkinter import filedialog, messagebox, ttk
+from typing import TYPE_CHECKING
 
-from scalewiz.components.project_info import ProjectInfo
-from scalewiz.components.project_params import ProjectParams
-from scalewiz.components.project_report import ProjectReport
+from scalewiz.components.project_editor_info import ProjectInfo
+from scalewiz.components.project_editor_params import ProjectParams
+from scalewiz.components.project_editor_report import ProjectReport
 from scalewiz.helpers.configuration import open_config
 from scalewiz.helpers.set_icon import set_icon
 from scalewiz.models.project import Project
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from scalewiz.models.test_handler import TestHandler
 
 
@@ -25,27 +25,25 @@ class ProjectWindow(tk.Toplevel):
     """
 
     def __init__(self, handler: TestHandler) -> None:
-        tk.Toplevel.__init__(self)
-        self.handler = handler
-        self.editor_project = Project()
-        if os.path.isfile(handler.project.path.get()):
+        super().__init__()
+        self.handler: TestHandler = handler
+        self.editor_project: Project = Project()
+        if Path(handler.project.path.get()).is_file():
             self.editor_project.load_json(handler.project.path.get())
+
+        self.title(f"{self.handler.name}")
+        set_icon(self)
         self.build()
 
     def build(self, reload: bool = False) -> None:
         """Destroys all child widgets, then builds the UI."""
         if reload:
-            # cleanup for the GC
-            for test in self.editor_project.tests:
-                test.remove_traces()
             self.editor_project.remove_traces()  # clean up the old one for GC
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
-        self.winfo_toplevel().title(f"{self.handler.name}")
-        set_icon(self)
         for child in self.winfo_children():
-            child.destroy()
+            self.after(0, child.destroy)
 
         self.winfo_toplevel().resizable(0, 0)
         self.grid_columnconfigure(0, weight=1)
@@ -60,15 +58,21 @@ class ProjectWindow(tk.Toplevel):
         )
 
         button_frame = ttk.Frame(self)
-        ttk.Button(button_frame, text="Save", width=7, command=self.save).grid(
-            row=0, column=0, padx=5
-        )
-        ttk.Button(button_frame, text="Save as", width=7, command=self.save_as).grid(
-            row=0, column=1, padx=10
-        )
-        ttk.Button(button_frame, text="New", width=7, command=self.new).grid(
-            row=0, column=2, padx=5
-        )
+
+        if self.handler.is_running:
+            state = "disabled"
+        else:
+            state = "normal"
+
+        ttk.Button(
+            button_frame, text="Save", width=7, command=self.save, state=state
+        ).grid(row=0, column=0, padx=5)
+        ttk.Button(
+            button_frame, text="Save as", width=7, command=self.save_as, state=state
+        ).grid(row=0, column=1, padx=10)
+        ttk.Button(
+            button_frame, text="New", width=7, command=self.new, state=state
+        ).grid(row=0, column=2, padx=5)
         ttk.Button(
             button_frame, text="Edit defaults", width=10, command=self.edit
         ).grid(row=0, column=3, padx=5)
@@ -81,12 +85,16 @@ class ProjectWindow(tk.Toplevel):
 
     def save(self) -> None:
         """Save the current Project to file as JSON."""
-        if self.editor_project.path.get() == "":
-            self.save_as()
+        # todo don't allow saving if saving to current project - otherwise fine
+        if not self.handler.is_running:
+            if self.editor_project.path.get() == "":
+                self.save_as()
+            else:
+                self.editor_project.dump_json()
+                self.handler.load_project(self.editor_project.path.get())
+                self.handler.rebuild_views()
         else:
-            self.editor_project.dump_json()
-            self.handler.load_project(self.editor_project.path.get())
-            self.handler.view.build()
+            messagebox.showwarning("Can't save while a Test is running")
 
     def save_as(self) -> None:
         """Saves the Project to JSON using a Save As dialog."""
@@ -101,7 +109,7 @@ class ProjectWindow(tk.Toplevel):
             ext = file_path[-5:]
             if ext not in (".json", ".JSON"):
                 file_path = f"{file_path}.json"
-            self.editor_project.path.set(file_path)
+            self.editor_project.path.set(str(Path(file_path).resolve()))
             self.save()
 
     def edit(self) -> None:

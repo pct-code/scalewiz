@@ -2,23 +2,26 @@
 
 from __future__ import annotations
 
-import tkinter as tk
-import typing
 from tkinter import ttk
+from typing import TYPE_CHECKING
 
 import tkcalendar as tkcal
 
-from scalewiz.helpers.render import render
-
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from scalewiz.models.project import Project
+
+
+def render(lbl: ttk.Label, ent: ttk.Entry, row: int) -> None:
+    """Grids a label and entry on the passed row."""
+    lbl.grid(row=row, column=0, sticky="e")
+    ent.grid(row=row, column=1, sticky="ew", pady=1)
 
 
 class ProjectInfo(ttk.Frame):
     """Editor for Project metadata."""
 
-    def __init__(self, parent: tk.Frame, project: Project) -> None:
-        ttk.Frame.__init__(self, parent)
+    def __init__(self, parent: ttk.Frame, project: Project) -> None:
+        super().__init__(parent)
         self.grid_columnconfigure(1, weight=1)
 
         # row 0 -----------------------------------------------------------------------
