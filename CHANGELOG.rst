@@ -30,6 +30,7 @@ Performance
 
 - updated the :code:`TestHandler` to poll for readings asynchronously
 - updated the :code:`TestHandler` to be more robust when generating log files
+- minor performance buff to log processing
 - minor performance buff to the :code:`LivePlot` component
 - minor performance buff to :code:`Project` serialization
 - minor performance buff to reading user configuration file
