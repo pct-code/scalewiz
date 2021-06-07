@@ -16,6 +16,18 @@ LOGGER = getLogger("scalewiz.config")
 
 CONFIG_DIR = Path(user_config_dir("ScaleWiz", "teauxfu"))
 CONFIG_FILE = Path(CONFIG_DIR, "config.toml")
+DATABASE_FILE = Path(CONFIG_DIR, "db.json")
+
+
+def ensure_database() -> None:
+    """Ensures a database file exists."""
+    # make sure we have a place to store data
+    if DATABASE_FILE.is_file():
+        LOGGER.info("Found an existing database file %s", DATABASE_FILE)
+    else:
+        LOGGER.info("No database file found. Making one now at %s", DATABASE_FILE)
+        with DATABASE_FILE.open("w") as dbfile:
+            dbfile.write("")
 
 
 def ensure_config() -> None:
@@ -34,6 +46,8 @@ def ensure_config() -> None:
             "No config file found in %s. Making one now at %s", CONFIG_DIR, CONFIG_FILE
         )
         init_config()
+    ensure_database()
+    update_config("recents", "database", str(DATABASE_FILE))
 
 
 def init_config() -> None:
@@ -84,6 +98,7 @@ def generate_default() -> document:
     recents = table()
     recents["analyst"] = "teauxfu"
     recents["project"] = ""
+    recents["database"] = str(DATABASE_FILE)
     doc["recents"] = recents
     doc["recents"].comment("these will get updated between user sessions")
 
@@ -124,7 +139,6 @@ def generate_default() -> document:
 
 def open_config() -> None:
     """Opens the config file."""
-    ensure_config()
     if CONFIG_FILE.is_file():
         os.startfile(CONFIG_FILE)
 
@@ -134,6 +148,8 @@ def get_config() -> dict[str, Union[float, int, str]]:
     ensure_config()
     with CONFIG_FILE.open("r") as file:
         config = loads(file.read())
+    if "database" not in config["recents"]:
+        config["recents"]["database"] = str(DATABASE_FILE)
     return config
 
 
@@ -145,7 +161,6 @@ def update_config(table: str, key: str, value: Union[float, int, str]) -> None:
         key (str): the key to update
         value (Union[float, int, str]): the new value of `key`
     """
-    ensure_config()
     doc = loads(CONFIG_FILE.open("r").read())
     if table in doc.keys() and key in doc[table].keys():
         doc[table][key] = value

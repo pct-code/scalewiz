@@ -29,6 +29,7 @@ pandas = "^1.2.2"
 py-hplc = "^1.0.1"
 tomlkit = "^0.7.0"
 appdirs = "^1.4.4"
+tinydb = "^4.4.0"
 
 [tool.poetry.scripts]
 scalewiz = "scalewiz.__main__:main"

@@ -79,12 +79,47 @@ class Project:
             self.interval_seconds.set(1)
         self.analyst.set(CONFIG["recents"]["analyst"])
 
-    def add_traces(self) -> None:
-        """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
-        self.customer.trace_add("write", self.update_proj_name)
-        self.client.trace_add("write", self.update_proj_name)
-        self.field.trace_add("write", self.update_proj_name)
-        self.sample.trace_add("write", self.update_proj_name)
+    def get_metadata(self) -> dict:
+        """Returns a dict representing the Project's metadata.
+
+        Returns:
+            dict: represents the project's metadata
+        """
+        return {
+            "customer": self.customer.get(),
+            "submittedBy": self.submitted_by.get(),
+            "productionCo": self.client.get(),
+            "field": self.field.get(),
+            "sample": self.sample.get(),
+            "sampleDate": self.sample_date.get(),
+            "recDate": self.received_date.get(),
+            "compDate": self.completed_date.get(),
+            "name": self.name.get(),
+            "analyst": self.analyst.get(),
+            "numbers": self.numbers.get(),
+            "path": str(Path(self.path.get()).resolve()),
+            "notes": self.notes.get(),
+        }
+
+    def get_params(self) -> dict:
+        """Returns a dict representing the Project's experiment parameters.
+
+        Returns:
+            dict: a dict representing experiment parameters
+        """
+        return {
+            "bicarbonates": self.bicarbs.get(),
+            "bicarbsIncreased": self.bicarbs_increased.get(),
+            "calcium": self.calcium.get(),
+            "chlorides": self.chlorides.get(),
+            "baseline": self.baseline.get(),
+            "temperature": self.temperature.get(),
+            "limitPSI": self.limit_psi.get(),
+            "limitMin": self.limit_minutes.get(),
+            "interval": self.interval_seconds.get(),
+            "flowrate": self.flowrate.get(),
+            "uptake": self.uptake_seconds.get(),
+        }
 
     def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
@@ -97,6 +132,7 @@ class Project:
             label = test.label.get().lower()
             while label in blanks or label in trials:  # make sure we don't overwrite
                 label = "".join((label, " - copy"))
+            test.label.set(label)
             if test.is_blank.get():
                 blanks[label] = test
             else:
@@ -104,7 +140,6 @@ class Project:
 
         blank_labels = sort_nicely(list(blanks.keys()))
         trial_labels = sort_nicely(list(trials.keys()))
-
         tests = []
         for label in blank_labels:
             tests.append(blanks.pop(label))
@@ -115,34 +150,8 @@ class Project:
         self.tests = [test for test in tests]
 
         this = {
-            "info": {
-                "customer": self.customer.get(),
-                "submittedBy": self.submitted_by.get(),
-                "productionCo": self.client.get(),
-                "field": self.field.get(),
-                "sample": self.sample.get(),
-                "sampleDate": self.sample_date.get(),
-                "recDate": self.received_date.get(),
-                "compDate": self.completed_date.get(),
-                "name": self.name.get(),
-                "analyst": self.analyst.get(),
-                "numbers": self.numbers.get(),
-                "path": str(Path(self.path.get()).resolve()),
-                "notes": self.notes.get(),
-            },
-            "params": {
-                "bicarbonates": self.bicarbs.get(),
-                "bicarbsIncreased": self.bicarbs_increased.get(),
-                "calcium": self.calcium.get(),
-                "chlorides": self.chlorides.get(),
-                "baseline": self.baseline.get(),
-                "temperature": self.temperature.get(),
-                "limitPSI": self.limit_psi.get(),
-                "limitMin": self.limit_minutes.get(),
-                "interval": self.interval_seconds.get(),
-                "flowrate": self.flowrate.get(),
-                "uptake": self.uptake_seconds.get(),
-            },
+            "info": self.get_metadata(),
+            "params": self.get_params(),
             "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
             "plot": str(Path(self.plot.get()).resolve()),
@@ -207,6 +216,15 @@ class Project:
         for entry in obj["tests"]:
             test = Test(data=entry)
             self.tests.append(test)
+
+    # traces / validation stuff
+
+    def add_traces(self) -> None:
+        """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
+        self.customer.trace_add("write", self.update_proj_name)
+        self.client.trace_add("write", self.update_proj_name)
+        self.field.trace_add("write", self.update_proj_name)
+        self.sample.trace_add("write", self.update_proj_name)
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""

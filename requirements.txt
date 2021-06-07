@@ -154,6 +154,9 @@ pytz==2021.1; python_full_version >= "3.7.1" \
 six==1.16.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.7" \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926
+tinydb==4.4.0; python_version >= "3.5" and python_version < "4.0" \
+    --hash=sha256:30b0f718ebb288e42d2f69f3e1b18928739f25153e6b5308a234e95c1673de71 \
+    --hash=sha256:d57c29524ecacc081ebc24f96e0d787bba11dc20d52634a32a709b878be3545a
 tkcalendar==1.6.1 \
     --hash=sha256:9d3a80816a7b32d64fab696fa3d2a007fb23c87953267d5e343a38ff4cd7c15c \
     --hash=sha256:c3ac34ab268734377ce73407893e8a5765e288aecbbb55136fb3ccea98006a96 \
