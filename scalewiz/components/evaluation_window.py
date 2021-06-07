@@ -119,7 +119,7 @@ class EvaluationWindow(tk.Toplevel):
         )
         parent_dir = Path(self.editor_project.path.get()).parent
         plot_output = Path(parent_dir, plot_output).resolve()
-        self.plot_view.fig.savefig(plot_output)
+        self.plot_view.fig.savefig(str(plot_output))
         self.editor_project.plot.set(str(plot_output))
         # update log
         log_output = (
