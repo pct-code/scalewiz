@@ -10,6 +10,14 @@ adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+[v0.5.8]
+--------
+
+Hotfix
+======
+
+- plot figure saving fixed
+
 [v0.5.7]
 --------
 
