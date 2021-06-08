@@ -206,7 +206,7 @@ class TestHandler:
         self.logger.info(
             "Saving %s to %s", self.test.name.get(), self.project.name.get()
         )
-        self.test.readings.extend(self.readings)
+        self.test.readings = tuple(self.readings)
         self.project.tests.append(self.test)
         self.project.dump_json()
         # refresh data / UI
