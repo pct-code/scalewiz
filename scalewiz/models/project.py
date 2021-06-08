@@ -7,6 +7,7 @@ import logging
 import tkinter as tk
 from pathlib import Path
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from scalewiz import CONFIG
 from scalewiz.helpers.configuration import update_config
@@ -15,6 +16,7 @@ from scalewiz.models.test import Test
 
 if TYPE_CHECKING:
     from typing import List
+    from uuid import UUID
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -26,6 +28,7 @@ class Project:
 
     def __init__(self) -> None:
         self.tests: List[Test] = []
+        self.uuid: str = None  # hex string id
         # experiment parameters that affect score
         self.baseline = tk.IntVar()
         self.limit_minutes = tk.DoubleVar()
@@ -179,22 +182,24 @@ class Project:
                 "Opened a Project whose actual path didn't match its path property"
             )
             obj["info"]["path"] = str(path)
+        self.uuid = UUID(obj.get("uuid", uuid4().hex))
 
+        # clerical metadata
         info: dict = obj["info"]
-        self.customer.set(info["customer"])
-        self.submitted_by.set(info["submittedBy"])
-        self.client.set(info["productionCo"])
-        self.field.set(info["field"])
-        self.sample.set(info["sample"])
-        self.sample_date.set(info["sampleDate"])
-        self.received_date.set(info["recDate"])
-        self.completed_date.set(info["compDate"])
-        self.name.set(info["name"])
-        self.numbers.set(info["numbers"])
-        self.analyst.set(info["analyst"])
+        self.customer.set(info.get("customer"))
+        self.submitted_by.set(info.get("submittedBy"))
+        self.client.set(info.get("productionCo"))
+        self.field.set(info.get("field"))
+        self.sample.set(info.get("sample"))
+        self.sample_date.set(info.get("sampleDate"))
+        self.received_date.set(info.get("recDate"))
+        self.completed_date.set(info.get("compDate"))
+        self.name.set(info.get("name"))
+        self.numbers.set(info.get("numbers"))
+        self.analyst.set(info.get("analyst"))
         self.path.set(str(Path(info["path"]).resolve()))
-        self.notes.set(info["notes"])
-
+        self.notes.set(info.get("notes"))
+        # experimental metadata
         defaults = CONFIG["defaults"]
         params: dict = obj["params"]
         self.bicarbs.set(params.get("bicarbonates", 0))
@@ -209,11 +214,10 @@ class Project:
         self.flowrate.set(params.get("flowrate", defaults["flowrate"]))
         self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
         self.output_format.set(obj.get("outputFormat", defaults["output_format"]))
-
-        self.plot.set(obj["plot"])
+        self.plot.set(obj.get("plot"))
 
         self.tests.clear()
-        for entry in obj["tests"]:
+        for entry in obj.get("tests"):
             test = Test(data=entry)
             self.tests.append(test)
 
