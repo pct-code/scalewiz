@@ -1,5 +1,10 @@
 This is a general mapping of the code / code flow 
 
+    
+.. image:: https://github.com/teauxfu/scalewiz/blob/main/img/architecture.png
+    :alt: code graph
+    
+
 ::
 
      models/
@@ -79,7 +84,4 @@ This is a general mapping of the code / code flow
 
 
     
-    
-.. image:: ../img/architecture.PNG
-    :alt: code graph
-    
+
