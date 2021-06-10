@@ -2,7 +2,7 @@ This is a general mapping of the code / code flow
 
 ::
 
-    models/
+     models/
      data models, dict-like collections of tkinter variables that can serialize themselves as JSON
     ├──  project.py
     │    organizes a collection of Tests with some metadata
@@ -19,20 +19,20 @@ This is a general mapping of the code / code flow
     │    a small toplevel that can run the pumps for a user-defined duration
     ├──  scalewiz.py
     │    core object of the app, used for setting up logging and ttk styles
-    │   ├──  scalewiz_main_frame.py
-    │   │    the main frame of the application, holds a notebook widget
-    │   ├──  scalewiz_menu_bar.py
-    │   │    defines the menu bar that gets loaded on to the main menu
-    │   ╰──  handler_view.py
-    │        represents a tab within the main frame's notebook
-    │       ├──  handler_view_devices_entry.py
-    │       │    widget for comboboxes, can poll for COM/serial port devices
-    │       ├──  handler_view_info_entry.py
-    │       │    widget for user entry of Test metadata
-    │       ├──  handler_view_controls.py
-    │       │    widget that holds the progess bar, readings log, and start/stop buttons
-    │       ╰──  handler_view_plot.py
-    │            widget that displays an animated matplotlib plot of the data collected for a running Test
+    │   ╰──  scalewiz_main_frame.py
+    │        the main frame of the application, holds a notebook widget
+    │       ├──  handler_view.py
+    │       │    represents a tab within the main frame's notebook
+    │       │   ├──  handler_view_devices_entry.py
+    │       │   │    widget for comboboxes, can poll for COM/serial port devices
+    │       │   ├──  handler_view_info_entry.py
+    │       │   │    widget for user entry of Test metadata
+    │       │   ├──  handler_view_controls.py
+    │       │   │    widget that holds the progess bar, readings log, and start/stop buttons
+    │       │   ╰──  handler_view_plot.py
+    │       │        widget that displays an animated matplotlib plot of the data collected for a running Test
+    │       ╰──  scalewiz_menu_bar.py
+    │            defines the menu bar that gets loaded on to the main menu
     ├──  project_editor.py
     │    toplevel for making/mutating Projects
     │   ├──  project_editor_info.py
@@ -43,10 +43,10 @@ This is a general mapping of the code / code flow
     │        form for setting exported report preferences
     ╰──  evaluation_window.py
          toplevel for displaying a Project summary with a notebook widget
-        ├──  evaluation_data_view.py
-        │    frame that displays a table-like view of data in a Project, giving each Test a row
-        ╰──  evaluation_plot_view.py
-             frame that uses matplotlib to plot a selection of data
+    ├──  evaluation_data_view.py
+    │    frame that displays a table-like view of data in a Project, giving each Test a row
+    ╰──  evaluation_plot_view.py
+         frame that uses matplotlib to plot a selection of data
 
      helpers/
      helper functions that didn't fit elsewhere
@@ -76,7 +76,8 @@ This is a general mapping of the code / code flow
     ├──  RinseWindow's thread
     │    the rinse window can spawn a thread IFF the TestHandler isn't running a Test
     ╰──  ...
-    
+
+
     
     
 .. image:: ../img/architecture.PNG
