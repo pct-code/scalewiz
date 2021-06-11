@@ -1,6 +1,6 @@
-========================================================================
-scalewiz |license| |python| |pypi| |build-status| |style| |code quality|
-========================================================================
+===========================================================================================
+scalewiz |license| |python| |pypi| |build-status| |style| |code quality| |maintainability|
+===========================================================================================
 
 A graphical user interface designed to work with `Teledyne SSI MX-class
 HPLC pumps`_ for the purpose of calcite scale inhibitor chemical
@@ -72,6 +72,11 @@ Acknowledgements
 .. |code quality| image:: https://img.shields.io/badge/code%20quality-flake8-black
   :target: https://gitlab.com/pycqa/flake8
   :alt: Code quality
+  
+.. |maintainability| image:: https://api.codeclimate.com/v1/badges/9f4d424afac626a8b2e3/maintainability
+   :target: https://codeclimate.com/github/teauxfu/scalewiz/maintainability
+   :alt: Maintainability
+
 
 .. _`Premier Chemical Technologies, LLC`: https://premierchemical.tech
 .. _`@balacla`: https://github.com/balacla
