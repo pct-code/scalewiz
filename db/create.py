@@ -39,7 +39,14 @@ def main():
                                         name text NOT NULL
                                     );"""
 
-    sql_create_tasks_table = """CREATE TABLE IF NOT EXISTS tasks (
+    sql_create_tests_table = """CREATE TABLE IF NOT EXISTS tests (
+                                    id integer PRIMARY KEY,
+                                    name text NOT NULL,
+                                    project_id integer NOT NULL,
+                                    FOREIGN KEY (project_id) REFERENCES projects (id)
+                                );"""
+
+    sql_create_readings_table = """CREATE TABLE IF NOT EXISTS readings (
                                     id integer PRIMARY KEY,
                                     name text NOT NULL,
                                     project_id integer NOT NULL,
@@ -56,7 +63,7 @@ def main():
 
         print("tasks")
         # create tasks table
-        create_table(conn, sql_create_tasks_table)
+        create_table(conn, sql_create_tests_table)
     else:
         print("Error! cannot create the database connection.")
 
