@@ -34,24 +34,41 @@ def create_table(conn, create_table_sql):
 
 def main():
     # trailing commas will throw a syntax error !?
-    sql_create_projects_table = """CREATE TABLE IF NOT EXISTS projects (
-                                        id integer PRIMARY KEY,
-                                        name text NOT NULL
-                                    );"""
 
-    sql_create_tests_table = """CREATE TABLE IF NOT EXISTS tests (
-                                    id integer PRIMARY KEY,
-                                    name text NOT NULL,
-                                    project_id integer NOT NULL,
-                                    FOREIGN KEY (project_id) REFERENCES projects (id)
-                                );"""
+    sql_create_projects_table = """
+        CREATE TABLE IF NOT EXISTS projects (
+            id integer PRIMARY KEY,
+            name text NOT NULL
+        );
+        """
 
-    sql_create_readings_table = """CREATE TABLE IF NOT EXISTS readings (
-                                    id integer PRIMARY KEY,
-                                    name text NOT NULL,
-                                    project_id integer NOT NULL,
-                                    FOREIGN KEY (project_id) REFERENCES projects (id)
-                                );"""
+    sql_create_tests_table = """
+        CREATE TABLE IF NOT EXISTS tests (
+            id integer PRIMARY KEY,
+            name text NOT NULL,
+            project_id integer NOT NULL,
+            FOREIGN KEY (project_id) REFERENCES projects (id)
+        );
+        """
+
+    sql_create_readings_table = """
+        CREATE TABLE IF NOT EXISTS readings (
+            id integer PRIMARY KEY,
+            name text NOT NULL,
+            pump_1 integer NOT NULL,
+            pump_2 integer NOT NULL,
+            test_id integer NOT NULL,
+            FOREIGN KEY (test_id) REFERENCES tests (id)
+        );
+        """
+
+    sql_create_groups_table = """
+        CREATE TABLE IF NOT EXISTS groups (
+            id integer NOT NULL,
+            listID NOT NULL,
+            name text NOT NULL,
+        )
+        """
 
     # create a database connection
     conn = create_connection()
