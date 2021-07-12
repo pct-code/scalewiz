@@ -1,0 +1,33 @@
+---
+_default:
+  '1':
+    uuid: uuid
+    name: project
+    customer: customer
+    productionCo: productionCo
+    submittedBy: submittedBy
+    field: field
+    sample: sample
+    sampleDate: sampleDate
+    recDate: recDate
+    compDate: compDate
+    analyst: analyst
+    numbers: numbers
+    notes: notes
+    tests:
+    - name: testname
+      reportAs: label
+      isBlank: true
+      chemical: chemical
+      rate: 100
+      clarity: clarity
+      toConsider: toConsider
+      includeOnRep: includeOnRep
+      obsBaseline: 75
+      notes: notes
+      result: 100
+      readings:
+      - average: 2
+        pump 1: 1
+        pump 2: 3
+        elapsedMin: stamp

@@ -7,6 +7,7 @@ import logging
 import tkinter as tk
 from pathlib import Path
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from scalewiz import CONFIG
 from scalewiz.helpers.configuration import update_config
@@ -15,6 +16,7 @@ from scalewiz.models.test import Test
 
 if TYPE_CHECKING:
     from typing import List
+    from uuid import UUID
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -26,6 +28,7 @@ class Project:
 
     def __init__(self) -> None:
         self.tests: List[Test] = []
+        self.uuid: str = None  # hex string id
         # experiment parameters that affect score
         self.baseline = tk.IntVar()
         self.limit_minutes = tk.DoubleVar()
@@ -79,12 +82,47 @@ class Project:
             self.interval_seconds.set(1)
         self.analyst.set(CONFIG["recents"]["analyst"])
 
-    def add_traces(self) -> None:
-        """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
-        self.customer.trace_add("write", self.update_proj_name)
-        self.client.trace_add("write", self.update_proj_name)
-        self.field.trace_add("write", self.update_proj_name)
-        self.sample.trace_add("write", self.update_proj_name)
+    def get_metadata(self) -> dict:
+        """Returns a dict representing the Project's metadata.
+
+        Returns:
+            dict: represents the project's metadata
+        """
+        return {
+            "customer": self.customer.get(),
+            "submittedBy": self.submitted_by.get(),
+            "productionCo": self.client.get(),
+            "field": self.field.get(),
+            "sample": self.sample.get(),
+            "sampleDate": self.sample_date.get(),
+            "recDate": self.received_date.get(),
+            "compDate": self.completed_date.get(),
+            "name": self.name.get(),
+            "analyst": self.analyst.get(),
+            "numbers": self.numbers.get(),
+            "path": str(Path(self.path.get()).resolve()),
+            "notes": self.notes.get(),
+        }
+
+    def get_params(self) -> dict:
+        """Returns a dict representing the Project's experiment parameters.
+
+        Returns:
+            dict: a dict representing experiment parameters
+        """
+        return {
+            "bicarbonates": self.bicarbs.get(),
+            "bicarbsIncreased": self.bicarbs_increased.get(),
+            "calcium": self.calcium.get(),
+            "chlorides": self.chlorides.get(),
+            "baseline": self.baseline.get(),
+            "temperature": self.temperature.get(),
+            "limitPSI": self.limit_psi.get(),
+            "limitMin": self.limit_minutes.get(),
+            "interval": self.interval_seconds.get(),
+            "flowrate": self.flowrate.get(),
+            "uptake": self.uptake_seconds.get(),
+        }
 
     def dump_json(self, path: str = None) -> None:
         """Dump a JSON representation of the Project at the passed path."""
@@ -97,6 +135,7 @@ class Project:
             label = test.label.get().lower()
             while label in blanks or label in trials:  # make sure we don't overwrite
                 label = "".join((label, " - copy"))
+            test.label.set(label)
             if test.is_blank.get():
                 blanks[label] = test
             else:
@@ -104,7 +143,6 @@ class Project:
 
         blank_labels = sort_nicely(list(blanks.keys()))
         trial_labels = sort_nicely(list(trials.keys()))
-
         tests = []
         for label in blank_labels:
             tests.append(blanks.pop(label))
@@ -115,34 +153,8 @@ class Project:
         self.tests = [test for test in tests]
 
         this = {
-            "info": {
-                "customer": self.customer.get(),
-                "submittedBy": self.submitted_by.get(),
-                "productionCo": self.client.get(),
-                "field": self.field.get(),
-                "sample": self.sample.get(),
-                "sampleDate": self.sample_date.get(),
-                "recDate": self.received_date.get(),
-                "compDate": self.completed_date.get(),
-                "name": self.name.get(),
-                "analyst": self.analyst.get(),
-                "numbers": self.numbers.get(),
-                "path": str(Path(self.path.get()).resolve()),
-                "notes": self.notes.get(),
-            },
-            "params": {
-                "bicarbonates": self.bicarbs.get(),
-                "bicarbsIncreased": self.bicarbs_increased.get(),
-                "calcium": self.calcium.get(),
-                "chlorides": self.chlorides.get(),
-                "baseline": self.baseline.get(),
-                "temperature": self.temperature.get(),
-                "limitPSI": self.limit_psi.get(),
-                "limitMin": self.limit_minutes.get(),
-                "interval": self.interval_seconds.get(),
-                "flowrate": self.flowrate.get(),
-                "uptake": self.uptake_seconds.get(),
-            },
+            "info": self.get_metadata(),
+            "params": self.get_params(),
             "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
             "plot": str(Path(self.plot.get()).resolve()),
@@ -170,22 +182,24 @@ class Project:
                 "Opened a Project whose actual path didn't match its path property"
             )
             obj["info"]["path"] = str(path)
+        self.uuid = UUID(obj.get("uuid", uuid4().hex))
 
+        # clerical metadata
         info: dict = obj["info"]
-        self.customer.set(info["customer"])
-        self.submitted_by.set(info["submittedBy"])
-        self.client.set(info["productionCo"])
-        self.field.set(info["field"])
-        self.sample.set(info["sample"])
-        self.sample_date.set(info["sampleDate"])
-        self.received_date.set(info["recDate"])
-        self.completed_date.set(info["compDate"])
-        self.name.set(info["name"])
-        self.numbers.set(info["numbers"])
-        self.analyst.set(info["analyst"])
+        self.customer.set(info.get("customer"))
+        self.submitted_by.set(info.get("submittedBy"))
+        self.client.set(info.get("productionCo"))
+        self.field.set(info.get("field"))
+        self.sample.set(info.get("sample"))
+        self.sample_date.set(info.get("sampleDate"))
+        self.received_date.set(info.get("recDate"))
+        self.completed_date.set(info.get("compDate"))
+        self.name.set(info.get("name"))
+        self.numbers.set(info.get("numbers"))
+        self.analyst.set(info.get("analyst"))
         self.path.set(str(Path(info["path"]).resolve()))
-        self.notes.set(info["notes"])
-
+        self.notes.set(info.get("notes"))
+        # experimental metadata
         defaults = CONFIG["defaults"]
         params: dict = obj["params"]
         self.bicarbs.set(params.get("bicarbonates", 0))
@@ -200,13 +214,21 @@ class Project:
         self.flowrate.set(params.get("flowrate", defaults["flowrate"]))
         self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
         self.output_format.set(obj.get("outputFormat", defaults["output_format"]))
-
-        self.plot.set(obj["plot"])
+        self.plot.set(obj.get("plot"))
 
         self.tests.clear()
-        for entry in obj["tests"]:
+        for entry in obj.get("tests"):
             test = Test(data=entry)
             self.tests.append(test)
+
+    # traces / validation stuff
+
+    def add_traces(self) -> None:
+        """Adds tkVar traces where needed. Must be cleaned up with remove_traces."""
+        self.customer.trace_add("write", self.update_proj_name)
+        self.client.trace_add("write", self.update_proj_name)
+        self.field.trace_add("write", self.update_proj_name)
+        self.sample.trace_add("write", self.update_proj_name)
 
     def remove_traces(self) -> None:
         """Remove tkVar traces to allow the GC to do its thing."""

@@ -9,6 +9,21 @@ Changelog <https://keepachangelog.com/en/1.0.0/>`_, and this project
 adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+[v0.5.9 unreleased]
+-------------------
+
+In Progress
+======
+
+- a database interface
+
+[v0.5.8]
+--------
+
+Hotfix
+======
+
+- plot figure saving fixed
 
 [v0.5.8]
 --------

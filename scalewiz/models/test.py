@@ -1,4 +1,4 @@
-"""Model object for a Test."""
+"""Tkinter-powered model object for a Test, with some dict-related capabilities."""
 
 from __future__ import annotations
 
@@ -10,16 +10,36 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import List, Tuple, Union
+    from uuid import UUID
 
 LOGGER = logging.getLogger("scalewiz")
 
 
 @dataclass
 class Reading:
-    elapsedMin: float
+    """Holds the data for a particular reading."""
+
+    elapsed_min: float
     pump1: int
     pump2: int
-    average: int
+    average: int = round((pump1 + pump2) / 2)
+
+
+#  this is currently unused
+@dataclass
+class TestData:
+    name: str
+    label: str
+    is_blank: bool
+    on_report: bool
+    clarity: str
+    readings: List[Reading]
+    max_pressure: int
+    observed_baseline: int
+    pump_to_score: str
+    result: float
+    chemical: str
+    rate: Union[float, int]
 
 
 class Test:
@@ -28,6 +48,7 @@ class Test:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, data: dict = None) -> None:
+        # mutable metadata
         self.is_blank = tk.BooleanVar()  # boolean for blank vs chemical trial
         self.name = tk.StringVar()  # identifier for the test
         self.chemical = tk.StringVar()  # chemical, if any, to be tested
@@ -35,14 +56,17 @@ class Test:
         self.label = tk.StringVar()  # how the test will be labeled on the report/plot
         self.clarity = tk.StringVar()  # the clarity of the treated water
         self.notes = tk.StringVar()  # misc notes on the experiment
+        # immutable data
+        self.readings: Tuple[Reading] = ()  # list of flat reading dicts
+        self.uuid: UUID = None
+        # mutable data
         self.pump_to_score = tk.StringVar()  # which series of PSIs to use
         self.result = tk.DoubleVar()  # represents the test's performance vs the blank
         self.include_on_report = tk.BooleanVar()  # condition for scoring
-        self.readings: List[Reading] = []  # list of flat reading dicts
         self.max_psi = tk.IntVar()  # the highest psi of the test
         self.observed_baseline = tk.IntVar()  # a guess at the baseline for the test
         # set defaults
-        self.pump_to_score.set("pump 1")
+        self.pump_to_score.set("pump1")
         self.is_blank.set(True)
         self.add_traces()  # will need to clean these up later for the GC
 
@@ -58,54 +82,63 @@ class Test:
 
     def to_dict(self) -> dict[str, Union[bool, float, int, str]]:
         """Returns a dict representation of a Test."""
-        self.clean_test()  # strip whitespaces from relevant fields
+        self.strip_test()  # strip whitespaces from relevant fields
         # cast all readings from dataclasses to dicts
         readings = []
         for reading in self.readings:
             readings.append(
                 {
-                    "pump 1": reading.pump1,
-                    "pump 2": reading.pump2,
                     "average": reading.average,
+                    "pump1": reading.pump1,
+                    "pump2": reading.pump2,
                     "elapsedMin": reading.elapsedMin,
                 }
             )
 
         return {
             "name": self.name.get(),
-            "isBlank": self.is_blank.get(),
+            "is_blank": self.is_blank.get(),
             "chemical": self.chemical.get(),
             "rate": self.rate.get(),
-            "reportAs": self.label.get(),
+            "report_as": self.label.get(),
             "clarity": self.clarity.get(),
             "notes": self.notes.get(),
-            "toConsider": self.pump_to_score.get(),
-            "includeOnRep": self.include_on_report.get(),
+            "to_consider": self.pump_to_score.get(),
+            "include_on_report": self.include_on_report.get(),
             "result": self.result.get(),
-            "obsBaseline": self.observed_baseline.get(),
+            "observed_baseline": self.observed_baseline.get(),
             "readings": readings,
         }
 
-    def load_json(self, obj: dict[str, Union[bool, float, int, str]]) -> None:
-        """Load a Test with values from a JSON object."""
-        self.name.set(obj["name"])
-        self.is_blank.set(obj["isBlank"])
-        self.chemical.set(obj["chemical"])
-        self.rate.set(obj["rate"])
-        self.label.set(obj["reportAs"])
-        self.clarity.set(obj["clarity"])
-        self.notes.set(obj["notes"])
-        self.pump_to_score.set(obj["toConsider"])
-        self.include_on_report.set(obj["includeOnRep"])
-        self.result.set(obj["result"])
-        readings = obj["readings"]
+    def load_json(self, obj: dict) -> None:
+        """Load a Test with values from a dict."""
+        # look for fallbacks for backwards compatability
+        self.name.set(obj.get("name"))
+        self.is_blank.set(obj.get("is_blank", obj.get("isBlank")))
+        self.calcium.set(obj.get("calcium"))
+        self.chemical.set(obj.get("chemical"))
+        self.rate.set(obj.get("rate"))
+        self.label.set(obj.get("report_as", obj.get("reportAs")))
+        self.clarity.set(obj.get("clarity"))
+        self.notes.set(obj.get("notes"))
+        self.pump_to_score.set(obj.get("to_consider", obj.get("toConsider")))
+        self.include_on_report.set(
+            obj.get("include_on_report", obj.get("includeOnRep"))
+        )
+        self.result.set(obj.get("result"))
+        readings: List[dict] = obj.get("readings")
         for reading in readings:
+            # do some cleaning for backwards compatibility
+            pump1 = reading.get("pump1", reading.get("pump 1"))
+            pump2 = reading.get("pump2", reading.get("pump 2"))
+            if "average" not in reading.keys():
+                average = round((pump1 + pump2) / 2)
             self.readings.append(
                 Reading(
-                    pump1=reading["pump 1"],
-                    pump2=reading["pump 2"],
-                    average=reading["average"],
-                    elapsedMin=reading["elapsedMin"],
+                    average=average,
+                    pump1=pump1,
+                    pump2=pump2,
+                    elapsed_min=reading.get("elapsed_min", reading.get("elapsedMin")),
                 )
             )
         self.update_obs_baseline()
@@ -113,23 +146,26 @@ class Test:
     def get_readings(self) -> Tuple[int]:
         """Returns a list of the pump_to_score's pressure readings."""
         pump = self.pump_to_score.get()
-        pump = pump.replace(" ", "")  # legacy accomodation for spaces in keys
-        return [getattr(reading, pump) for reading in self.readings]
+        if " " in pump:  # legacy accomodation for spaces in keys
+            pump = pump.replace(" ", "")
+        return tuple([getattr(reading, pump) for reading in self.readings])
 
     def update_test_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""
-        if not (self.chemical.get() == "" or self.rate.get() == 0):
+        if self.chemical.get() != "" and self.rate.get() != 0:
             if float(self.rate.get()) == int(self.rate.get()):
                 self.name.set(f"{self.chemical.get()} {self.rate.get():.0f} ppm")
             else:
                 self.name.set(f"{self.chemical.get()} {self.rate.get():.2f} ppm")
 
-    def clean_test(self) -> None:
+    def strip_test(self) -> None:
         """Do some formatting on the test to clean it up for storing."""
         strippables = (self.chemical, self.name, self.label, self.clarity, self.notes)
         for attr in strippables:
-            if attr.get().strip() != attr.get():
-                attr.set(attr.get().strip())
+            val = attr.get()
+            stripped = val.strip()
+            if val != stripped:
+                attr.set(stripped)
 
     def update_label(self, *args) -> None:
         """Sets the label to the current name as a default value."""

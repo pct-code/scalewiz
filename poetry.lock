@@ -277,6 +277,14 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
+name = "tinydb"
+version = "4.4.0"
+description = "TinyDB is a tiny, document oriented database optimized for your happiness :)"
+category = "main"
+optional = false
+python-versions = ">=3.5,<4.0"
+
+[[package]]
 name = "tkcalendar"
 version = "1.6.1"
 description = "Calendar and DateEntry widgets for Tkinter"
@@ -332,7 +340,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "c8aea8aaf25674e2103327faab3031b697a230a0b36c8015cd08cbbb87a79d4e"
+content-hash = "3108fb9291bfae1f579f9170ddec544c2c3e314247ace01876975a82c8941338"
 
 [metadata.files]
 appdirs = [
@@ -582,6 +590,10 @@ rope = [
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+tinydb = [
+    {file = "tinydb-4.4.0-py3-none-any.whl", hash = "sha256:30b0f718ebb288e42d2f69f3e1b18928739f25153e6b5308a234e95c1673de71"},
+    {file = "tinydb-4.4.0.tar.gz", hash = "sha256:d57c29524ecacc081ebc24f96e0d787bba11dc20d52634a32a709b878be3545a"},
 ]
 tkcalendar = [
     {file = "tkcalendar-1.6.1-py3-none-any.whl", hash = "sha256:9d3a80816a7b32d64fab696fa3d2a007fb23c87953267d5e343a38ff4cd7c15c"},

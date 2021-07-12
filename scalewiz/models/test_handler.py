@@ -157,8 +157,9 @@ class TestHandler:
             psi1 = self.pool.submit(get_pressure, self.pump1)
             psi2 = self.pool.submit(get_pressure, self.pump2)
             psi1, psi2 = psi1.result(), psi2.result()
-            t1 = time()
-            self.logger.warn("got both in %s s", t1 - t0)
+            self.logger.debug(
+                "got both pressures from %s in %s s", self.name, time() - t0
+            )
             average = round(((psi1 + psi2) / 2))
             reading = Reading(
                 elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
@@ -206,7 +207,7 @@ class TestHandler:
         self.logger.info(
             "Saving %s to %s", self.test.name.get(), self.project.name.get()
         )
-        self.test.readings.extend(self.readings)
+        self.test.readings = tuple(self.readings)
         self.project.tests.append(self.test)
         self.project.dump_json()
         # refresh data / UI

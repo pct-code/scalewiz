@@ -5,6 +5,7 @@ description = "A graphical user interface for chemical performance testing desig
 readme = "README.rst"
 license = "GPL-3.0"
 authors = ["Alex Whittington <alex@southsun.tech>"]
+repository = "https://github.com/teauxfu/scalewiz"
 packages = [
     {include = "scalewiz"}
 ]
@@ -29,6 +30,7 @@ pandas = "^1.2.2"
 py-hplc = "^1.0.1"
 tomlkit = "^0.7.0"
 appdirs = "^1.4.4"
+tinydb = "^4.4.0"
 
 [tool.poetry.scripts]
 scalewiz = "scalewiz.__main__:main"
