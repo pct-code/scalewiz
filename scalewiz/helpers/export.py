@@ -48,16 +48,17 @@ def export(project: Project) -> Tuple[int, Path]:
         "plotPath": project.plot.get(),
     }
     # filter the blanks and trials to sort them
-    blanks = {
+    blanks = [
         test
         for test in project.tests
         if test.include_on_report.get() and test.is_blank.get()
-    }
-    trials = {
+    ]
+    trials = [
         test
         for test in project.tests
         if test.include_on_report.get() and not test.is_blank.get()
-    }
+    ]
+
     tests = blanks + trials
     # we use lists here instead of sets since sets aren't JSON serializable
     output_dict["name"] = [test.name.get() for test in tests]

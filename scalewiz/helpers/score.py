@@ -100,6 +100,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
             f"Result: 1 - ({int_psi} - {baseline_area}) / {avg_protectable_area}"
         )
         log.append(f"Result: {result} \n")
+
         trial.result.set(f"{result:.2f}")
 
     if isinstance(log_widget, tk.Text):

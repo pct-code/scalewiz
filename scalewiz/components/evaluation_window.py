@@ -81,7 +81,14 @@ class EvaluationWindow(tk.Toplevel):
         # finished adding to tab control
 
         button_frame = ttk.Frame(self)
-        save_btn = ttk.Button(button_frame, text="Save", command=self.save, width=10)
+        if self.handler.is_running:
+            state = "disabled"
+        else:
+            state = "normal"
+        save_btn = ttk.Button(
+            button_frame, text="Save", command=self.save, width=10, state=state
+        )
+
         save_btn.grid(row=0, column=0, padx=5)
         export_btn = ttk.Button(
             button_frame,
@@ -120,7 +127,7 @@ class EvaluationWindow(tk.Toplevel):
         )
         parent_dir = Path(self.editor_project.path.get()).parent
         plot_output = Path(parent_dir, plot_output).resolve()
-        self.plot_view.fig.savefig(plot_output)
+        self.plot_view.fig.savefig(str(plot_output))
         self.editor_project.plot.set(str(plot_output))
         # update log
         log_output = (

@@ -7,7 +7,9 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
+
 from queue import Empty, Queue
+
 from time import sleep, time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
@@ -34,6 +36,7 @@ class TestHandler:
         self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.project: Project = Project()
         self.test: Test = None
+
         self.readings: Queue = Queue()
         self.max_readings: int = None  # max # of readings to collect
         self.limit_psi: int = None
@@ -63,7 +66,9 @@ class TestHandler:
         return (
             (self.max_psi_1 < self.limit_psi or self.max_psi_2 < self.limit_psi)
             and self.elapsed_min < self.limit_minutes
+
             and self.readings.qsize() < self.max_readings
+
             and not self.stop_requested
         )
 
@@ -118,7 +123,6 @@ class TestHandler:
 
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
-        uptake = self.project.uptake_seconds.get()
         step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
@@ -133,7 +137,15 @@ class TestHandler:
         self.take_readings()  # still in the Future's thread
 
     def take_readings(self) -> None:
+        """Collects Readings by messaging the pumps.
+
+        Meant to be run from a worker thread.
+        """
+        self.logger.info("Starting readings collection")
+
         def get_pressure(pump: NextGenPump) -> Union[float, int]:
+            self.logger.info("collecting a reading from %s", pump.serial.name)
+
             return pump.pressure
 
         interval = self.project.interval_seconds.get()
@@ -141,9 +153,13 @@ class TestHandler:
         # readings loop ----------------------------------------------------------------
         while self.can_run:
             self.elapsed_min = (time() - start_time) / 60
+            t0 = time()
             psi1 = self.pool.submit(get_pressure, self.pump1)
             psi2 = self.pool.submit(get_pressure, self.pump2)
             psi1, psi2 = psi1.result(), psi2.result()
+            t1 = time()
+            self.logger.warn("got both in %s s", t1 - t0)
+
             average = round(((psi1 + psi2) / 2))
             reading = Reading(
                 elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
@@ -152,6 +168,7 @@ class TestHandler:
             msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
                 self.elapsed_min, psi1, psi2, average
             )
+
             self.readings.put(reading)
             self.log_queue.put(msg)
             self.logger.debug(msg)
@@ -166,6 +183,7 @@ class TestHandler:
             # TYSM https://stackoverflow.com/a/25251804
             sleep(interval - ((time() - start_time) % interval))
         else:
+
             self.stop_test(save=True)
 
     def request_stop(self) -> None:
@@ -175,6 +193,7 @@ class TestHandler:
 
     def stop_test(self, save: bool = False, rinsing: bool = False) -> None:
         """Stops the pumps, closes their ports."""
+
         for pump in (self.pump1, self.pump2):
             if pump.is_open:
                 pump.stop()
@@ -196,6 +215,9 @@ class TestHandler:
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
+        self.logger.info(
+            "Saving %s to %s", self.test.name.get(), self.project.name.get()
+        )
         while True:
             try:
                 reading = self.readings.get(block=False)
@@ -243,6 +265,7 @@ class TestHandler:
         new_test: bool = True,
     ) -> None:
         """Opens a file dialog then loads the selected Project file.
+
 
         `loaded` gets built from scratch every time it is passed in -- no need to update
         """

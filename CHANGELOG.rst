@@ -10,6 +10,14 @@ adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+[v0.5.8]
+--------
+
+Hotfix
+======
+
+- plot figure saving fixed
+
 [v0.5.7]
 --------
 
@@ -35,15 +43,20 @@ Performance
 
 - updated the :code:`TestHandler` to poll for readings asynchronously
 - updated the :code:`TestHandler` to be more robust when generating log files
+- minor performance buff to log processing
 - minor performance buff to the :code:`LivePlot` component
 - minor performance buff to :code:`Project` serialization
+- minor performance buff to reading user configuration file
+
 
 Data handling
 =============
 
+- the :code:`Project` data model now records calcium concentration
 - updated the :code:`Test` object model to handle the :code:`Reading` class
 - updated the :code:`Project` object model to be more backwards compatible
 - refactored data analysis out of the :code:`EvaluationWindow` and into its own :code:`score` function
+- calculations log is a bit more verbose now
 - updated :code:`score` function to handle the :code:`Reading` class
 
 Misc
@@ -51,6 +64,7 @@ Misc
 
 - update all :code:`os.path` operations to fancy :code:`pathlib.Path` operations
 - update all :code:`matplotlib` code to use the object oriented API
+- fixed some lag that would accumulate when displaying log messages in the main menu
 - lots of misc. code cleanup / reorganizing
 
 
