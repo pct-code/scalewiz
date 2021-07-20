@@ -88,6 +88,7 @@ class EvaluationWindow(tk.Toplevel):
         save_btn = ttk.Button(
             button_frame, text="Save", command=self.save, width=10, state=state
         )
+
         save_btn.grid(row=0, column=0, padx=5)
         export_btn = ttk.Button(
             button_frame,
@@ -111,6 +112,13 @@ class EvaluationWindow(tk.Toplevel):
 
     def save(self) -> None:
         """Saves to file the project, most recent plot, and calculations log."""
+        if self.handler.is_running:
+            messagebox.showwarning(
+                "Can't save to this Project right now",
+                "Can't save while a Test in this Project is running",
+            )
+            return
+
         # update image
         plot_output = (
             f"{self.editor_project.numbers.get().replace(' ', '')} "

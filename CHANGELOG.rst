@@ -21,6 +21,11 @@ Hotfix
 [v0.5.7]
 --------
 
+Added
+~~~~~
+
+- the :code:`Project` data model now records calcium concentration
+
 Changed
 ~~~~~~~
 

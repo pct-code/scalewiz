@@ -58,6 +58,7 @@ def export(project: Project) -> Tuple[int, Path]:
         for test in project.tests
         if test.include_on_report.get() and not test.is_blank.get()
     ]
+
     tests = blanks + trials
     # we use lists here instead of sets since sets aren't JSON serializable
     output_dict["name"] = [test.name.get() for test in tests]
