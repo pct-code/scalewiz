@@ -60,6 +60,7 @@ class LivePlot(ttk.Frame):
                 pump1 = []
                 pump2 = []
                 elapsed = []  # we will share this series as an axis
+
                 for reading in readings:
                     pump1.append(reading.pump1)
                     pump2.append(reading.pump2)

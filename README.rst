@@ -21,9 +21,13 @@ Installation
 ::
 
     python -m pip install --user scalewiz
-    
+
 Or, if you use :code:`pipx` (`try it!`_ 😉) ::
-    
+
+    pipx install scalewiz
+
+Or, if you use :code:`pipx` (`try it!`_ 😉) ::
+
     pipx install scalewiz
 
 Or, if you use :code:`pipx` (`try it!`_ 😉) ::
@@ -76,7 +80,7 @@ Acknowledgements
 .. |code quality| image:: https://img.shields.io/badge/code%20quality-flake8-black
   :target: https://gitlab.com/pycqa/flake8
   :alt: Code quality
-  
+
 .. |maintainability| image:: https://api.codeclimate.com/v1/badges/9f4d424afac626a8b2e3/maintainability
    :target: https://codeclimate.com/github/teauxfu/scalewiz/maintainability
    :alt: Maintainability

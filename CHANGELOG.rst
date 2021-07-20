@@ -48,7 +48,6 @@ Performance
 - minor performance buff to :code:`Project` serialization
 - minor performance buff to reading user configuration file
 
-
 Data handling
 =============
 

@@ -7,9 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
-
 from queue import Empty, Queue
-
 from time import sleep, time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
@@ -38,6 +36,7 @@ class TestHandler:
         self.test: Test = None
 
         self.readings: Queue = Queue()
+
         self.max_readings: int = None  # max # of readings to collect
         self.limit_psi: int = None
         self.max_psi_1: int = None
@@ -66,9 +65,7 @@ class TestHandler:
         return (
             (self.max_psi_1 < self.limit_psi or self.max_psi_2 < self.limit_psi)
             and self.elapsed_min < self.limit_minutes
-
             and self.readings.qsize() < self.max_readings
-
             and not self.stop_requested
         )
 
@@ -115,6 +112,7 @@ class TestHandler:
             for pump in (self.pump1, self.pump2):
                 pump.close()
         else:
+
             self.stop_requested = False
             self.is_done = False
             self.is_running = True
@@ -123,6 +121,7 @@ class TestHandler:
 
     def uptake_cycle(self) -> None:
         """Get ready to take readings."""
+        uptake = self.project.uptake_seconds.get()
         step = uptake / 100  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
@@ -173,6 +172,7 @@ class TestHandler:
             self.log_queue.put(msg)
             self.logger.debug(msg)
             prog = round((self.readings.qsize() / self.max_readings) * 100)
+
             self.progress.set(prog)
 
             if psi1 > self.max_psi_1:
