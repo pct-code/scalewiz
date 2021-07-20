@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from typing import List, Set
 
     from scalewiz.models.project import Project
+    from scalewiz.models.test import Test
 
 
 def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
@@ -19,6 +20,26 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
     """
     # extra unused args may be passed in by tkinter
     log: List[str] = []
+    # sort
+    blanks: List[Test] = []
+    trials: List[Test] = []
+    for test in project.tests:
+        if test.include_on_report.get():
+            if test.is_blank.get():
+                blanks.append(test)
+            else:
+                trials.append(test)
+        else:
+            if not test.is_blank.get():
+                test.result.set(0)
+    if len(blanks) < 1:
+        log.append("Insufficient data on report to score.")
+        log.append(
+            "You must select at least one blank and one trial to generate scores."
+        )
+        to_log(log, log_widget)
+        return
+
     log.append(f"Evaluating results for {project.name.get()}...")
     # scoring props
     limit_minutes = project.limit_minutes.get()
@@ -32,14 +53,6 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
     log.append(f"Baseline area: {baseline_area}")
     log.append("-" * 80)
     log.append("")
-
-    # select the blanks
-    blanks = []
-    for test in project.tests:
-        if test.is_blank.get() and test.include_on_report.get():
-            blanks.append(test)
-    if len(blanks) < 1:  # this is bad enough to stop us, could check earlier ..?
-        return
 
     areas_over_blanks: Set[int] = set()
     for blank in blanks:
@@ -76,12 +89,6 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
     log.append("-" * 80)
     log.append("")
 
-    # select trials
-    trials = []
-    for test in project.tests:
-        if not test.is_blank.get():
-            trials.append(test)
-
     # get readings
     for trial in trials:
         log.append(f"Evaluating {trial.name.get()}")
@@ -102,13 +109,12 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         log.append(f"Result: {result} \n")
         trial.result.set(result)
 
-    if isinstance(log_widget, tk.Text):
-        to_log(log, log_widget)
+    to_log(log, log_widget)
 
 
 def to_log(log: list[str], log_widget: ScrolledText) -> None:
     """Adds the passed log messages to the passed Text widget."""
-    if log_widget.winfo_exists():
+    if isinstance(log_widget, tk.Text) and log_widget.winfo_exists():
         log_widget.configure(state="normal")
         log_widget.delete(1.0, "end")
         for msg in log:

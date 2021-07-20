@@ -133,7 +133,7 @@ class TestHandler:
         for i in range(100):
             if self.can_run:
                 self.progress.set(i)
-                self.progress_msg.set(f"{i+1}/{uptake} s")
+                self.progress_msg.set(f"Uptake: {round(i*step)}/{uptake} s")
                 sleep(step - ((time() - rinse_start) % step))
             else:
                 self.stop_test(save=False)

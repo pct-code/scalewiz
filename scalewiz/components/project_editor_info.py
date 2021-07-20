@@ -2,25 +2,27 @@
 
 from __future__ import annotations
 
+import tkinter as tk
 from tkinter import ttk
 from typing import TYPE_CHECKING
 
 import tkcalendar as tkcal
 
 if TYPE_CHECKING:
+    from scalewiz.components.project_editor import ProjectWindow
     from scalewiz.models.project import Project
 
 
 def render(lbl: ttk.Label, ent: ttk.Entry, row: int) -> None:
     """Grids a label and entry on the passed row."""
-    lbl.grid(row=row, column=0, sticky="e")
+    lbl.grid(row=row, column=0, sticky="e", pady=1)
     ent.grid(row=row, column=1, sticky="ew", pady=1)
 
 
 class ProjectInfo(ttk.Frame):
     """Editor for Project metadata."""
 
-    def __init__(self, parent: ttk.Frame, project: Project) -> None:
+    def __init__(self, parent: ProjectWindow, project: Project) -> None:
         super().__init__(parent)
         self.grid_columnconfigure(1, weight=1)
 
@@ -108,5 +110,13 @@ class ProjectInfo(ttk.Frame):
 
         # row 12 ----------------------------------------------------------------------
         pathLbl = ttk.Label(self, text="File path:")
-        pathEnt = ttk.Label(self, textvariable=parent.editor_project.path)
-        render(pathLbl, pathEnt, 12)
+        xscrollbar = ttk.Scrollbar(self, orient="horizontal")
+        pathText = tk.Text(
+            self, wrap="none", xscrollcommand=xscrollbar.set, height=1, width=20
+        )
+        xscrollbar.configure(command=pathText.xview)
+        pathText.insert("end", parent.editor_project.path.get())
+        pathText.see("end")
+        pathLbl.grid(row=12, column=0, sticky="e", pady=1)
+        pathText.grid(row=12, column=1, sticky="ew", pady=1)
+        xscrollbar.grid(row=13, column=1, sticky="nsew")
