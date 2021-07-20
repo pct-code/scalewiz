@@ -73,6 +73,7 @@ class ProjectWindow(tk.Toplevel):
         ttk.Button(
             button_frame, text="New", width=7, command=self.new, state=state
         ).grid(row=0, column=2, padx=5)
+
         ttk.Button(
             button_frame, text="Edit defaults", width=10, command=self.edit
         ).grid(row=0, column=3, padx=5)
@@ -86,6 +87,7 @@ class ProjectWindow(tk.Toplevel):
     def save(self) -> None:
         """Save the current Project to file as JSON."""
         # todo don't allow saving if saving to current project - otherwise fine
+
         if not self.handler.is_running:
             if self.editor_project.path.get() == "":
                 self.save_as()

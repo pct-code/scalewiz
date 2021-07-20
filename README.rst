@@ -21,6 +21,10 @@ Installation
 ::
 
     python -m pip install --user scalewiz
+    
+Or, if you use :code:`pipx` (`try it!`_ 😉) ::
+    
+    pipx install scalewiz
 
 Or, if you use :code:`pipx` (`try it!`_ 😉) ::
 

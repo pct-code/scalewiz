@@ -1,4 +1,7 @@
-"""Handles a test."""
+"""Handles a test. Experimental / not currently used.
+
+Readings are collected using a combination of multithreading and tk.after calls.
+"""
 
 from __future__ import annotations
 
@@ -7,10 +10,8 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from logging import DEBUG, FileHandler, Formatter, getLogger
 from pathlib import Path
-
 from queue import Empty, Queue
-
-from time import sleep, time
+from time import time
 from tkinter import filedialog, messagebox
 from typing import TYPE_CHECKING
 
@@ -25,6 +26,10 @@ if TYPE_CHECKING:
     from typing import List, Set, Union
 
 
+def get_pressure(pump: NextGenPump) -> Union[float, int]:
+    return pump.pressure
+
+
 class TestHandler:
     """Handles a Test."""
 
@@ -36,7 +41,6 @@ class TestHandler:
         self.logger: Logger = getLogger(f"scalewiz.{name}")
         self.project: Project = Project()
         self.test: Test = None
-
         self.readings: Queue = Queue()
         self.max_readings: int = None  # max # of readings to collect
         self.limit_psi: int = None
@@ -66,9 +70,7 @@ class TestHandler:
         return (
             (self.max_psi_1 < self.limit_psi or self.max_psi_2 < self.limit_psi)
             and self.elapsed_min < self.limit_minutes
-
             and self.readings.qsize() < self.max_readings
-
             and not self.stop_requested
         )
 
@@ -119,59 +121,61 @@ class TestHandler:
             self.is_done = False
             self.is_running = True
             self.rebuild_views()
-            self.pool.submit(self.uptake_cycle)
+            self.uptake_cycle(self.project.uptake_seconds.get() * 1000)
 
-    def uptake_cycle(self) -> None:
+    def uptake_cycle(self, duration_ms: int) -> None:
         """Get ready to take readings."""
-        step = uptake / 100  # we will sleep for 100 steps
+        # run the uptake cycle ---------------------------------------------------------
+        ms_step = round((duration_ms / 100))  # we will sleep for 100 steps
         self.pump1.run()
         self.pump2.run()
-        rinse_start = time()
-        for i in range(100):
+        print("starting rinse for", duration_ms, "with 100 steps of", ms_step)
+
+        def cycle(start, i, step_ms) -> None:
             if self.can_run:
-                self.progress.set(i)
-                sleep(step - ((time() - rinse_start) % step))
+                if i < 100:
+                    i += 1
+                    self.progress.set(i)
+                    self.root.after(
+                        round(step_ms - (((time() - start) * 1000) % step_ms)),
+                        cycle,
+                        start,
+                        i,
+                        step_ms,
+                    )
+                else:
+                    self.pool.submit(self.take_readings)
             else:
                 self.stop_test(save=False)
-                break
-        self.take_readings()  # still in the Future's thread
 
-    def take_readings(self) -> None:
-        """Collects Readings by messaging the pumps.
+        cycle(time(), 0, ms_step)
 
-        Meant to be run from a worker thread.
-        """
-        self.logger.info("Starting readings collection")
-
-        def get_pressure(pump: NextGenPump) -> Union[float, int]:
-            self.logger.info("collecting a reading from %s", pump.serial.name)
-
-            return pump.pressure
-
-        interval = self.project.interval_seconds.get()
-        start_time = time()
+    def take_readings(self, start_time: float = None, interval: float = None) -> None:
+        if start_time is None:
+            start_time = time()
+        if interval is None:
+            interval = self.project.interval_seconds.get() * 1000
         # readings loop ----------------------------------------------------------------
-        while self.can_run:
-            self.elapsed_min = (time() - start_time) / 60
-            t0 = time()
+        if self.can_run:
+
+            self.elapsed_min = round((time() - start_time) / 60, 2)
+
             psi1 = self.pool.submit(get_pressure, self.pump1)
             psi2 = self.pool.submit(get_pressure, self.pump2)
             psi1, psi2 = psi1.result(), psi2.result()
-            t1 = time()
-            self.logger.warn("got both in %s s", t1 - t0)
-
             average = round(((psi1 + psi2) / 2))
+
             reading = Reading(
                 elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
             )
+
             # make a message for the log in the test handler view
             msg = "@ {:.2f} min; pump1: {}, pump2: {}, avg: {}".format(
                 self.elapsed_min, psi1, psi2, average
             )
-
-            self.readings.put(reading)
             self.log_queue.put(msg)
             self.logger.debug(msg)
+            self.readings.put(reading)
             prog = round((self.readings.qsize() / self.max_readings) * 100)
             self.progress.set(prog)
 
@@ -179,11 +183,15 @@ class TestHandler:
                 self.max_psi_1 = psi1
             if psi2 > self.max_psi_2:
                 self.max_psi_2 = psi2
-
             # TYSM https://stackoverflow.com/a/25251804
-            sleep(interval - ((time() - start_time) % interval))
+            self.root.after(
+                round(interval - (((time() - start_time) * 1000) % interval)),
+                self.take_readings,
+                start_time,
+                interval,
+            )
         else:
-
+            # end of readings loop -----------------------------------------------------
             self.stop_test(save=True)
 
     def request_stop(self) -> None:
@@ -193,7 +201,6 @@ class TestHandler:
 
     def stop_test(self, save: bool = False, rinsing: bool = False) -> None:
         """Stops the pumps, closes their ports."""
-
         for pump in (self.pump1, self.pump2):
             if pump.is_open:
                 pump.stop()
@@ -215,9 +222,6 @@ class TestHandler:
 
     def save_test(self) -> None:
         """Saves the test to the Project file in JSON format."""
-        self.logger.info(
-            "Saving %s to %s", self.test.name.get(), self.project.name.get()
-        )
         while True:
             try:
                 reading = self.readings.get(block=False)
@@ -265,7 +269,6 @@ class TestHandler:
         new_test: bool = True,
     ) -> None:
         """Opens a file dialog then loads the selected Project file.
-
 
         `loaded` gets built from scratch every time it is passed in -- no need to update
         """

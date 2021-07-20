@@ -21,6 +21,11 @@ Hotfix
 [v0.5.7]
 --------
 
+Added
+~~~~~
+
+- the :code:`Project` data model now records calcium concentration
+
 Changed
 ~~~~~~~
 
@@ -42,6 +47,7 @@ Performance
 - minor performance buff to the :code:`LivePlot` component
 - minor performance buff to :code:`Project` serialization
 - minor performance buff to reading user configuration file
+
 
 Data handling
 =============
