@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import tkinter as tk
+from importlib.metadata import version
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -40,7 +41,8 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         to_log(log, log_widget)
         return
 
-    log.append(f"Evaluating results for {project.name.get()}...")
+    log.append(f"Evaluating results for {project.name.get()}")
+    log.append(f"ScaleWiz {version('scalewiz')}\n")
     # time limit
     limit_minutes = project.limit_minutes.get()
     log.append(f"Time limit: {limit_minutes} min")
@@ -125,7 +127,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         log.append(f"Failure PSI: {fail_psi}")
         log.append("\n###")
         log.append(
-            "Result: 1 - (integral area + failure area - baseline area) / avg protectable area"
+            "Result1: 1 - (integral area + failure area - baseline area) / avg protectable area"
         )
         log.append(
             "Result2: 1 - (integral area + failure area - baseline area) / (avg protectable area - baseline area)"
@@ -139,7 +141,7 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
             1 - (int_psi + fail_psi - baseline_area) / avg_protectable_area, 3
         )
         log.append(
-            f"Result: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / {avg_protectable_area:,}"
+            f"Result1: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / {avg_protectable_area:,}"
         )
         # ??
         result2 = round(
@@ -158,12 +160,12 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         )
         # ---
         log.append("")
-        log.append(f"Result: {result:.2f}")
+        log.append(f"Result1: {result:.2f}")
         log.append(f"Result2: {result2:.2f}")
         log.append(f"Result3: {result3:.2f}")
         trial.result.set(f"{result:.2f}")
-        log.append("")
         log.append("-" * 40)
+        log.append("")
 
     to_log(log, log_widget)
 

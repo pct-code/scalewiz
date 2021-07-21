@@ -104,7 +104,7 @@ class TestControls(ttk.Frame):
 
         for i in range(duration):
             if not self.stop.get():
-                self.handler.progress.set(round((i + 1) / duration) * 100)
+                self.handler.progress.set(round((i + 1) / duration, 2) * 100)
                 self.handler.progress_msg.set(f"Rinsing: {i+1}/{duration} s")
                 sleep(1 - ((time() - rinse_start) % 1))
             else:

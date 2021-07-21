@@ -116,6 +116,7 @@ class ProjectInfo(ttk.Frame):
         )
         xscrollbar.configure(command=pathText.xview)
         pathText.insert("end", parent.editor_project.path.get())
+        pathText.configure(state="disable")
         pathText.see("end")
         pathLbl.grid(row=12, column=0, sticky="e", pady=1)
         pathText.grid(row=12, column=1, sticky="ew", pady=1)
