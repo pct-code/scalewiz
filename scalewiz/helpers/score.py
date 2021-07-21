@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from tkinter.scrolledtext import ScrolledText
-    from typing import List, Set
+    from typing import List
 
     from scalewiz.models.project import Project
     from scalewiz.models.test import Test
 
-
+# flake8: noqa
 def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
     """Updates the result for every Test in the Project.
 
@@ -41,51 +41,66 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         return
 
     log.append(f"Evaluating results for {project.name.get()}...")
-    # scoring props
+    # time limit
     limit_minutes = project.limit_minutes.get()
+    log.append(f"Time limit: {limit_minutes} min")
+    # reading interval
     interval_seconds = project.interval_seconds.get()
+    log.append(f"Reading interval: {interval_seconds} s")
+    # max psi
+    limit_psi = project.limit_psi.get()
+    log.append(f"Max PSI: {limit_psi:,}")
+    # max readings
+    log.append("Max readings: time limit minutes * 60 s / reading interval s")
+    log.append(
+        f"Max readings: round({limit_minutes} min * 60 s / {interval_seconds} s)"
+    )
     max_readings = round(limit_minutes * 60 / interval_seconds)
-    log.append("Max readings: limitMin * 60 / reading interval")
-    log.append(f"Max readings: {max_readings}")
-    baseline_area = round(project.baseline.get() * max_readings)
+    log.append(f"Max readings: {max_readings:,}")
+    # baseline area
     log.append("Baseline area: baseline PSI * max readings")
-    log.append(f"Baseline area: {project.baseline.get()} * {max_readings}")
-    log.append(f"Baseline area: {baseline_area}")
+    baseline = project.baseline.get()
+    log.append(f"Baseline area: {baseline:,} * {max_readings:,}")
+    baseline_area = baseline * max_readings
+    log.append(f"Baseline area: {baseline_area:,}")
+    # ---
     log.append("-" * 80)
     log.append("")
 
-    areas_over_blanks: Set[int] = set()
+    # for each blank, find the area over the curve
+    areas_over_blanks: List[int] = []
     for blank in blanks:
         log.append(f"Evaluating {blank.name.get()}")
-        log.append(f"Considering data: {blank.pump_to_score.get()}")
+        log.append(f"Considering pump data: {blank.pump_to_score.get()}")
         readings = blank.get_readings()
-        log.append(f"Total readings: {len(readings)}")
-        log.append(f"Observed baseline: {blank.observed_baseline.get()} psi")
-        int_psi = sum(readings)
+        log.append(f"Total readings: {len(readings):,}")
+        log.append(f"Observed baseline: {blank.observed_baseline.get():,} PSI")
+        log.append(f"Project baseline: {baseline} PSI")
         log.append("Integral PSI: sum of all pressure readings")
-        log.append(f"Integral PSI: {int_psi}")
-        area = project.limit_psi.get() * len(readings) - int_psi
-        log.append("Area over blank: limit_psi * # of readings - integral PSI")
+        int_psi = sum(readings)
+        log.append(f"Integral PSI: {int_psi:,}")
+        log.append("Area over blank: limit PSI * # of readings - integral PSI")
+        area = limit_psi * len(readings) - int_psi
         log.append(
-            f"Area over blank: {project.limit_psi.get()} "
-            f"* {len(readings)} - {int_psi}"
+            f"Area over blank: {limit_psi:,} " f"* {len(readings):,} - {int_psi:,}"
         )
-        log.append(f"Area over blank: {area}")
+        log.append(f"Area over blank: {area:,}")
+        areas_over_blanks.append(area)
+        log.append("-" * 40)
         log.append("")
-        areas_over_blanks.add(area)
 
     # get protectable area
     avg_blank_area = round(sum(areas_over_blanks) / len(areas_over_blanks))
-    log.append(f"Avg. area over blanks: {avg_blank_area}")
-    avg_protectable_area = project.limit_psi.get() * max_readings - avg_blank_area
+    log.append(f"Average area over blanks: {avg_blank_area:,}")
+    avg_protectable_area = limit_psi * max_readings - avg_blank_area
     log.append(
-        "Avg. protectable area: limit_psi * max_readings - avg. area over blanks"
+        "Average protectable area: limit_psi * max_readings - average area over blanks"
     )
     log.append(
-        f"Avg. protectable area: {project.limit_psi.get()} "
-        f"* {max_readings} - {avg_blank_area}"
+        f"Average protectable area: {limit_psi:,} "
+        f"* {max_readings:,} - {avg_blank_area:,}"
     )
-    log.append(f"Avg. protectable area: {avg_protectable_area}")
+    log.append(f"Average protectable area: {avg_protectable_area:,}")
     log.append("-" * 80)
     log.append("")
 
@@ -94,20 +109,61 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         log.append(f"Evaluating {trial.name.get()}")
         log.append(f"Considering data: {trial.pump_to_score.get()}")
         readings = trial.get_readings()
-        log.append(f"Total readings: {len(readings)}")
-        log.append(f"Observed baseline: {trial.observed_baseline.get()} psi")
-        int_psi = sum(readings) + (
-            (max_readings - len(readings)) * project.limit_psi.get()
-        )
+        log.append(f"Total readings: {len(readings):,} / {max_readings}")
+        log.append(f"Observed baseline: {trial.observed_baseline.get():,} PSI")
+        log.append(f"Project baseline: {baseline} PSI")
+        # int psi
         log.append("Integral PSI: sum of all pressure readings")
-        log.append(f"Integral PSI: {int_psi}")
-        result = round(1 - (int_psi - baseline_area) / avg_protectable_area, 3)
-        log.append("Result: 1 - (integral PSI - baseline area) / avg protectable area")
+        int_psi = sum(readings)
+        log.append(f"Integral PSI: {int_psi:,}")
+        # failure region
+        fail_psi = (max_readings - len(readings)) * limit_psi
+        log.append(f"Failure PSI: (# max readings - # readings) * max PSI")
         log.append(
-            f"Result: 1 - ({int_psi} - {baseline_area}) / {avg_protectable_area}"
+            f"Failure PSI: ({max_readings:,} - {len(readings):,}) * {limit_psi:,}"
         )
-        log.append(f"Result: {result:.2f} \n")
+        log.append(f"Failure PSI: {fail_psi}")
+        log.append("\n###")
+        log.append(
+            "Result: 1 - (integral area + failure area - baseline area) / avg protectable area"
+        )
+        log.append(
+            "Result2: 1 - (integral area + failure area - baseline area) / (avg protectable area - baseline area)"
+        )
+        log.append(
+            "Result3: 1 - (integral area + failure area) / (avg protectable area)"
+        )
+        log.append("")
+        # ?
+        result = round(
+            1 - (int_psi + fail_psi - baseline_area) / avg_protectable_area, 3
+        )
+        log.append(
+            f"Result: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / {avg_protectable_area:,}"
+        )
+        # ??
+        result2 = round(
+            1
+            - (int_psi + fail_psi - baseline_area)
+            / (avg_protectable_area - baseline_area),
+            3,
+        )
+        log.append(
+            f"Result2: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / ({avg_protectable_area:,} - {baseline_area:,})"
+        )
+        # ???
+        result3 = round(1 - (int_psi + fail_psi) / (avg_protectable_area), 3)
+        log.append(
+            f"Result3: 1 - ({int_psi:,} + {fail_psi:,}) / ({avg_protectable_area:,})"
+        )
+        # ---
+        log.append("")
+        log.append(f"Result: {result:.2f}")
+        log.append(f"Result2: {result2:.2f}")
+        log.append(f"Result3: {result3:.2f}")
         trial.result.set(f"{result:.2f}")
+        log.append("")
+        log.append("-" * 40)
 
     to_log(log, log_widget)
 
