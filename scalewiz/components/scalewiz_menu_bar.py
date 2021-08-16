@@ -40,7 +40,7 @@ class MenuBar:
         menubar.add_cascade(label="Project", menu=project_menu)
         # resume making buttons
         menubar.add_command(label="Evaluation", command=self.spawn_evaluator)
-        menubar.add_command(label="Rinse", command=self.spawn_rinse)
+        # menubar.add_command(label="Rinse", command=self.spawn_rinse)
         menubar.add_command(
             label="Log", command=self.parent.master.log_window.deiconify
         )

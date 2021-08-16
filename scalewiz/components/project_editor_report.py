@@ -6,6 +6,7 @@ from tkinter import ttk
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from scalewiz.components.project_editor import ProjectWindow
     from scalewiz.models.project import Project
 
 
@@ -18,7 +19,7 @@ def render(lbl: ttk.Label, ent: ttk.Entry, row: int) -> None:
 class ProjectReport(ttk.Frame):
     """Editor for Project reporting settings."""
 
-    def __init__(self, parent: ttk.Frame, project: Project) -> None:
+    def __init__(self, parent: ProjectWindow, project: Project) -> None:
         super().__init__(parent)
         self.grid_columnconfigure(1, weight=1)
 
@@ -30,6 +31,15 @@ class ProjectReport(ttk.Frame):
             state="readonly",
         )
         render(lbl, ent, 0)
+
+        lbl = ttk.Label(self, text="Default pump:")
+        ent = ttk.Combobox(
+            self,
+            values=["Pump 1", "Pump 2", "Average"],
+            textvariable=project.default_pump,
+            state="readonly",
+        )
+        render(lbl, ent, 1)
 
         # matplotlib stuff
         # colorsLbl = ttk.Label(self, text="Plot color cycle:")

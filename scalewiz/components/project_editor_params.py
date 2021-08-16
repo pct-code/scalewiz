@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from scalewiz.helpers.validation import can_be_float, can_be_pos_float, can_be_pos_int
 
 if TYPE_CHECKING:
+    from scalewiz.components.project_editor import ProjectWindow
     from scalewiz.models.project import Project
 
 
@@ -20,7 +21,7 @@ def render(lbl: ttk.Label, ent: ttk.Entry, row: int) -> None:
 class ProjectParams(ttk.Frame):
     """A form for mutating experiment-relevant attributes of the Project."""
 
-    def __init__(self, parent: ttk.Frame, project: Project) -> None:
+    def __init__(self, parent: ProjectWindow, project: Project) -> None:
         super().__init__(parent)
         # validation commands to ensure numeric inputs
 

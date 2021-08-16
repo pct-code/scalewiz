@@ -55,6 +55,7 @@ class Project:
         self.chlorides = tk.DoubleVar()
         self.temperature = tk.DoubleVar()  # the test temperature
         self.plot = tk.StringVar()  # path to plot local file
+        self.default_pump = tk.StringVar()
         self.set_defaults()  # get default values from the config
         self.add_traces()  # these need to be cleaned up later
 
@@ -74,6 +75,7 @@ class Project:
         self.temperature.set(defaults["test_temperature"])
         self.flowrate.set(defaults["flowrate"])
         self.uptake_seconds.set(defaults["uptake_time"])
+        self.default_pump.set("Pump 1")
         # this must never be <= 0
         if self.interval_seconds.get() <= 0:
             self.interval_seconds.set(1)
@@ -146,6 +148,7 @@ class Project:
             "tests": [test.to_dict() for test in self.tests],
             "outputFormat": self.output_format.get(),
             "plot": str(Path(self.plot.get()).resolve()),
+            "defaultPump": self.default_pump.get(),
         }
         try:
             with Path(path).open("w") as file:
@@ -201,7 +204,8 @@ class Project:
         self.uptake_seconds.set(params.get("uptake", defaults["uptake_time"]))
         self.output_format.set(obj.get("outputFormat", defaults["output_format"]))
 
-        self.plot.set(obj["plot"])
+        self.plot.set(obj.get("plot"))
+        self.default_pump.set(obj.get("defaultPump", "Pump 1"))
 
         self.tests.clear()
         for entry in obj["tests"]:

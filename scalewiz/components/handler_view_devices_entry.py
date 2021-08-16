@@ -60,7 +60,6 @@ class DeviceBoxes(ttk.Frame):
         label.grid(row=0, column=0, sticky="ne")
         self.device1_entry.grid(row=0, column=1, sticky="w")
         self.device2_entry.grid(row=0, column=2, sticky="e")
-        # refresh
         self.update_devices_list()
 
     def update_devices_list(self, *args) -> None:
@@ -72,6 +71,16 @@ class DeviceBoxes(ttk.Frame):
 
         self.device1_entry.configure(values=self.devices_list)
         self.device2_entry.configure(values=self.devices_list)
+
+        # HACK: try to auto select the right devices
+        n = int(self.handler.name.split("System")[1])
+        n = n * 2  # two pumps per system
+        if len(self.devices_list) == n:
+            try:
+                self.device1_entry.current(n - 2)
+                self.device2_entry.current(n - 1)
+            except Exception:
+                pass
 
         if "None found" not in self.devices_list:
             LOGGER.debug(

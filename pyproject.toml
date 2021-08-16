@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scalewiz"
-version = "0.5.8"
+version = "0.5.9"
 description = "A graphical user interface for chemical performance testing designed to work with Teledyne SSI MX-class HPLC pumps."
 readme = "README.rst"
 license = "GPL-3.0"
@@ -37,6 +37,7 @@ scalewiz = "scalewiz.__main__:main"
 rope = "^0.18.0"
 readme-renderer = "^29.0"
 pre-commit = "^2.12.1"
+black = {version = "^21.7b0", allow-prereleases = true}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

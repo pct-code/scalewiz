@@ -46,6 +46,7 @@ class TestHandler:
         self.dev2 = tk.StringVar()
         self.stop_requested: bool = bool()
         self.progress = tk.IntVar()
+        self.progress_msg = tk.StringVar()
         self.elapsed_min: float = float()  # current duration
         self.pump1: NextGenPump = None
         self.pump2: NextGenPump = None
@@ -78,9 +79,11 @@ class TestHandler:
         self.max_psi_1, self.max_psi_2 = 0, 0
         self.is_running, self.is_done = False, False
         self.progress.set(0)
+        self.progress_msg.set("Starting a new test ...")
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
         )
+        self.test.pump_to_score.set(self.project.default_pump.get().lower())
         self.rebuild_views()
 
     def start_test(self) -> None:
@@ -131,6 +134,7 @@ class TestHandler:
         for i in range(100):
             if self.can_run:
                 self.progress.set(i)
+                self.progress_msg.set(f"Uptake: {round(i*step)}/{uptake} s")
                 sleep(step - ((time() - rinse_start) % step))
             else:
                 self.stop_test(save=False)
@@ -145,8 +149,12 @@ class TestHandler:
         self.logger.info("Starting readings collection")
 
         def get_pressure(pump: NextGenPump) -> Union[float, int]:
-            self.logger.info("collecting a reading from %s", pump.serial.name)
-            return pump.pressure
+            t0 = time()
+            p = pump.pressure
+            self.logger.info(
+                "collected a reading from %s in %s", pump.serial.name, time() - t0
+            )
+            return p
 
         interval = self.project.interval_seconds.get()
         start_time = time()
@@ -158,7 +166,7 @@ class TestHandler:
             psi2 = self.pool.submit(get_pressure, self.pump2)
             psi1, psi2 = psi1.result(), psi2.result()
             t1 = time()
-            self.logger.warn("got both in %s s", t1 - t0)
+            self.logger.info("got both in %s s", t1 - t0)
             average = round(((psi1 + psi2) / 2))
             reading = Reading(
                 elapsedMin=self.elapsed_min, pump1=psi1, pump2=psi2, average=average
@@ -172,6 +180,14 @@ class TestHandler:
             self.logger.debug(msg)
             prog = round((len(self.readings) / self.max_readings) * 100)
             self.progress.set(prog)
+            self.progress_msg.set(
+                "{:.2f} / {:.2f} min, {} / {} readings".format(
+                    self.elapsed_min,
+                    self.limit_minutes,
+                    len(self.readings),
+                    self.max_readings,
+                )
+            )
 
             if psi1 > self.max_psi_1:
                 self.max_psi_1 = psi1
