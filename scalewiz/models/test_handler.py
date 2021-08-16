@@ -83,6 +83,7 @@ class TestHandler:
         self.max_readings = round(
             self.project.limit_minutes.get() * 60 / self.project.interval_seconds.get()
         )
+        self.test.pump_to_score.set(self.project.default_pump.get().lower())
         self.rebuild_views()
 
     def start_test(self) -> None:

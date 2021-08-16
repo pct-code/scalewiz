@@ -32,6 +32,15 @@ class ProjectReport(ttk.Frame):
         )
         render(lbl, ent, 0)
 
+        lbl = ttk.Label(self, text="Default pump:")
+        ent = ttk.Combobox(
+            self,
+            values=["Pump 1", "Pump 2", "Average"],
+            textvariable=project.default_pump,
+            state="readonly",
+        )
+        render(lbl, ent, 1)
+
         # matplotlib stuff
         # colorsLbl = ttk.Label(self, text="Plot color cycle:")
         # colorsEnt = ttk.Entry(self)
