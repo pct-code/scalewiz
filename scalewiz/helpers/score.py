@@ -161,9 +161,9 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
         # ---
         log.append("")
         log.append(f"Result1: {result:.2f}")
-        log.append(f"Result2: {result2:.2f}")
+        log.append(f"Result2: {result2:.3f}")
         log.append(f"Result3: {result3:.2f}")
-        trial.result.set(f"{result:.2f}")
+        trial.result.set(result2)
         log.append("-" * 40)
         log.append("")
 
