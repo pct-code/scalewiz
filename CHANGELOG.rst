@@ -22,6 +22,7 @@ UI improvements
 - main menu: added a system status label
 - rinse window: this functionality was moved into the main menu
 - project info window: sizing doesn't break when the project file has a long path
+- project report window: can set default pump per-project
 - calculations: tweaked scoring formula, log is now more verbose
 
 [v0.5.8]
