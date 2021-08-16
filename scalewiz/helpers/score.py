@@ -125,45 +125,26 @@ def score(project: Project, log_widget: ScrolledText = None, *args) -> None:
             f"Failure PSI: ({max_readings:,} - {len(readings):,}) * {limit_psi:,}"
         )
         log.append(f"Failure PSI: {fail_psi}")
-        log.append("\n###")
-        log.append(
-            "Result1: 1 - (integral area + failure area - baseline area) / avg protectable area"
-        )
-        log.append(
-            "Result2: 1 - (integral area + failure area - baseline area) / (avg protectable area - baseline area)"
-        )
-        log.append(
-            "Result3: 1 - (integral area + failure area) / (avg protectable area)"
-        )
+
         log.append("")
-        # ?
-        result = round(
-            1 - (int_psi + fail_psi - baseline_area) / avg_protectable_area, 3
-        )
         log.append(
-            f"Result1: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / {avg_protectable_area:,}"
+            "Result: 1 - (integral area + failure area - baseline area) / (avg protectable area - baseline area)"
         )
-        # ??
-        result2 = round(
+
+        result = round(
             1
             - (int_psi + fail_psi - baseline_area)
             / (avg_protectable_area - baseline_area),
             3,
         )
         log.append(
-            f"Result2: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / ({avg_protectable_area:,} - {baseline_area:,})"
+            f"Result: 1 - ({int_psi:,} + {fail_psi:,} - {baseline_area:,}) / ({avg_protectable_area:,} - {baseline_area:,})"
         )
-        # ???
-        result3 = round(1 - (int_psi + fail_psi) / (avg_protectable_area), 3)
-        log.append(
-            f"Result3: 1 - ({int_psi:,} + {fail_psi:,}) / ({avg_protectable_area:,})"
-        )
+
         # ---
         log.append("")
-        log.append(f"Result1: {result:.2f}")
-        log.append(f"Result2: {result2:.3f}")
-        log.append(f"Result3: {result3:.2f}")
-        trial.result.set(result2)
+        log.append(f"Result: {result:.3f}")
+        trial.result.set(result)
         log.append("-" * 40)
         log.append("")
 
