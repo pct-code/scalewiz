@@ -10,9 +10,9 @@ If you are working with Teledyne SSI Next Generation pumps generally, please che
 
 If you notice something weird, fragile, or otherwise encounter a bug, please open an `issue`_.
 
-.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/main_menu.PNG
+.. image:: https://raw.githubusercontent.com/pct-code/scalewiz/main/img/main_menu.PNG
 
-.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/evaluation(plot).PNG
+.. image:: https://raw.githubusercontent.com/pct-code/scalewiz/main/img/evaluation(plot).PNG
 
 Installation
 ============
@@ -42,14 +42,14 @@ menu.
 
 Author
 ======
-`@teauxfu`
+`@teauxfu`_
 
 Acknowledgements
 ================
 -  `@balacla`_ for support and invaluable help in brainstorming
 
 .. |license| image:: https://img.shields.io/github/license/teauxfu/scalewiz
-  :target: https://github.com/teauxfu/py-hplc/blob/main/COPYING
+  :target: https://github.com/pct-code/py-hplc/blob/main/COPYING
   :alt: GitHub
 
 .. |python| image:: https://img.shields.io/pypi/pyversions/scalewiz
@@ -59,8 +59,8 @@ Acknowledgements
   :target: https://pypi.org/project/scalewiz/
   :alt: PyPI
 
-.. |build-status| image:: https://github.com/teauxfu/scalewiz/actions/workflows/build.yml/badge.svg
-  :target: https://github.com/teauxfu/scalewiz/actions/workflows/build.yml
+.. |build-status| image:: https://github.com/pct-code/scalewiz/actions/workflows/build.yml/badge.svg
+  :target: https://github.com/pct-code/scalewiz/actions/workflows/build.yml
   :alt: Build Status
 
 .. |docs| image:: https://readthedocs.org/projects/pip/badge/?version=stable
@@ -82,9 +82,9 @@ Acknowledgements
 
 .. _`Premier Chemical Technologies, LLC`: https://premierchemical.tech
 .. _`@balacla`: https://github.com/balacla
-.. _`@teauxfu`: https://github.com/teauxfu
+.. _`@teauxfu`: https://github.com/pct-code
 .. _`Teledyne SSI MX-class HPLC pumps`: https://store.teledynessi.com/collections/mx-class
-.. _`py-hplc`: https://github.com/teauxfu/py-hplc
-.. _`docs`: https://github.com/teauxfu/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
-.. _`issue`: https://github.com/teauxfu/scalewiz/issues
+.. _`py-hplc`: https://github.com/pct-code/py-hplc
+.. _`docs`: https://github.com/pct-code/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
+.. _`issue`: https://github.com/pct-code/scalewiz/issues
 .. _`try it!`: https://pypa.github.io/pipx/

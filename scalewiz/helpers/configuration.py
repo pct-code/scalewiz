@@ -76,7 +76,7 @@ def generate_default() -> document:
     doc.add(
         comment(
             "If valid TOML is behaving unexpectedly in ScaleWiz, "
-            "please open an issue at https://github.com/teauxfu/scalewiz/issues"
+            "please open an issue at https://github.com/pct-code/scalewiz/issues"
         )
     )
 

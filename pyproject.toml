@@ -5,7 +5,7 @@ description = "A graphical user interface for chemical performance testing desig
 readme = "README.rst"
 license = "GPL-3.0"
 authors = ["Alex Whittington <alex@southsun.tech>"]
-repository = "https://github.com/teauxfu/scalewiz"
+repository = "https://github.com/pct-code/scalewiz"
 packages = [
     {include = "scalewiz"}
 ]

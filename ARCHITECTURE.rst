@@ -1,9 +1,9 @@
-This is a general mapping of the code / code flow 
+This is a general mapping of the code / code flow
 
-    
-.. image:: https://github.com/teauxfu/scalewiz/blob/main/img/architecture.png
+
+.. image:: https://github.com/pct-code/scalewiz/blob/main/img/architecture.png
     :alt: code graph
-    
+
 
 ::
 
@@ -81,7 +81,3 @@ This is a general mapping of the code / code flow
     ├──  RinseWindow's thread
     │    the rinse window can spawn a thread IFF the TestHandler isn't running a Test
     ╰──  ...
-
-
-    
-
