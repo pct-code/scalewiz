@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Tuple, Union
+    from typing import List, Union
 
 LOGGER = logging.getLogger("scalewiz")
 
@@ -37,6 +37,7 @@ class Test:
         self.notes = tk.StringVar()  # misc notes on the experiment
         self.pump_to_score = tk.StringVar()  # which series of PSIs to use
         self.result = tk.DoubleVar()  # represents the test's performance vs the blank
+        self.result2 = tk.DoubleVar()  # represents the test's performance vs the blank
         self.include_on_report = tk.BooleanVar()  # condition for scoring
         self.readings: List[Reading] = []  # list of flat reading dicts
         self.max_psi = tk.IntVar()  # the highest psi of the test
@@ -110,11 +111,23 @@ class Test:
             )
         self.update_obs_baseline()
 
-    def get_readings(self) -> Tuple[int]:
-        """Returns a list of the pump_to_score's pressure readings."""
+    def get_readings(self, cap: int = None) -> List[int]:
+        """Returns a list of the pump_to_score's pressure readings.
+        If `cap` is not None, truncate the series at that psi, discarding the rest.
+        """
         pump = self.pump_to_score.get()
         pump = pump.replace(" ", "")  # legacy accomodation for spaces in keys
-        return [getattr(reading, pump) for reading in self.readings]
+        if cap is None:
+            return [getattr(reading, pump) for reading in self.readings]
+        else:
+            result = []
+            for reading in self.readings:
+                psi = getattr(reading, pump)
+                if psi <= cap:
+                    result.append(psi)
+                else:
+                    break
+            return result
 
     def update_test_name(self, *args) -> None:
         """Makes a name by concatenating the chemical name and rate."""

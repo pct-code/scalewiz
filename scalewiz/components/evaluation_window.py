@@ -54,10 +54,11 @@ class EvaluationWindow(tk.Toplevel):
             self.editor_project = Project()
             self.editor_project.load_json(self.handler.project.path.get())
 
+        self.title(f"{self.handler.name} {self.handler.project.name.get()}")
+
         for child in self.winfo_children():
             if child.winfo_exists():
                 self.after(0, child.destroy)
-
         self.grid_columnconfigure(0, weight=1)
         # we will build a few tabs in this
         self.tab_control = ttk.Notebook(self)

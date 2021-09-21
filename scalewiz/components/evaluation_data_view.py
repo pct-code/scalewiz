@@ -85,6 +85,7 @@ class EvaluationDataView(ttk.Frame):
         )
         labels.append(tk.Label(self, text="Notes", font=self.bold_font, anchor="w"))
         labels.append(tk.Label(self, text="Score", font=self.bold_font, anchor="w"))
+        labels.append(tk.Label(self, text="ALT%", font=self.bold_font, anchor="w"))
         labels.append(tk.Label(self, text="On Report", font=self.bold_font, anchor="w"))
         # extra for del button row
         labels.append(tk.Label(self, text=" ", font=self.bold_font, anchor="w"))
@@ -148,6 +149,9 @@ class EvaluationDataView(ttk.Frame):
         cols.append(ttk.Entry(self, textvariable=test.notes, width=25))
         # col 8 - result
         cols.append(ttk.Label(self, textvariable=test.result, width=5, anchor="center"))
+        cols.append(
+            ttk.Label(self, textvariable=test.result2, width=5, anchor="center")
+        )
         # col 9 - include on report
         cols.append(
             ttk.Checkbutton(
@@ -171,7 +175,7 @@ class EvaluationDataView(ttk.Frame):
                 col.grid(row=row, column=i, padx=1, pady=1, sticky="w")
             elif i == 7:  # make the notes col stretch
                 col.grid(row=row, column=i, padx=1, pady=1, sticky="ew")
-            elif i == 10:  # right align the delete buttons
+            elif i == len(cols):  # right align the delete buttons
                 col.grid(row=row, column=i, padx=(5, 0), pady=1, sticky="e")
             else:
                 col.grid(row=row, column=i, padx=1, pady=1)
