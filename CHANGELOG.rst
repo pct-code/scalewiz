@@ -10,6 +10,16 @@ adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+
+[v0.5.11]
+---------
+
+Fixed
+~~~~~~~
+
+- export confirmation dialog
+
+
 [v0.5.10]
 ---------
 
