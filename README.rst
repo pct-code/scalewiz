@@ -51,7 +51,7 @@ Acknowledgements
 - `@balacla`_ for support and invaluable help in brainstorming
 
 .. |license| image:: https://img.shields.io/github/license/pct-code/scalewiz
-  :target: https://github.com/pct-code/py-hplc/blob/main/COPYING
+  :target: https://github.com/pct-code/scalewiz/blob/main/COPYING
   :alt: GitHub
 
 .. |python| image:: https://img.shields.io/pypi/pyversions/scalewiz
