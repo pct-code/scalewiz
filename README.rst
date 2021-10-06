@@ -17,6 +17,8 @@ If you notice something weird, fragile, or otherwise encounter a bug, please ope
 Installation
 ============
 
+ScaleWiz is packaged and run as a GUI, but can be installed like a command-line tool.
+
 ::
 
     python -m pip install --user scalewiz
@@ -42,13 +44,13 @@ menu.
 
 Author
 ======
-`@teauxfu`_
+Written by `@teauxfu`_ for `Premier Chemical Technologies, LLC`_.
 
 Acknowledgements
 ================
 - `@balacla`_ for support and invaluable help in brainstorming
 
-.. |license| image:: https://img.shields.io/github/license/teauxfu/scalewiz
+.. |license| image:: https://img.shields.io/github/license/pct-code/scalewiz
   :target: https://github.com/pct-code/py-hplc/blob/main/COPYING
   :alt: GitHub
 
@@ -82,7 +84,7 @@ Acknowledgements
 
 .. _`Premier Chemical Technologies, LLC`: https://premierchemical.tech
 .. _`@balacla`: https://github.com/balacla
-.. _`@teauxfu`: https://github.com/pct-code
+.. _`@teauxfu`: https://github.com/teauxfu
 .. _`Teledyne SSI MX-class HPLC pumps`: https://store.teledynessi.com/collections/mx-class
 .. _`py-hplc`: https://github.com/pct-code/py-hplc
 .. _`docs`: https://github.com/pct-code/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
