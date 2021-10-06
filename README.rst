@@ -61,8 +61,8 @@ Acknowledgements
   :target: https://pypi.org/project/scalewiz/
   :alt: PyPI
 
-.. |build-status| image:: https://github.com/pct-code/scalewiz/actions/workflows/build.yml/badge.svg
-  :target: https://github.com/pct-code/scalewiz/actions/workflows/build.yml
+.. |build-status| image:: https://github.com/pct-code/scalewiz/actions/workflows/manual.yml/badge.svg
+  :target: https://github.com/pct-code/scalewiz/actions/workflows/manual.yml
   :alt: Build Status
 
 .. |docs| image:: https://readthedocs.org/projects/pip/badge/?version=stable
