@@ -10,12 +10,14 @@ If you are working with Teledyne SSI Next Generation pumps generally, please che
 
 If you notice something weird, fragile, or otherwise encounter a bug, please open an `issue`_.
 
-.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/main_menu.PNG
+.. image:: https://raw.githubusercontent.com/pct-code/scalewiz/main/img/main_menu.PNG
 
-.. image:: https://raw.githubusercontent.com/teauxfu/scalewiz/main/img/evaluation(plot).PNG
+.. image:: https://raw.githubusercontent.com/pct-code/scalewiz/main/img/evaluation(plot).PNG
 
 Installation
 ============
+
+ScaleWiz is packaged and run as a GUI, but can be installed like a command-line tool.
 
 ::
 
@@ -40,13 +42,16 @@ If Python is on your PATH (or you used :code:`pipx` 😎), simply ::
 Further instructions can be viewed in the `docs`_ section of this repo or with the Help button in the main
 menu.
 
+Author
+======
+Written by `@teauxfu`_ for `Premier Chemical Technologies, LLC`_.
+
 Acknowledgements
 ================
-- `Premier Chemical Technologies, LLC`_ for sponsoring development
--  `@balacla`_ for support and invaluable help in brainstorming
+- `@balacla`_ for support and invaluable help in brainstorming
 
-.. |license| image:: https://img.shields.io/github/license/teauxfu/scalewiz
-  :target: https://github.com/teauxfu/py-hplc/blob/main/COPYING
+.. |license| image:: https://img.shields.io/github/license/pct-code/scalewiz
+  :target: https://github.com/pct-code/py-hplc/blob/main/COPYING
   :alt: GitHub
 
 .. |python| image:: https://img.shields.io/pypi/pyversions/scalewiz
@@ -56,8 +61,8 @@ Acknowledgements
   :target: https://pypi.org/project/scalewiz/
   :alt: PyPI
 
-.. |build-status| image:: https://github.com/teauxfu/scalewiz/actions/workflows/build.yml/badge.svg
-  :target: https://github.com/teauxfu/scalewiz/actions/workflows/build.yml
+.. |build-status| image:: https://github.com/pct-code/scalewiz/actions/workflows/build.yml/badge.svg
+  :target: https://github.com/pct-code/scalewiz/actions/workflows/build.yml
   :alt: Build Status
 
 .. |docs| image:: https://readthedocs.org/projects/pip/badge/?version=stable
@@ -71,16 +76,17 @@ Acknowledgements
 .. |code quality| image:: https://img.shields.io/badge/code%20quality-flake8-black
   :target: https://gitlab.com/pycqa/flake8
   :alt: Code quality
-  
+
 .. |maintainability| image:: https://api.codeclimate.com/v1/badges/9f4d424afac626a8b2e3/maintainability
-   :target: https://codeclimate.com/github/teauxfu/scalewiz/maintainability
+   :target: https://codeclimate.com/github/pct-code/scalewiz/maintainability
    :alt: Maintainability
 
 
 .. _`Premier Chemical Technologies, LLC`: https://premierchemical.tech
 .. _`@balacla`: https://github.com/balacla
+.. _`@teauxfu`: https://github.com/teauxfu
 .. _`Teledyne SSI MX-class HPLC pumps`: https://store.teledynessi.com/collections/mx-class
-.. _`py-hplc`: https://github.com/teauxfu/py-hplc
-.. _`docs`: https://github.com/teauxfu/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
-.. _`issue`: https://github.com/teauxfu/scalewiz/issues
+.. _`py-hplc`: https://github.com/pct-code/py-hplc
+.. _`docs`: https://github.com/pct-code/scalewiz/blob/main/doc/index.rst#scalewiz-user-guide
+.. _`issue`: https://github.com/pct-code/scalewiz/issues
 .. _`try it!`: https://pypa.github.io/pipx/
