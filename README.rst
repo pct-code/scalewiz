@@ -50,7 +50,7 @@ Acknowledgements
 ================
 - `@balacla`_ for support and invaluable help in brainstorming
 
-.. |license| image:: https://img.shields.io/github/license/pct-code/scalewiz
+.. |license| image:: https://img.shields.io/github/license/pct-code/scalewiz   :alt: GitHub
   :target: https://github.com/pct-code/scalewiz/blob/main/COPYING
   :alt: GitHub
 
