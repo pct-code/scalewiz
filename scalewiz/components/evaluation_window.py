@@ -92,7 +92,7 @@ class EvaluationWindow(tk.Toplevel):
         export_btn = ttk.Button(
             button_frame,
             text="Export",
-            command=lambda: export(self.editor_project),
+            command=lambda: self.exportFile(),
             width=10,
         )
         export_btn.grid(row=0, column=1, padx=5)
@@ -137,7 +137,8 @@ class EvaluationWindow(tk.Toplevel):
         self.handler.load_project(self.editor_project.path.get())
         self.after(0, self.handler.rebuild_views)
 
-    def export(self) -> None:
+    def exportFile(self) -> None:
+        """Exports the report to a file."""
         result, file = export(self.editor_project)
         if result == 0:
             messagebox.showinfo("Export complete", f"Exported a report to {file}")
