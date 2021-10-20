@@ -50,10 +50,10 @@ Acknowledgements
 ================
 - `@balacla`_ for support and invaluable help in brainstorming
 
-.. |license| image:: https://img.shields.io/github/license/pct-code/scalewiz   :alt: GitHub
+.. |license| image::  https://img.shields.io/pypi/l/scalewiz   
+  :alt: PyPI - License
   :target: https://github.com/pct-code/scalewiz/blob/main/COPYING
-  :alt: GitHub
-
+  
 .. |python| image:: https://img.shields.io/pypi/pyversions/scalewiz
   :alt: PyPI - Python Version
 
