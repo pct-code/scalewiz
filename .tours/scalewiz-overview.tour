@@ -1,0 +1,97 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "scalewiz overview",
+  "steps": [
+    {
+      "file": "ARCHITECTURE.rst",
+      "description": "this document details most of what everything does.\r\n\r\noverall the app has a \"component/model/helper\" structure. this is somewhat analagous to an MVC pattern, except that each component is its own view-controller. \r\n\r\nhelpers exist only where a component needs functionality that is common to multiple components or independent of a particular component's implementation. \r\nan example of this would be the `score` helper which calculates a result for each `Test` in a `Project`. `Test`s don't calculate their own scores because the score depends on metadata in the `Project`, and `Test`s are ignorant of `Project`s.\r\n\r\nrather than trudge through this let's just jump in",
+      "line": 1
+    },
+    {
+      "file": "scalewiz/__main__.py",
+      "description": "this is the entry point for the program where we create the `tkinter` event loop. this loop runs on the \"main thread\" for the lifespan of the program. \r\n\r\nUI updates should be scheduled on this event loop, especially if being done from across more than one thread. \r\n\r\nwe are holding a reference to it on the `scalewiz` module for convenience. it is most notably used in `TestHandler` objects, which are coming up.",
+      "line": 9
+    },
+    {
+      "file": "scalewiz/components/scalewiz.py",
+      "description": "this is the `ScaleWiz` object we created in `__main__`. all UI elements in the main window are children of this element. \r\n\r\nwe use this container to set some global color/font themes, and set up our logging functionality.",
+      "line": 15
+    },
+    {
+      "file": "scalewiz/components/scalewiz_main_frame.py",
+      "description": "this `MainFrame` gets loaded into the `ScaleWiz` container we just made. \r\n\r\nnow that themeing and logging is taken care of, we can start rendering UI",
+      "line": 14
+    },
+    {
+      "file": "scalewiz/components/scalewiz_main_frame.py",
+      "description": "every component in ScaleWiz should have a `build` method that can be used to refresh the UI to reflect changing state (this one in particular is only called once)\r\n\r\nhere we create the prominent tab control on the main menu, then call `add_handler` to add the first tab.\r\n\r\neach tab represents an independent \"system\" that can be used to run an experiment. \r\nScaleWiz supports an arbitrary number of systems in theory, but in practice we typically only use 1-2 at a time. ",
+      "line": 22
+    },
+    {
+      "file": "scalewiz/models/test_handler.py",
+      "description": "this `TestHandler` class is the meat and potatoes of ScaleWiz. \r\nit's primary concern is collecting data from the pressure sensors in the pumps via serial port communications. we use multithreading to accomplish this because the data needs to be collected in real time while the UI remains responsive.\r\n\r\nunfortunately, it is also responsible for making some UI updates. \r\nsince it would be dangerous to \"cross streams\" and mutate UI from outside the \"main thread\", we ask the mainloop (ref @ `scalewiz.ROOT`) to fire those updates for us such as in the `rebuild_views` method.\r\n\r\nit has been one of my more bloated classes, although less so now than in previous versions. ",
+      "line": 26
+    },
+    {
+      "file": "scalewiz/models/test_handler.py",
+      "description": "in ScaleWiz, data is organized into `Project`s, each of which contain any number of `Test`s. \r\n\r\na `Test` represents a particular experiment, while a `Project` stores metadata common to a collection of tests, such as the experiment parameters.\r\n\r\nhere we load one such `Project` from a JSON file, which are used in lieu of a real database .....",
+      "line": 269
+    },
+    {
+      "file": "scalewiz/models/project.py",
+      "description": "the `Project` and `Test` objects work pretty similarly. they serve as data structures and are responsible for serializing/parsing themselves to/from a JSON file.",
+      "line": 22
+    },
+    {
+      "file": "scalewiz/models/project.py",
+      "description": "we use `tkinter`'s observable variables (\"tkVars\") for convenience. \r\n1) UI elements whose content is a tkVar will be updated automatically\r\n2) we can use \"traces\" to schedule callbacks for when their values are read or changed.",
+      "line": 27
+    },
+    {
+      "file": "scalewiz/models/project.py",
+      "description": "the traces come in handy when we have some props that are composed of others and need to be kept up to date\r\n\r\nwe also have a `remove_traces` which un-watches these variables so that garbage collection can occur",
+      "line": 84
+    },
+    {
+      "file": "scalewiz/models/project.py",
+      "description": "here we are getting ready to persist a `Project` to file\r\n\r\nthe data felt like it could be best organized into dictionaries. this made serializing to JSON a natural choice.\r\n\r\nhowever, the lack of a formal schema makes this somewhat fragile.\r\n\r\nI think interfacing to a real NoSQL database would be the smoothest way to address this since we are already halfway there. ",
+      "line": 119
+    },
+    {
+      "file": "scalewiz/models/project.py",
+      "description": "the lack of a formal schema here really makes the JSON parsing less impressive. \r\n\r\nas the project has grown the shape of the data has changed. we use `dict` operations so we can `get` a key while supplying a fallback.\r\n\r\nsome default values for these (such as experimental method parameters) are stored in a config dict accessible on the `scalewiz` module",
+      "line": 162
+    },
+    {
+      "file": "scalewiz/helpers/configuration.py",
+      "description": "this file has functions that create, fetch, or update values in the config file. \r\n\r\nin retrospect it may have made more sense to bundle these all into a class and hold an instance on the `ScaleWiz` object that handles other global state, but this works too.\r\n\r\nhonestly, we needed some kind of persistent config, I just wanted an excuse to try playing with TOML files. All the other config file formats suck.",
+      "line": 125
+    },
+    {
+      "file": "scalewiz/models/test.py",
+      "description": "`Test` objects work very similarly to `Project`s\r\n\r\ntkVars are used to keep props live, and we can create `Test`s by parsing some JSON",
+      "line": 25
+    },
+    {
+      "file": "scalewiz/models/test.py",
+      "description": "however, since the `Project` is already serializing Python -> JSON, we just pack tests into dicts and hand them to the `Project` to serialize",
+      "line": 59
+    },
+    {
+      "file": "scalewiz/components/evaluation_window.py",
+      "description": "the `EvaluationWindow` allows users to export the results as a report. that work is delegated out to a helper function `export`",
+      "line": 29
+    },
+    {
+      "file": "scalewiz/components/evaluation_window.py",
+      "description": "the `EvaluationWindow` allows users to export the results as a report. that work is delegated out to a helper function `export`",
+      "line": 140
+    },
+    {
+      "file": "scalewiz/helpers/export.py",
+      "description": "this is one of the messier parts of the code for sure -- data is aggregated from a `Project` and pumped out to a CSV file. \r\nI don't like the way this is handled, but it is a working compromise.\r\n\r\nManagement wants the deliverable reports in Excel format, and originally ScaleWiz would directly export reports as an Excel file by plugging values into a template Excel file that has already been styled. However, they didn't want the report template freely available online, packaged into the app.\r\nSo instead, we spit out this CSV file, which a macro-enabled workbook then finishes the work of completing the deliverable report.\r\n\r\nThis makes it a bit more universal too, as others could pipe the CSV into their own spreadsheet or whatever.",
+      "line": 17
+    }
+  ],
+  "ref": "v0.5.12"
+}
